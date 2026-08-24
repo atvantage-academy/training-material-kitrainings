@@ -1,0 +1,158 @@
+# =============================================================================
+# GitHub Pages – Build & Deploy für ein Academy-Schulungsrepo
+# -----------------------------------------------------------------------------
+# VORLAGE aus @avd-academy-tools/academy-theme. In das Schulungsrepo als
+# `.github/workflows/pages.yml` übernehmen.
+#
+# Prinzip: Das Repo enthält KEINE Layout-/Theme-Dateien. Der komplette Design-
+# und Layout-Layer wird zur Build-Zeit als npm-Paket aus der GHE-Registry geladen
+# und nach ./theme/ kopiert; danach baut Jekyll mit den Theme-Defaults plus der
+# projekteigenen _config.yml.
+#
+# Voraussetzungen (einmalig):
+#   1. Settings → Pages → Source: „GitHub Actions“.
+#   2. Actions-Secret `THEME_NPM_TOKEN` = GHE-Token mit `read:packages`.
+#   3. Läuft das Repo auf öffentlichem github.com, müssen die Runner
+#      `npm.timetoact.ghe.com` erreichen können (Registry via Variable
+#      `NPM_REGISTRY` überschreibbar). Theme-Version via Variable `THEME_VERSION`;
+#      Standard ist die kompatible Spanne `^1`, nicht `latest`.
+#   4. Org-Variable `ACADEMY_WEBSITE` = URL der Academy-Website (Link in der
+#      Druck-Kontaktzeile). Org-weit gesetzt, pro Repo nichts nachzuhinterlegen;
+#      fehlt sie, greift der Theme-Default.
+# =============================================================================
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# NUR DER LETZTE STAND ZAEHLT: Ein neuer Lauf bricht den vorigen ab.
+#
+# Vorher stand hier `cancel-in-progress: false`, und das hat einmal zwei Stunden
+# gekostet: Der deploy-Job eines Laufs bekam keinen Runner und blieb in der
+# Warteschlange. Weil die Gruppe damit belegt war, startete DANACH KEIN Lauf mehr –
+# auch keine PR-Pruefung, und die stand ohne Job und ohne Meldung auf „pending".
+# Ein haengender Lauf blockierte so die ganze Pipeline, obwohl sein Ergebnis vom
+# naechsten ohnehin ueberholt worden waere.
+#
+# DIE GRUPPE IST NACH REF GETRENNT (`github.ref`): Bei einem festen Gruppennamen
+# wuerde ein PR-Lauf einen laufenden main-Deploy abbrechen. So bricht ein Lauf nur
+# seinen eigenen Vorgaenger ab.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  THEME_PACKAGE: "@avd-academy-tools/academy-theme"
+  NPM_REGISTRY: ${{ vars.NPM_REGISTRY || 'https://npm.timetoact.ghe.com' }}
+  # Kompatible Spanne statt `latest`: ^2.1.1 löst zu >=2.1.1 <3.0.0 auf. Innerhalb von
+  # Major 2 sind Updates verträglich; ein inkompatibles Release erhöht die Major-
+  # Stelle und wird damit NICHT automatisch gezogen (siehe CHANGELOG des Pakets).
+  #
+  # MINDESTVERSION 2.1.1, nicht bloß ^2: Der Schritt weiter unten schreibt
+  # `contact.website` ins Config-Overlay. Das Config-Schema ist unter `contact`
+  # geschlossen – ein Theme 2.0.x weist den Schlüssel ab, und die Prüfung vor dem Build
+  # schlägt fehl. `^2` wäre also mit einer Fassung erfüllbar, unter der dieser Workflow
+  # nicht durchläuft.
+  THEME_VERSION: ${{ vars.THEME_VERSION || '^2.1.1' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Theme aus der GHE-npm-Registry installieren
+        env:
+          THEME_NPM_TOKEN: ${{ secrets.THEME_NPM_TOKEN }}
+        run: |
+          scope="${THEME_PACKAGE%%/*}"                 # @avd-academy-tools
+          host="${NPM_REGISTRY#*://}"; host="${host%%/*}"
+          {
+            echo "${scope}:registry=${NPM_REGISTRY}"
+            echo "//${host}/:_authToken=\${THEME_NPM_TOKEN}"
+          } > .npmrc
+          npm install --no-save "${THEME_PACKAGE}@${THEME_VERSION}"
+
+      - name: Theme nach ./theme kopieren
+        run: |
+          pkg="node_modules/${THEME_PACKAGE}"
+          rm -rf theme && mkdir -p theme
+          cp -R "$pkg/atvantage" "$pkg/academy" "$pkg/jekyll" theme/
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      # Academy-Website aus der Org-Variablen ACADEMY_WEBSITE – so steht die URL an
+      # genau einer Stelle und muss in keinem Schulungs-Repo gepflegt werden. Sie
+      # erscheint in der Footer-Spalte „Kontakt“ und in der Druck-Kontaktzeile.
+      # Gesetzt wird ausschließlich contact.website; Jekyll merget Config-Hashes tief,
+      # alle übrigen contact.*-Werte aus der projekteigenen _config.yml bleiben
+      # erhalten. Fehlt die Variable (Fork, lokaler Build), greift der Theme-Default.
+      # ERFORDERT THEME >= 2.1.0. Ältere Themes kennen nur brand.website – wer noch
+      # auf 2.0.x steht, zieht erst das Theme nach und dann diese Vorlage.
+      # DIESER SCHRITT IST EINE ORG-KONVENTION, keine Anforderung des Themes: Er
+      # gehört in Repos einer Academy-Organisation, in der `ACADEMY_WEBSITE` gesetzt
+      # ist. Wer außerhalb einer solchen Org baut, streicht ihn und pflegt
+      # `contact.website` in der eigenen `_config.yml` (dann auch `_config.ci.yml`
+      # aus dem `--config`-Aufruf unten entfernen). `_config.ci.yml` gehört in die
+      # .gitignore; Jekyll liefert Dateien mit `_`-Präfix ohnehin nicht aus.
+      - name: Academy-Website aus Org-Variable ins Config-Overlay schreiben
+        env:
+          ACADEMY_WEBSITE: ${{ vars.ACADEMY_WEBSITE }}
+        run: |
+          : > _config.ci.yml
+          if [ -n "$ACADEMY_WEBSITE" ]; then
+            printf 'contact:\n  website: "%s"\n' "$ACADEMY_WEBSITE" >> _config.ci.yml
+          else
+            echo "::warning::Org-Variable ACADEMY_WEBSITE ist nicht gesetzt – die Druck-Kontaktzeile nutzt den Theme-Default."
+          fi
+
+      # Konfiguration und Front Matter gegen die Schemas des Themes prüfen – VOR dem
+      # Build, damit ein Tippfehler auffällt, statt still zu wirken (`ressources:`
+      # baut fehlerfrei und lässt die Sidebar-Karte einfach weg).
+      #
+      # Der Prüfer kommt aus dem Theme, das oben schon installiert ist – kein Download,
+      # keine zusätzliche Abhängigkeit. Wer noch früher prüfen will (vor dem
+      # Theme-Bezug), lädt Prüfer und Schemas von der veröffentlichten, versionierten
+      # URL: «Theme-Doku»/schema/«Version»/ – siehe docs/theme/schemas.md.
+      #
+      # Exit-Code 2 heißt: Die Prüfung konnte nicht laufen (Schema fehlt, oder es wurde
+      # KEINE Seite gefunden). Auch das ist ein Fehlschlag – eine Prüfung über die leere
+      # Menge ist kein Erfolg.
+      - name: Konfiguration und Front Matter gegen die Theme-Schemas prüfen
+        run: ruby theme/jekyll/schema/validate.rb --config _config.yml --config _config.ci.yml
+
+      - name: Jekyll bauen (Theme-Defaults + Projekt-_config + CI-Overlay)
+        env:
+          JEKYLL_ENV: production
+        run: |
+          gem install jekyll --no-document
+          jekyll build \
+            --config "node_modules/${THEME_PACKAGE}/jekyll/_config.defaults.yml,_config.yml,_config.ci.yml" \
+            --strict_front_matter --trace
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

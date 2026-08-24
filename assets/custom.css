@@ -1,0 +1,34 @@
+/* =============================================================================
+   Schulungs-Customization – VERPFLICHTEND für jedes Schulungs-Repo.
+   -----------------------------------------------------------------------------
+   Sorgt für eine klar erkennbare Abweichung vom academy-online-Look:
+   „Schulungs-Grün“ als Akzentfarbe plus Schulungs-Logo (siehe `logo:` in
+   _config.yml). Diese Datei wird über `custom_css` in _config.yml NACH dem Theme
+   geladen und überschreibt daher die Design-Tokens (`--avd-*`) – für Light & Dark.
+
+   Trainer:innen dürfen die Werte anpassen (andere Farbe, eigenes Logo). Die Datei
+   MUSS aber bestehen bleiben, damit Schulungsunterlagen erkennbar anders aussehen
+   als die öffentliche Academy-Website. Siehe academy-theme-Doku, Abschnitt
+   „Customizations“.
+   ============================================================================= */
+
+:root {
+  --avd-schulung-accent: #0e7c66;              /* Schulungs-Grün (Light) */
+  --avd-orange: var(--avd-schulung-accent);    /* Akzent: Links, Hover, Icons, aria-current */
+  --avd-academy-hero-bg: #e6f4ee;              /* Hero-Band (Light) */
+}
+
+:root[data-avd-academy-theme="dark"] {
+  --avd-schulung-accent: #34d3ac;              /* Schulungs-Grün (Dark, heller) */
+  --avd-academy-hero-bg: #10322a;              /* Hero-Band (Dark) */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-avd-academy-theme="light"]) {
+    --avd-schulung-accent: #34d3ac;
+    --avd-academy-hero-bg: #10322a;
+  }
+}
+
+/* Grüner Akzentstreifen unter der Kopfzeile – deutliches Erkennungsmerkmal. */
+.avd-academy-header { border-bottom: 3px solid var(--avd-schulung-accent); }

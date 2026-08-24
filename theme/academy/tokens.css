@@ -1,0 +1,164 @@
+/* =============================================================================
+   ATVANTAGE Academy – Token-Mapping auf das ATVANTAGE-Fundament
+   -----------------------------------------------------------------------------
+   Farben und Schriften kommen AUSSCHLIESSLICH aus dem ATVANTAGE-Design-System
+   (`../atvantage/`, unveränderlich). Diese Datei definiert KEINE eigenen
+   Markenfarben/Schriften mehr, sondern bildet die intern genutzten
+   `--avd-academy-*`-Variablen auf die atvantage-Tokens (`--avd-*` / `--color-*` /
+   `--font-family` / `--radius` / `--shadow`) ab. Zusätzlich stehen hier nur die
+   Tokens, die atvantage NICHT definiert und die der Schulungsunterlagen-Bereich
+   braucht (modulare Typo-Skala, Diagramm-Füllpalette, Layoutbreiten, Dark-Mode).
+
+   Voraussetzung: `../atvantage/styles.css` ist VOR dieser Datei geladen.
+
+   Präfixe: `avd` (AVD = AtVantage Deutschland) ist die Abkürzung auf ATVANTAGE-
+   Ebene; die **Academy-Schicht** namespaced ihre Tokens/Klassen daher unter
+   `--avd-academy-` / `avd-academy-`. Die Foundation-Tokens `--avd-*` / `--color-*`
+   gehören dem Fundament (`../atvantage/`) und werden hier nur referenziert.
+   ============================================================================= */
+
+:root {
+  /* --- Markenfarben: Aliase auf atvantage (keine eigenen Werte!) ---------- */
+  --avd-academy-color-primary:         var(--avd-slate);       /* dunkle Flächen, Kopfzeile */
+  --avd-academy-color-primary-dark:    var(--avd-ink);         /* kräftigste Fläche (Topbar) */
+  --avd-academy-color-primary-light:   var(--avd-gray-mid);    /* Rahmen/neutrale Linien */
+  --avd-academy-color-primary-tint:    var(--avd-blue-light);  /* abgesetzte Flächen */
+  --avd-academy-color-primary-contrast:var(--avd-white);
+  --avd-academy-color-accent:          var(--avd-orange);      /* aktive Elemente, Signale */
+  --avd-academy-color-accent-soft:     color-mix(in srgb, var(--avd-orange) 12%, #fff);
+  --avd-academy-color-accent-contrast: var(--avd-white);
+
+  /* --- Neutrale / Flächenfarben (theme-fähig; Light-Defaults) -------------
+     Light-Werte kommen aus atvantage. Das Dark-Theme kennt atvantage NICHT –
+     wir erarbeiten es selbst (siehe Dark-Block unten). Deshalb liegen alle
+     umschaltbaren Oberflächen als eigene Academy-Tokens vor. */
+  --avd-academy-color-ink:        var(--avd-anthracite);       /* Fließtext */
+  --avd-academy-color-ink-muted:  var(--avd-gray-metatext);    /* sekundärer Text */
+  --avd-academy-color-headline:   var(--avd-ink);              /* Überschriften */
+  --avd-academy-color-bg:         var(--avd-white);            /* Seitenfläche */
+  --avd-academy-color-bg-subtle:  var(--avd-gray-card);        /* Karten/erhöhte Flächen */
+  --avd-academy-color-border:     color-mix(in srgb, var(--avd-slate) 18%, #fff);
+  --avd-academy-border-soft:      #e6e8ea;                     /* Hairlines */
+  --avd-academy-hero-bg:          var(--color-surface-blue);   /* Hero-Band */
+  --avd-academy-topbar-bg:        var(--avd-white);            /* Kopfzeile */
+  --avd-academy-metanav-bg:       var(--avd-gray-metanav);     /* Meta-Nav */
+  --avd-academy-metanav-text:     var(--avd-gray-metatext);
+  --avd-academy-code-bg:          var(--avd-gray-card);        /* Inline-/Block-Code (hell) */
+
+  /* --- Statusfarben: Danger aus atvantage; Success/Warning ergänzt academy
+     (atvantage definiert nur Danger). Info = Slate. ------------------------- */
+  --avd-academy-color-info:     var(--avd-slate);
+  --avd-academy-color-success:  #2f855a;
+  --avd-academy-color-warning:  #c9a227;
+  --avd-academy-color-danger:   var(--avd-red);
+
+  /* --- Kategoriale Füllpalette (academy-spezifisch; atvantage kennt keine).
+     Orientiert an atvantage: Füllung 2 = ATVANTAGE-Orange. ------------------ */
+  --avd-academy-fill-1: var(--avd-slate);  --avd-academy-fill-1-bg: var(--avd-blue-light);
+  --avd-academy-fill-2: var(--avd-orange); --avd-academy-fill-2-bg: color-mix(in srgb, var(--avd-orange) 18%, #fff);
+  --avd-academy-fill-3: #c9a227;           --avd-academy-fill-3-bg: #f6ecc4;
+  --avd-academy-fill-4: #7a6fb3;           --avd-academy-fill-4-bg: #e5e1f4;
+
+  /* --- Töne zum Unterscheiden von Gruppen (gruppierte Tabellen) -----------
+     Vier gegeneinander unterscheidbare Töne plus ein Signalton. Sie leiten sich
+     aus der kategorialen Füllpalette oben ab und tragen deshalb keine eigenen
+     Farbwerte; genutzt werden sie von `.avd-academy-grouptable` (components.css)
+     als schmaler Streifen, nicht als Fläche. Im Dark-Theme werden sie
+     aufgehellt (siehe Dark-Block unten) – die Füllpalette selbst ist auf helle
+     Flächen gerechnet und würde auf dunklem Grund verschwinden. */
+  --avd-academy-tone-1: var(--avd-academy-fill-1);
+  --avd-academy-tone-2: var(--avd-academy-fill-2);
+  --avd-academy-tone-3: var(--avd-academy-fill-3);
+  --avd-academy-tone-4: var(--avd-academy-fill-4);
+  --avd-academy-tone-alert: var(--avd-academy-color-danger);
+
+  /* --- Typografie: Familie aus atvantage; modulare Skala academy-spezifisch. */
+  --avd-academy-font-sans:  var(--font-family, "Outfit", system-ui, sans-serif);
+  --avd-academy-font-head:  var(--avd-academy-font-sans);
+  --avd-academy-font-mono:  "Consolas", "SF Mono", ui-monospace, monospace;
+
+  --avd-academy-fs-root:      16px;
+  --avd-academy-lh-body:      var(--text-line-height, 1.6);
+  --avd-academy-lh-heading:   1.2;
+  --avd-academy-fw-normal:    var(--text-weight, 400);
+  --avd-academy-fw-medium:    var(--headline-weight-content, 500);
+  --avd-academy-fw-bold:      var(--headline-weight, 600);
+
+  /* Modulare Skala (fluid) für Doku-/Unterlagen-Inhalte (nicht in atvantage). */
+  --avd-academy-fs-sm:   clamp(0.82rem, 0.8rem + 0.1vw, 0.9rem);
+  --avd-academy-fs-base: 1rem;
+  --avd-academy-fs-md:   clamp(1.1rem,  1rem + 0.4vw, 1.25rem);
+  --avd-academy-fs-lg:   clamp(1.4rem,  1.2rem + 0.8vw, 1.8rem);
+  --avd-academy-fs-xl:   clamp(1.9rem,  1.5rem + 1.6vw, 2.6rem);
+  --avd-academy-fs-2xl:  clamp(2.4rem,  1.8rem + 2.6vw, 3.6rem);
+
+  /* --- Abstände (8px-Raster; atvantage-Spacing ist sektionsbezogen) ------- */
+  --avd-academy-space-1: 0.25rem;  --avd-academy-space-2: 0.5rem;   --avd-academy-space-3: 0.75rem;
+  --avd-academy-space-4: 1rem;     --avd-academy-space-6: 1.5rem;   --avd-academy-space-8: 2rem;
+  --avd-academy-space-12: 3rem;    --avd-academy-space-16: 4rem;
+
+  /* --- Radien, Schatten: an atvantage orientiert -------------------------- */
+  --avd-academy-radius-sm: 4px;
+  --avd-academy-radius:    var(--radius, 5px);       /* atvantage: kleine Radien */
+  --avd-academy-radius-lg: var(--radius-dark, 8px);
+  --avd-academy-shadow-1:  0 1px 2px rgba(26, 38, 39, 0.08);
+  --avd-academy-shadow-2:  var(--shadow, 0 0 10px #5F5F5F);
+
+  /* --- Layout (academy-spezifisch) --------------------------------------- */
+  --avd-academy-content-width: 72ch;
+  --avd-academy-page-width:   1180px;
+
+  --avd-academy-transition: 160ms ease;
+}
+
+/* -----------------------------------------------------------------------------
+   Dark-Theme – SELBST ERARBEITET (atvantage liefert keins). Startpunkt ist Light;
+   die Systempräferenz greift als Default (`prefers-color-scheme`), eine explizite
+   Wahl per data-Attribut hat Vorrang. Damit explizites Light auch bei
+   System-Dark gewinnt, ist der System-Dark-Block gegen [data-…="light"]
+   ausgenommen. Dark-Werte an den atvantage-Neutraltönen (Ink/Slate) orientiert.
+   ----------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-avd-academy-theme="light"]) {
+    --avd-academy-color-ink:       #e8edee;
+    --avd-academy-color-ink-muted: #9fb0b3;
+    --avd-academy-color-headline:  #f3f6f6;
+    --avd-academy-color-bg:        #14201f;
+    --avd-academy-color-bg-subtle: #1f2c2b;
+    --avd-academy-color-border:    color-mix(in srgb, #fff 14%, #1f2c2b);
+    --avd-academy-border-soft:     color-mix(in srgb, #fff 12%, #1f2c2b);
+    --avd-academy-hero-bg:         var(--avd-slate);
+    --avd-academy-topbar-bg:       #16211f;
+    --avd-academy-metanav-bg:      #101a18;
+    --avd-academy-metanav-text:    #93a5a2;
+    --avd-academy-code-bg:         #24332f;
+    /* Gruppen-Töne aufhellen: Die Füllpalette ist auf helle Flächen gerechnet;
+       auf dunklem Grund wäre besonders Ton 1 (Slate) nicht mehr zu sehen. Kein
+       eigener Farbwert – dieselben Töne, nur zu Weiß hin gemischt. */
+    --avd-academy-tone-1: color-mix(in srgb, var(--avd-academy-fill-1) 45%, #fff);
+    --avd-academy-tone-2: color-mix(in srgb, var(--avd-academy-fill-2) 60%, #fff);
+    --avd-academy-tone-3: color-mix(in srgb, var(--avd-academy-fill-3) 60%, #fff);
+    --avd-academy-tone-4: color-mix(in srgb, var(--avd-academy-fill-4) 55%, #fff);
+    --avd-academy-tone-alert: color-mix(in srgb, var(--avd-academy-color-danger) 55%, #fff);
+  }
+}
+:root[data-avd-academy-theme="dark"] {
+  --avd-academy-color-ink:       #e8edee;
+  --avd-academy-color-ink-muted: #9fb0b3;
+  --avd-academy-color-headline:  #f3f6f6;
+  --avd-academy-color-bg:        #14201f;
+  --avd-academy-color-bg-subtle: #1f2c2b;
+  --avd-academy-color-border:    color-mix(in srgb, #fff 14%, #1f2c2b);
+  --avd-academy-border-soft:     color-mix(in srgb, #fff 12%, #1f2c2b);
+  --avd-academy-hero-bg:         var(--avd-slate);
+  --avd-academy-topbar-bg:       #16211f;
+  --avd-academy-metanav-bg:      #101a18;
+  --avd-academy-metanav-text:    #93a5a2;
+  --avd-academy-code-bg:         #24332f;
+  /* Gruppen-Töne aufhellen – Begründung siehe System-Dark-Block oben. */
+  --avd-academy-tone-1: color-mix(in srgb, var(--avd-academy-fill-1) 45%, #fff);
+  --avd-academy-tone-2: color-mix(in srgb, var(--avd-academy-fill-2) 60%, #fff);
+  --avd-academy-tone-3: color-mix(in srgb, var(--avd-academy-fill-3) 60%, #fff);
+  --avd-academy-tone-4: color-mix(in srgb, var(--avd-academy-fill-4) 55%, #fff);
+  --avd-academy-tone-alert: color-mix(in srgb, var(--avd-academy-color-danger) 55%, #fff);
+}

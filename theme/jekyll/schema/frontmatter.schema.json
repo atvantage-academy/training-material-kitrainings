@@ -1,0 +1,328 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Academy-Theme – Front Matter einer Seite",
+  "description": "Alle Front-Matter-Felder, die das Academy-Theme einer Markdown-Seite ausliest. Schema-Version 2. Jedes Feld ist optional; zu jedem gibt es einen Standardwert. Draft-07, weil die IDE-Auflöser (VS Code / JetBrains) diesen Entwurf am verlässlichsten unterstützen.",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x_": {
+      "description": "Repo-eigenes Feld. Alles mit dem Präfix `x_` ist frei: Das Theme liest es nicht, eigene Includes und Skripte des Repos dürfen es nutzen. So bleibt das Schema geschlossen (Tippfehler wie `ressources` fallen auf), ohne eigene Felder zu verbieten."
+    }
+  },
+  "properties": {
+    "layout": {
+      "type": "string",
+      "default": "page",
+      "description": "Layout der Seite. GILT IN: allen. Mitgeliefert: `page` (gewöhnliche Seite), `guide` (Übung mit Schritten, erbt von `page`), `visualization` (Vollflächen-Ansicht), `presentation` (Folien), `simulation` (Ablauf) sowie `default` – der reine Rahmen ohne Kopfzeile, Hero und Sidebar. Eigene Layouts sind erlaubt; sie erben über `layout:` in ihrem eigenen Front Matter.",
+      "examples": [
+        "page",
+        "guide",
+        "visualization",
+        "presentation",
+        "simulation",
+        "default"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "description": "Seitentitel – erscheint im Hero, in `<title>` und in den Brotkrumen. GILT IN: allen. STANDARD: die erste `#`-Überschrift der Seite. In Markdown besser weglassen und diese Überschrift schreiben – dann steht der Titel nur an einer Stelle. In HTML-Dateien umgekehrt: Dort wird ein `<h1>` im Rumpf NICHT ausgewertet, also `title` setzen. Fehlt beides, bleibt der Hero titellos."
+    },
+    "description": {
+      "type": "string",
+      "description": "Kurzbeschreibung für `<meta name=\"description\">` und Vorschauen. Ein Satz, keine Aufzählung. GILT IN: allen. STANDARD: `description` der Site aus der `_config.yml`."
+    },
+    "lang": {
+      "type": "string",
+      "description": "Sprache dieser Seite (BCP-47). GILT IN: allen. STANDARD: `lang` der Site.",
+      "examples": [
+        "de",
+        "en"
+      ]
+    },
+    "permalink": {
+      "type": "string",
+      "description": "Jekyll-Standard: abweichende Ziel-URL dieser Seite. STANDARD: der Pfad der Datei."
+    },
+    "published": {
+      "type": "boolean",
+      "default": true,
+      "description": "Jekyll-Standard: `false` schließt die Seite vom Build aus."
+    },
+    "date": {
+      "type": [
+        "string",
+        "object"
+      ],
+      "description": "Jekyll-Standard: Datum der Seite (ISO-8601). YAML liest ein unquotiertes Datum als Datumsobjekt."
+    },
+    "audiences": {
+      "$ref": "#/definitions/zielgruppen",
+      "description": "Die Zielgruppen, für die diese Seite gedacht ist. STANDARD: keine Angabe = die Seite erscheint in JEDEM Build. GILT IN: allen – ausgewertet aber NICHT vom Theme, sondern vom zielgruppengefilterten Build: Seiten fremder Zielgruppe landen nicht in der Ausgabe. Welche Werte es gibt, legt das Theme nicht fest; die Site deklariert sie in `audiences` ihrer `_config.yml`, und jede Angabe wird dagegen geprüft. Wer sie benutzt, ohne zu deklarieren, bekommt einen Fehler – eine Angabe ohne prüfbare Menge ist eine Vermutung."
+    },
+    "duration": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Zeit in MINUTEN; erscheint als Zeit-Tag im Hero. GILT IN: `page`, `guide` – die übrigen Layouts zeigen kein Zeit-Tag. STANDARD: keine Angabe = kein Tag. Was gemessen wird, hängt an der Art der Seite: bei einer Übung die Bearbeitungszeit, bei einer gewöhnlichen Seite die Lesedauer. Ein Richtwert, keine Vorgabe. Nicht zu verwechseln mit `simulation.step.interval`, das in Millisekunden zählt."
+    },
+    "topics": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "Schlagworte, die im Hero als Tags erscheinen. Kurze Substantive, keine Sätze. GILT IN: `page`, `guide`, `visualization` – die eigenständigen Layouts haben keinen Hero. STANDARD: keine Tags."
+    },
+    "breadcrumb": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x_": {
+          "description": "Repo-eigenes Feld – vom Theme nicht gelesen."
+        }
+      },
+      "description": "Brotkrumen-Steuerung. GILT IN: `page`, `guide` – die Visualisierung blendet die Brotkrumen aus, `presentation` und `simulation` haben keine. STANDARD: der Pfad wird automatisch aus der Ordnerstruktur gebaut.",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Anzeigename DIESES Ordners in den Brotkrumen. Gehört in die `index`-Seite des Ordners und gilt zentral für alle Seiten darunter. STANDARD: der Ordnername."
+        },
+        "ancestors": {
+          "type": "array",
+          "description": "Explizite Vorfahren-Kette OHNE die aktuelle Seite. Überschreibt den automatischen Pfad und wird an Unterseiten vererbt (die tiefere Angabe gewinnt). STANDARD: automatisch aus der Ordnerstruktur.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "title",
+              "url"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Anzeigename dieser Station."
+              },
+              "url": {
+                "type": "string",
+                "description": "Ziel dieser Station, site-relativ (führender `/`)."
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "description": "Weiterführende Informationen – dieselbe Form wie die Einträge von `nav.items` und `footer.links.items`. Erscheinen als Sidebar-Karte und im Ausdruck als Abschnitt am Textende. GILT IN: `page`, `guide` – die übrigen Layouts haben keine Sidebar. STANDARD: keine Karte.",
+      "items": {
+        "$ref": "#/definitions/verweis"
+      }
+    },
+    "sidebar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Die Karten der Sidebar. Jede Karte ist ein Abschnitt mit `enabled`; Inhaltsverzeichnis und Verweis-Karte tragen zusätzlich `open` – den Anfangszustand DIESER Seite. GILT IN: `page`, `guide` – nur diese Layouts haben eine Sidebar; in den übrigen bleibt die Gruppe wirkungslos.",
+      "properties": {
+        "toc": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Karte „Auf dieser Seite“ – das Inhaltsverzeichnis aus den Überschriften. Die Schwelle `open_threshold` gehört in die `_config.yml`; hier steht nur, ob die Karte erscheint und wie sie startet.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Erscheint die Karte? STANDARD: an."
+            },
+            "title": {
+              "type": "string",
+              "default": "Auf dieser Seite",
+              "description": "Überschrift der Karte. STANDARD: „Auf dieser Seite“. Site-weit unter `components.sidebar.toc.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+            },
+            "open": {
+              "type": "boolean",
+              "description": "Startet die Karte aufgeklappt? OHNE ANGABE entscheidet die Schwelle `components.sidebar.toc.open_threshold` der `_config.yml` – und zugeklappt startet das Verzeichnis nur, wenn UNTER ihm noch eine Karte steht (Fortschritt, Verweise), die es sonst aus dem Bild schiebt. Ist es das letzte Element der Sidebar, bleibt es offen: Ein Klick, der nichts freilegt, lohnt nicht."
+            }
+          }
+        },
+        "progress": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Karte „Fortschritt“ – zählt die Definition-of-Done-Haken. Nicht zu verwechseln mit den Fortschrittsleisten von Präsentation und Simulation; die gehören zum Ablauf und sind nicht schaltbar.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Erscheint die Karte? STANDARD: an in `guide`, sonst aus."
+            },
+            "title": {
+              "type": "string",
+              "default": "Fortschritt",
+              "description": "Überschrift der Karte. STANDARD: „Fortschritt“. Site-weit unter `components.sidebar.progress.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Karte „Weiterführende Informationen“ – sie erscheint ohnehin nur, wenn die Seite `resources` trägt. Die Schwelle `open_threshold` gehört in die `_config.yml`.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Erscheint die Karte? STANDARD: an."
+            },
+            "title": {
+              "type": "string",
+              "default": "Weiterführende Informationen",
+              "description": "Überschrift der Karte. STANDARD: „Weiterführende Informationen“. Site-weit unter `components.sidebar.resources.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+            },
+            "open": {
+              "type": "boolean",
+              "description": "Startet die Karte aufgeklappt? Eine Angabe hier macht die Karte überhaupt erst klappbar – ohne sie und ohne die Schwelle `components.sidebar.resources.open_threshold` ist sie ein gewöhnlicher Kasten."
+            }
+          }
+        }
+      }
+    },
+    "toolbar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Die Knöpfe der Werkzeugleiste – in der Kopfzeile (`page`, `guide`), im Hero der Visualisierung bzw. in der Kopfleiste von Präsentation und Simulation.",
+      "properties": {
+        "copy": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Knopf „Markdown kopieren“ samt der versteckten Seitenquelle. GILT IN: `page`, `guide`, `visualization`.",
+          "properties": {
+            "enabled": {
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "const": "force"
+                }
+              ],
+              "default": false,
+              "description": "Erscheint der Knopf? STANDARD: an in `guide`, sonst aus. Enthält die Seite Liquid-Anweisungen, entfällt er automatisch (der Rohtext wäre irreführend) – `force` erzwingt ihn trotzdem."
+            },
+            "title": {
+              "type": "string",
+              "default": "Markdown kopieren",
+              "description": "Tooltip und Beschriftung für Screenreader. STANDARD: „Markdown kopieren“. Site-weit unter `components.toolbar.copy.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+            }
+          }
+        },
+        "print": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Drucken-Knopf DIESER Ansicht. GILT IN: `visualization` (Hero) und `presentation` (Werkzeugleiste) – auf gewöhnlichen Seiten wäre er eine Dopplung von Strg/Cmd+P.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Erscheint der Knopf? STANDARD: an."
+            },
+            "title": {
+              "type": "string",
+              "default": "Diese Seite drucken",
+              "description": "Tooltip und Beschriftung für Screenreader. In der Präsentation lautet die Vorgabe „Drucken (alle Folien)“ – dort druckt der Knopf alle. STANDARD: „Diese Seite drucken“. Site-weit unter `components.toolbar.print.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+            }
+          }
+        },
+        "qr": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "QR-Code auf die Seitenadresse – der Rückweg vom Papier bzw. vom Beamer aufs eigene Gerät. GILT IN: `page`, `guide`, `visualization`, `presentation`, `simulation`.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Erscheint der Knopf? STANDARD: an."
+            },
+            "title": {
+              "type": "string",
+              "default": "Diese Seite auf Deinem Smartphone öffnen",
+              "description": "Tooltip und Beschriftung für Screenreader. STANDARD: „Diese Seite auf Deinem Smartphone öffnen“. Site-weit unter `components.toolbar.qr.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+            }
+          }
+        }
+      }
+    },
+    "simulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "GILT IN: `simulation`. Layout-spezifische Felder tragen den Layout-Namen vorn – so ist ohne Nachschlagen klar, wo sie wirken.",
+      "properties": {
+        "intro": {
+          "type": "string",
+          "description": "Text, der vor dem Start des Ablaufs steht. STANDARD: kein Text."
+        },
+        "aside": {
+          "type": "boolean",
+          "default": true,
+          "description": "Erklärspalte neben der Bühne. `false` macht den Ablauf über die volle Breite. STANDARD: an."
+        },
+        "speed": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1,
+          "description": "Starttempo als Faktor auf `simulation.step.interval`. STANDARD: 1."
+        },
+        "step": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Der einzelne Schritt des Ablaufs.",
+          "properties": {
+            "interval": {
+              "type": "integer",
+              "minimum": 100,
+              "default": 2500,
+              "description": "Dauer eines Schritts in MILLISEKUNDEN. STANDARD: 2500. Bewusst nicht `duration`: Das Feld auf Seitenebene zählt Minuten, und zwei Felder gleichen Namens mit verschiedenen Einheiten wären eine Falle."
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "zielgruppen": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste von Zielgruppen. Erlaubt sind die Werte, die die Site in `audiences` ihrer `_config.yml` deklariert."
+    },
+    "verweis": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x_": {
+          "description": "Repo-eigenes Feld – vom Theme nicht gelesen."
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "description": "Ein Verweis. Dieselbe Form gilt für `resources`, `nav.items` und `footer.links.items` – wer eine kennt, kennt alle.",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Anzeigetext. Bei einem Eintrag mit `icon` optional (dann dient er als Alternativtext), sonst nötig."
+        },
+        "url": {
+          "type": "string",
+          "description": "Ziel, site-relativ (führender `/`). Absolute URLs (`://`) öffnen in einem neuen Tab."
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon-Pfad, site-relativ. Mit `title` erscheint es davor, ohne `title` allein. Das Theme liefert u. a. `/theme/academy/icons/icon-guide.svg`."
+        },
+        "audiences": {
+          "$ref": "#/definitions/zielgruppen",
+          "description": "Beschränkt DIESEN Eintrag auf die genannten Zielgruppen; in den übrigen Builds fehlt er. STANDARD: keine Angabe = immer sichtbar. Bleibt in einer Liste kein Eintrag übrig, entfällt der ganze Bereich."
+        }
+      }
+    }
+  }
+}
