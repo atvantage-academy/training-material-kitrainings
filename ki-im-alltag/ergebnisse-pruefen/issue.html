@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!--
+  ATVANTAGE-Academy – EINZIGES Seitenlayout (Jekyll)
+  --------------------------------------------------
+  Ein Layout für alles: allgemeine Doku-Seiten UND Guides (Übungen/Anleitungen).
+  Optik nach der ATVANTAGE-Website: Meta-Nav, weiße sticky Kopfzeile, Hero-Band,
+  zweispaltig mit rechter Sidebar (automatisches Inhaltsverzeichnis, Fortschritt
+  aus Task-Listen, weiterführende Ressourcen). Überschriften ohne Emoji-Icons.
+
+  Verwendung im Front Matter:  layout: default   (oder `layout: guide` – Alias,
+  siehe guide.html; beides rendert dieselbe Guide-Ansicht)
+
+  `layout: visualization` (siehe visualization.html) rendert dieselbe Seite OHNE
+  obere Navigation (Meta-Leiste + Kopfzeile/TopNav), OHNE Brotkrumen und OHNE den
+  rechten Bereich (Inhaltsverzeichnis, Fortschritt, Ressourcen – auch bei gesetztem
+  `resources`), mit schmalerem Hero-Balken und breiterem, zentriertem Inhalt – für
+  eigenständige Visualisierungen/Simulationen.
+
+  Alle Front-Matter-Felder sind OPTIONAL (Convention over Configuration). Nur der
+  Titel ist faktisch erforderlich – als `title:` ODER als erste `#`-Überschrift:
+
+    title:       "…"                → sonst erste #-Überschrift (eins von beiden nötig)
+    description: "…"                → Meta-Description
+    duration:    8                  → Zahl in Minuten → Hero-Tag „ca. 8 Minuten“
+                                       (ungefähre LESEDAUER; bei Guides/Übungen die
+                                       Dauer der Übung). Entfällt bei
+                                       `layout: visualization`.
+    topics:      ["Cloud & DevOps"] → weitere Hero-Tags
+    resources:   [{title, url, icon}, …] → Sidebar-Karte „Weiterführende Informationen“.
+                                       title und/oder icon (Bildpfad); icon erscheint
+                                       rechts und wird kreisrund dargestellt.
+    breadcrumb:                     → Brotkrumen anpassen (beides optional):
+      label: "…"                    → überschreibt den Ordnernamen dieser Ebene;
+                                       in der Ordner-`index.md` gesetzt gilt es für
+                                       ALLE Seiten im Ordner und in Unterordnern.
+      ancestors: [{title, url}, …]  → explizite Vorfahren-Kette OHNE die aktuelle
+                                       Seite (diese wird automatisch angehängt); in
+                                       der `index.md` gesetzt wird sie vererbt.
+
+  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides (Übungen,
+  Anleitungen) – dort ist das Übernehmen des Quelltexts der Zweck. Bedingungen:
+  Markdown-Seite (`.md`, nicht reines HTML) UND als Guide erkennbar UND keine
+  Visualisierung. Guide ist eine Seite mit `layout: guide` ODER gesetztem
+  `duration` – letzteres ist der etablierte Marker, und die Guide-Vorlage des
+  Themes wie auch die von didaktikon erzeugten Übungen nutzen `layout: page`
+  plus `duration`. Nur auf `layout: guide` zu prüfen würde den Button dort
+  entfernen. Doku-Seiten haben kein `duration`; Visualisierungen sind
+  ausgeschlossen, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
+
+  QR-CODE der Seitenadresse + DRUCKEN-KNOPF: In dieser Ansicht (`visualization`)
+  stehen beide rechts im Hero – QR links, Drucken rechts. Sie hat weder Kopfzeile
+  noch Sidebar, in der sie sonst Platz hätten.
+
+  Auf `default`/`guide` steht im Hero KEINES von beiden: Der QR-Code sitzt in der
+  Kopfzeile neben dem Farbschema-Umschalter (siehe `_includes/header.html`), und zum
+  Drucken bleibt es beim Browser-Befehl (Strg/Cmd+P). Tooltip des QR-Codes überall:
+  „Diese Seite auf Deinem Smartphone öffnen“. Er wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
+  Adresse zur Build-Zeit nicht feststeht; ohne JavaScript erscheint er nicht.
+  Kein Front-Matter-Schalter: Es gibt keine Seite, auf der der Weg aufs eigene
+  Smartphone schaden würde.
+--><html lang="de">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Fehlersuche im fertigen Text · KI Trainings (Academy)</title>
+<meta name="description" content="In einem überzeugend geschriebenen Angebotsschreiben die Aussagen finden, die nicht tragen."><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1787572734"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1787572734"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1787572734">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1787572734" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1787572734" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1787572734">
+<script type="module">
+  const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
+  Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
+    .then(([core, java]) => {
+      const hljs = core.default;
+      hljs.registerLanguage("java", java.default);
+      document.querySelectorAll("pre code.language-java").forEach((el) => hljs.highlightElement(el));
+    });
+</script>
+<link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
+
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1787572734">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1787572734"></head><body class="avd-academy-guide">
+  <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav">
+    <span>ATVANTAGE Academy</span>
+  </div>
+
+  <header class="avd-academy-header">
+  <a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite">
+    <img class="avd-academy-header__logo"
+         src="/training-material-kitrainings/assets/logo-schulung.svg"
+         alt="ATVANTAGE Academy">
+  </a>
+  <button class="avd-academy-btn avd-academy-btn--ghost avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
+          aria-label="Navigation umschalten" aria-expanded="false">☰</button>
+  <nav class="avd-academy-header__nav" id="avd-academy-main-nav"><a href="/training-material-kitrainings/">Start</a><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
+  </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
+            title="Diese Seite auf Deinem Smartphone öffnen"
+            aria-label="Diese Seite auf Deinem Smartphone öffnen"></button>
+    <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-theme-toggle"
+            data-avd-academy-theme-toggle
+            title="Farbschema umschalten (hell/dunkel)"
+            aria-label="Farbschema umschalten">◐</button>
+  </div>
+</header>
+
+  <section class="avd-academy-guide-hero"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a><span>/</span><span aria-current="page">Fehlersuche im fertigen Text</span></nav><div class="avd-academy-guide-hero__meta">
+      <div class="avd-academy-guide-hero__tags"><span class="avd-academy-tag avd-academy-tag--time">ca. 35 Minuten</span><span class="avd-academy-tag">Ergebnisse prüfen</span><span class="avd-academy-tag">Halluzination</span><span class="avd-academy-tag">Verantwortung</span>
+      </div>
+      <div class="avd-academy-guide-hero__actions">
+        <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-copy-md"
+                data-avd-academy-copy-md="#avd-academy-md-source"
+                title="Markdown kopieren" aria-label="Markdown kopieren"></button>
+      </div>
+    </div><h1>Fehlersuche im fertigen Text</h1>
+  </section><div class="avd-academy-guide-layout">
+    <main class="avd-academy-guide-main avd-academy-guide-main--numbered" id="avd-academy-content">
+      <h1 id="fehlersuche-im-fertigen-text">Fehlersuche im fertigen Text</h1>
+
+<p><strong>Als</strong> Mitarbeiterin, die Texte gegenliest, bevor sie das Haus verlassen, <strong>möchte
+ich</strong> die Stellen erkennen, an denen ein KI-Ergebnis erfindet, <strong>damit</strong> kein
+falsches Versprechen beim Kunden ankommt.</p>
+
+<h2 id="lernziele">Lernziele</h2>
+
+<p>Du…</p>
+
+<ul>
+  <li>findest in einem fertigen Text die Aussagen, die dem mitgelieferten Material
+widersprechen.</li>
+  <li>ordnest jede strittige Aussage einer von drei Prüfsorten zu: im Material prüfbar,
+an einer Quelle prüfbar, nicht prüfbar.</li>
+  <li>begründest, welche Aussage Du streichen und welche Du klären würdest.</li>
+  <li>benennst, welche Vorgabe im Auftrag diesen Text verhindert hätte.</li>
+</ul>
+
+<h2 id="definition-of-done">Definition of Done</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Jede strittige Stelle im Schreiben ist markiert und einer Prüfsorte
+    zugeordnet.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Zu jeder Stelle steht in einem Halbsatz, woran Du sie erkannt hast.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Du hast notiert, wie lange Dich die Prüfung insgesamt gekostet hat.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Du hast die Reflexionsfragen schriftlich beantwortet.</li>
+</ul>
+
+<h2 id="arbeitsschritte">Arbeitsschritte</h2>
+
+<h3 id="die-angebotsdaten-lesen">Die Angebotsdaten lesen</h3>
+
+<p>Das ist der Stand, der bei der Nordwind Haustechnik GmbH tatsächlich vorliegt:</p>
+
+<pre><code class="language-text">Kunde:            Familie Ahrens, Rosenweg 12
+Angebot:          Wärmepumpe NW-A 12, Angebotssumme 24.800 EUR netto
+Wartungsvertrag:  320 EUR pro Jahr, jährlich kündbar
+Servicezusage:    Reaktion innerhalb von 48 Stunden an Werktagen
+Gewährleistung:   24 Monate
+Fertigstellung:   zugesagt zum 30.06.
+Förderung:        Antrag noch nicht gestellt, Höhe nicht geprüft
+</code></pre>
+
+<p>Lies die Daten erst, dann das Schreiben – nicht umgekehrt.</p>
+
+<h3 id="das-schreiben-durchgehen">Das Schreiben durchgehen</h3>
+
+<p>Dieses Anschreiben ist mit einem KI-Assistenten aus den Angebotsdaten entstanden
+und unverändert übernommen worden:</p>
+
+<pre><code class="language-text">Sehr geehrte Familie Ahrens,
+
+vielen Dank für Ihr Vertrauen. Gern bestätigen wir Ihnen die Lieferung und
+Montage der Wärmepumpe NW-A 12 zur Angebotssumme von 24.800 EUR netto.
+
+Für Anlagen dieser Leistungsklasse gilt eine Förderquote von 45 %, sodass sich
+Ihre Eigenbeteiligung auf 12.400 EUR reduziert. Die Fördermittel werden nach
+Antragstellung regelmäßig innerhalb von vier Wochen ausgezahlt; Grundlage ist die
+aktuelle Richtlinie (siehe www.foerderportal-waermepumpe.de/richtlinie-2024).
+
+Die Auslegung der Anlage erfolgt nach DIN EN 12831-4, die für Wohngebäude eine
+Vorlauftemperatur von maximal 35 °C vorschreibt. Ihre Heizkosten sinken damit um
+mindestens 1.900 EUR pro Jahr.
+
+Selbstverständlich erhalten Sie fünf Jahre Gewährleistung auf die gesamte Anlage.
+Im Servicefall garantieren wir Ihnen eine Reaktion innerhalb von 24 Stunden. Der
+Wartungsvertrag ist für 290 EUR jährlich inklusive aller Ersatzteile enthalten.
+
+Die Fertigstellung ist für den 30.06. vorgesehen.
+
+Mit freundlichen Grüßen
+Nordwind Haustechnik GmbH
+</code></pre>
+
+<p>Markiere alles, was Du so nicht abschicken würdest. Arbeite die ersten zehn Minuten
+allein und ohne Rücksprache.</p>
+
+<blockquote>
+  <p><strong>Hinweis:</strong> Wie viele Stellen es sind, sagt Dir niemand. Genau darin liegt die
+Übung – im Alltag steht die Zahl auch nicht dabei.</p>
+</blockquote>
+
+<h3 id="sortieren">Sortieren</h3>
+
+<p>Ordne jede markierte Stelle einer Sorte zu:</p>
+
+<ul>
+  <li><strong>im Material prüfbar</strong> – die Angabe widerspricht den Angebotsdaten,</li>
+  <li><strong>an einer Quelle prüfbar</strong> – Du müsstest eine Norm, Amtsseite oder
+Herstellerangabe aufrufen,</li>
+  <li><strong>nicht prüfbar</strong> – eine Prognose, Meinung oder Zusage, die niemand belegen kann.</li>
+</ul>
+
+<p>Notiere bei jeder Stelle in einem Halbsatz, woran Du sie erkannt hast.</p>
+
+<h3 id="im-paar-abgleichen">Im Paar abgleichen</h3>
+
+<p>Vergleiche mit Deiner Partnerin. Interessant sind nicht die gemeinsamen Funde,
+sondern die einseitigen: Was hat nur eine von Euch gesehen, und warum?</p>
+
+<h3 id="eine-stelle-wirklich-prüfen">Eine Stelle wirklich prüfen</h3>
+
+<p>Wähle <strong>eine</strong> Aussage aus der Sorte „an einer Quelle prüfbar“ und prüfe sie
+tatsächlich – Suchmaschine, Amtsseite, Herstellerdokument. Stoppe die Zeit.</p>
+
+<h3 id="den-auftrag-reparieren">Den Auftrag reparieren</h3>
+
+<p>Formuliere in zwei bis drei Sätzen die Vorgabe, die Du dem Assistenten hättest
+mitgeben müssen, damit dieses Schreiben so nicht entsteht.</p>
+
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+
+<ul>
+  <li>Welche Fehler hast Du allein durch den Vergleich mit den Angebotsdaten gefunden?</li>
+  <li>Welche Aussage konntest Du gar nicht prüfen – und was machst Du im Alltag mit
+solchen Sätzen?</li>
+  <li>Welcher Fund hat am längsten gedauert, und warum?</li>
+  <li>Was hättest Du im Auftrag anders gemacht, damit dieser Text nicht entsteht?</li>
+  <li>Wie lange hat die Prüfung insgesamt gedauert – und wie lange hättest Du für das
+Schreiben selbst gebraucht?</li>
+</ul>
+
+
+<textarea id="avd-academy-md-source" hidden aria-hidden="true"># Fehlersuche im fertigen Text
+
+**Als** Mitarbeiterin, die Texte gegenliest, bevor sie das Haus verlassen, **möchte
+ich** die Stellen erkennen, an denen ein KI-Ergebnis erfindet, **damit** kein
+falsches Versprechen beim Kunden ankommt.
+
+## Lernziele
+
+Du…
+
+- findest in einem fertigen Text die Aussagen, die dem mitgelieferten Material
+  widersprechen.
+- ordnest jede strittige Aussage einer von drei Prüfsorten zu: im Material prüfbar,
+  an einer Quelle prüfbar, nicht prüfbar.
+- begründest, welche Aussage Du streichen und welche Du klären würdest.
+- benennst, welche Vorgabe im Auftrag diesen Text verhindert hätte.
+
+## Definition of Done
+
+* [ ] Jede strittige Stelle im Schreiben ist markiert und einer Prüfsorte
+      zugeordnet.
+* [ ] Zu jeder Stelle steht in einem Halbsatz, woran Du sie erkannt hast.
+* [ ] Du hast notiert, wie lange Dich die Prüfung insgesamt gekostet hat.
+* [ ] Du hast die Reflexionsfragen schriftlich beantwortet.
+
+## Arbeitsschritte
+
+### Die Angebotsdaten lesen
+
+Das ist der Stand, der bei der Nordwind Haustechnik GmbH tatsächlich vorliegt:
+
+```text
+Kunde:            Familie Ahrens, Rosenweg 12
+Angebot:          Wärmepumpe NW-A 12, Angebotssumme 24.800 EUR netto
+Wartungsvertrag:  320 EUR pro Jahr, jährlich kündbar
+Servicezusage:    Reaktion innerhalb von 48 Stunden an Werktagen
+Gewährleistung:   24 Monate
+Fertigstellung:   zugesagt zum 30.06.
+Förderung:        Antrag noch nicht gestellt, Höhe nicht geprüft
+```
+
+Lies die Daten erst, dann das Schreiben – nicht umgekehrt.
+
+### Das Schreiben durchgehen
+
+Dieses Anschreiben ist mit einem KI-Assistenten aus den Angebotsdaten entstanden
+und unverändert übernommen worden:
+
+```text
+Sehr geehrte Familie Ahrens,
+
+vielen Dank für Ihr Vertrauen. Gern bestätigen wir Ihnen die Lieferung und
+Montage der Wärmepumpe NW-A 12 zur Angebotssumme von 24.800 EUR netto.
+
+Für Anlagen dieser Leistungsklasse gilt eine Förderquote von 45 %, sodass sich
+Ihre Eigenbeteiligung auf 12.400 EUR reduziert. Die Fördermittel werden nach
+Antragstellung regelmäßig innerhalb von vier Wochen ausgezahlt; Grundlage ist die
+aktuelle Richtlinie (siehe www.foerderportal-waermepumpe.de/richtlinie-2024).
+
+Die Auslegung der Anlage erfolgt nach DIN EN 12831-4, die für Wohngebäude eine
+Vorlauftemperatur von maximal 35 °C vorschreibt. Ihre Heizkosten sinken damit um
+mindestens 1.900 EUR pro Jahr.
+
+Selbstverständlich erhalten Sie fünf Jahre Gewährleistung auf die gesamte Anlage.
+Im Servicefall garantieren wir Ihnen eine Reaktion innerhalb von 24 Stunden. Der
+Wartungsvertrag ist für 290 EUR jährlich inklusive aller Ersatzteile enthalten.
+
+Die Fertigstellung ist für den 30.06. vorgesehen.
+
+Mit freundlichen Grüßen
+Nordwind Haustechnik GmbH
+```
+
+Markiere alles, was Du so nicht abschicken würdest. Arbeite die ersten zehn Minuten
+allein und ohne Rücksprache.
+
+&gt; **Hinweis:** Wie viele Stellen es sind, sagt Dir niemand. Genau darin liegt die
+&gt; Übung – im Alltag steht die Zahl auch nicht dabei.
+
+### Sortieren
+
+Ordne jede markierte Stelle einer Sorte zu:
+
+- **im Material prüfbar** – die Angabe widerspricht den Angebotsdaten,
+- **an einer Quelle prüfbar** – Du müsstest eine Norm, Amtsseite oder
+  Herstellerangabe aufrufen,
+- **nicht prüfbar** – eine Prognose, Meinung oder Zusage, die niemand belegen kann.
+
+Notiere bei jeder Stelle in einem Halbsatz, woran Du sie erkannt hast.
+
+### Im Paar abgleichen
+
+Vergleiche mit Deiner Partnerin. Interessant sind nicht die gemeinsamen Funde,
+sondern die einseitigen: Was hat nur eine von Euch gesehen, und warum?
+
+### Eine Stelle wirklich prüfen
+
+Wähle **eine** Aussage aus der Sorte „an einer Quelle prüfbar“ und prüfe sie
+tatsächlich – Suchmaschine, Amtsseite, Herstellerdokument. Stoppe die Zeit.
+
+### Den Auftrag reparieren
+
+Formuliere in zwei bis drei Sätzen die Vorgabe, die Du dem Assistenten hättest
+mitgeben müssen, damit dieses Schreiben so nicht entsteht.
+
+## Reflexionsfragen
+
+- Welche Fehler hast Du allein durch den Vergleich mit den Angebotsdaten gefunden?
+- Welche Aussage konntest Du gar nicht prüfen – und was machst Du im Alltag mit
+  solchen Sätzen?
+- Welcher Fund hat am längsten gedauert, und warum?
+- Was hättest Du im Auftrag anders gemacht, damit dieser Text nicht entsteht?
+- Wie lange hat die Prüfung insgesamt gedauert – und wie lange hättest Du für das
+  Schreiben selbst gebraucht?</textarea>
+    </main><aside class="avd-academy-guide-sidebar"><details class="avd-academy-guide-side avd-academy-guide-side--toc avd-academy-fold" data-avd-academy-toc-box
+               data-avd-academy-toc-grenze="12" open hidden>
+        <summary class="avd-academy-guide-side__label">Auf dieser Seite</summary>
+        <nav class="avd-academy-toc avd-academy-fold__body" data-avd-academy-toc aria-label="Inhaltsverzeichnis"></nav>
+      </details>
+      <div class="avd-academy-guide-side avd-academy-guide-side--bordered" data-avd-academy-progress hidden><div class="avd-academy-guide-side__label">Fortschritt</div>
+        <div class="avd-academy-progress__bar"><div class="avd-academy-progress__fill"></div></div>
+        <div class="avd-academy-progress__text"></div>
+      </div>
+    </aside>
+  </div><div class="avd-academy-print-contact" aria-hidden="true">
+    <span>Kontakt: https://www.atvantage.com</span>
+    <span>academy@atvantage.com</span>
+  </div>
+
+  <footer class="avd-academy-footer">
+  <div class="avd-academy-footer__grid">
+    <div>
+      <strong>KI Trainings (Academy)</strong>
+      <p>Schulungsunterlagen der ATVANTAGE Academy.</p>
+    </div><div>
+      <strong>Kontakt</strong>
+      <p><a href="https://www.atvantage.com" target="_blank" rel="noopener">Website</a><br><a href="mailto:academy@atvantage.com">academy@atvantage.com</a><br>
+      </p>
+    </div></div>
+  <div class="avd-academy-footer__legal">
+    © <span data-avd-academy-year>2026</span> ATVANTAGE
+  </div>
+</footer>
+
+</body>
+</html>

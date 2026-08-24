@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<!--
+  ATVANTAGE-Academy – EINZIGES Seitenlayout (Jekyll)
+  --------------------------------------------------
+  Ein Layout für alles: allgemeine Doku-Seiten UND Guides (Übungen/Anleitungen).
+  Optik nach der ATVANTAGE-Website: Meta-Nav, weiße sticky Kopfzeile, Hero-Band,
+  zweispaltig mit rechter Sidebar (automatisches Inhaltsverzeichnis, Fortschritt
+  aus Task-Listen, weiterführende Ressourcen). Überschriften ohne Emoji-Icons.
+
+  Verwendung im Front Matter:  layout: default   (oder `layout: guide` – Alias,
+  siehe guide.html; beides rendert dieselbe Guide-Ansicht)
+
+  `layout: visualization` (siehe visualization.html) rendert dieselbe Seite OHNE
+  obere Navigation (Meta-Leiste + Kopfzeile/TopNav), OHNE Brotkrumen und OHNE den
+  rechten Bereich (Inhaltsverzeichnis, Fortschritt, Ressourcen – auch bei gesetztem
+  `resources`), mit schmalerem Hero-Balken und breiterem, zentriertem Inhalt – für
+  eigenständige Visualisierungen/Simulationen.
+
+  Alle Front-Matter-Felder sind OPTIONAL (Convention over Configuration). Nur der
+  Titel ist faktisch erforderlich – als `title:` ODER als erste `#`-Überschrift:
+
+    title:       "…"                → sonst erste #-Überschrift (eins von beiden nötig)
+    description: "…"                → Meta-Description
+    duration:    8                  → Zahl in Minuten → Hero-Tag „ca. 8 Minuten“
+                                       (ungefähre LESEDAUER; bei Guides/Übungen die
+                                       Dauer der Übung). Entfällt bei
+                                       `layout: visualization`.
+    topics:      ["Cloud & DevOps"] → weitere Hero-Tags
+    resources:   [{title, url, icon}, …] → Sidebar-Karte „Weiterführende Informationen“.
+                                       title und/oder icon (Bildpfad); icon erscheint
+                                       rechts und wird kreisrund dargestellt.
+    breadcrumb:                     → Brotkrumen anpassen (beides optional):
+      label: "…"                    → überschreibt den Ordnernamen dieser Ebene;
+                                       in der Ordner-`index.md` gesetzt gilt es für
+                                       ALLE Seiten im Ordner und in Unterordnern.
+      ancestors: [{title, url}, …]  → explizite Vorfahren-Kette OHNE die aktuelle
+                                       Seite (diese wird automatisch angehängt); in
+                                       der `index.md` gesetzt wird sie vererbt.
+
+  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides (Übungen,
+  Anleitungen) – dort ist das Übernehmen des Quelltexts der Zweck. Bedingungen:
+  Markdown-Seite (`.md`, nicht reines HTML) UND als Guide erkennbar UND keine
+  Visualisierung. Guide ist eine Seite mit `layout: guide` ODER gesetztem
+  `duration` – letzteres ist der etablierte Marker, und die Guide-Vorlage des
+  Themes wie auch die von didaktikon erzeugten Übungen nutzen `layout: page`
+  plus `duration`. Nur auf `layout: guide` zu prüfen würde den Button dort
+  entfernen. Doku-Seiten haben kein `duration`; Visualisierungen sind
+  ausgeschlossen, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
+
+  QR-CODE der Seitenadresse + DRUCKEN-KNOPF: In dieser Ansicht (`visualization`)
+  stehen beide rechts im Hero – QR links, Drucken rechts. Sie hat weder Kopfzeile
+  noch Sidebar, in der sie sonst Platz hätten.
+
+  Auf `default`/`guide` steht im Hero KEINES von beiden: Der QR-Code sitzt in der
+  Kopfzeile neben dem Farbschema-Umschalter (siehe `_includes/header.html`), und zum
+  Drucken bleibt es beim Browser-Befehl (Strg/Cmd+P). Tooltip des QR-Codes überall:
+  „Diese Seite auf Deinem Smartphone öffnen“. Er wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
+  Adresse zur Build-Zeit nicht feststeht; ohne JavaScript erscheint er nicht.
+  Kein Front-Matter-Schalter: Es gibt keine Seite, auf der der Weg aufs eigene
+  Smartphone schaden würde.
+--><html lang="de">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Fünf Regeln, die ab Montag gelten · KI Trainings (Academy)</title>
+<meta name="description" content="Fünf überprüfbare Regeln für den eigenen Bereich formulieren – und die Fragen benennen, die die Leitung beantworten muss."><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1787572734"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1787572734"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1787572734">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1787572734" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1787572734" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1787572734">
+<script type="module">
+  const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
+  Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
+    .then(([core, java]) => {
+      const hljs = core.default;
+      hljs.registerLanguage("java", java.default);
+      document.querySelectorAll("pre code.language-java").forEach((el) => hljs.highlightElement(el));
+    });
+</script>
+<link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
+
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1787572734">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1787572734"></head><body class="avd-academy-guide">
+  <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav">
+    <span>ATVANTAGE Academy</span>
+  </div>
+
+  <header class="avd-academy-header">
+  <a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite">
+    <img class="avd-academy-header__logo"
+         src="/training-material-kitrainings/assets/logo-schulung.svg"
+         alt="ATVANTAGE Academy">
+  </a>
+  <button class="avd-academy-btn avd-academy-btn--ghost avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
+          aria-label="Navigation umschalten" aria-expanded="false">☰</button>
+  <nav class="avd-academy-header__nav" id="avd-academy-main-nav"><a href="/training-material-kitrainings/">Start</a><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
+  </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
+            title="Diese Seite auf Deinem Smartphone öffnen"
+            aria-label="Diese Seite auf Deinem Smartphone öffnen"></button>
+    <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-theme-toggle"
+            data-avd-academy-theme-toggle
+            title="Farbschema umschalten (hell/dunkel)"
+            aria-label="Farbschema umschalten">◐</button>
+  </div>
+</header>
+
+  <section class="avd-academy-guide-hero"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a><span>/</span><span aria-current="page">Fünf Regeln, die ab Montag gelten</span></nav><div class="avd-academy-guide-hero__meta">
+      <div class="avd-academy-guide-hero__tags"><span class="avd-academy-tag avd-academy-tag--time">ca. 25 Minuten</span><span class="avd-academy-tag">Team-Regeln</span><span class="avd-academy-tag">Transparenz</span>
+      </div>
+      <div class="avd-academy-guide-hero__actions">
+        <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-copy-md"
+                data-avd-academy-copy-md="#avd-academy-md-source"
+                title="Markdown kopieren" aria-label="Markdown kopieren"></button>
+      </div>
+    </div><h1>Fünf Regeln, die ab Montag gelten</h1>
+  </section><div class="avd-academy-guide-layout">
+    <main class="avd-academy-guide-main avd-academy-guide-main--numbered" id="avd-academy-content">
+      <h1 id="fünf-regeln-die-ab-montag-gelten">Fünf Regeln, die ab Montag gelten</h1>
+
+<p><strong>Als</strong> Team, das dieselben Aufgaben teilt, <strong>möchten wir</strong> wenige, überprüfbare
+Regeln verabreden, <strong>damit</strong> nicht jeder eigene Wege geht und niemand heimlich
+arbeitet.</p>
+
+<h2 id="lernziele">Lernziele</h2>
+
+<p>Du…</p>
+
+<ul>
+  <li>formulierst mit Deiner Gruppe fünf Regeln, die am Montag überprüfbar sind.</li>
+  <li>unterscheidest, was Euer Team verabreden kann und was die Leitung entscheiden muss.</li>
+  <li>benennst, wer die Verabredung ins Team trägt.</li>
+</ul>
+
+<h2 id="definition-of-done">Definition of Done</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Genau fünf Regeln – nicht mehr.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Jede Regel deckt einen dieser Punkte ab: Werkzeug, was nicht hinein darf,
+    wer gegenliest, wo die Vorlagen liegen.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Jede Regel besteht den Montagstest: Man kann feststellen, ob sie eingehalten
+    wurde.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Die Fragen, die Eure Gruppe nicht entscheiden darf, stehen auf einer eigenen
+    Liste – mit Adressat.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Für die Vorstellung im Team ist eine Person benannt.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Du hast die Reflexionsfragen schriftlich beantwortet.</li>
+</ul>
+
+<h2 id="arbeitsschritte">Arbeitsschritte</h2>
+
+<h3 id="sammeln-was-schon-da-ist">Sammeln, was schon da ist</h3>
+
+<p>Legt zusammen, was aus den beiden Tagen bei Euch angefallen ist: die offenen Fragen
+aus der Ampel-Übung, Eure Vorlagen, die Aufgaben, die in mehreren Bereichen gleich
+sind.</p>
+
+<h3 id="zu-vier-punkten-je-einen-satz-schreiben">Zu vier Punkten je einen Satz schreiben</h3>
+
+<p>Formuliert zu jeder dieser Fragen eine Regel:</p>
+
+<pre><code class="language-text">1  Welches Werkzeug benutzen wir – und welches nicht?
+2  Was geben wir nicht hinein?
+3  Wer liest gegen, und bei welcher Art von Ergebnis?
+4  Wo liegen unsere Vorlagen, und wer pflegt sie?
+</code></pre>
+
+<p>Die fünfte Regel ist frei: Nehmt das, was in Eurem Bereich am dringendsten fehlt.</p>
+
+<blockquote>
+  <p><strong>Hinweis:</strong> Formuliert in der Wir-Form und im Präsens, so knapp wie möglich.
+Eine Regel, die länger als zwei Zeilen ist, ist noch nicht fertig gedacht.</p>
+</blockquote>
+
+<h3 id="den-montagstest-machen">Den Montagstest machen</h3>
+
+<p>Geht jede Regel durch und fragt: Könnte am Montagabend jemand sagen, ob wir uns
+daran gehalten haben? Wenn nicht, umformulieren – oder streichen.</p>
+
+<p>Braucht Ihr eine sechste Regel, muss eine andere weichen.</p>
+
+<h3 id="trennen-was-euch-nicht-gehört">Trennen, was Euch nicht gehört</h3>
+
+<p>Streicht alles, was Eure Gruppe nicht entscheiden darf – Werkzeugfreigaben,
+Lizenzen, Verträge, Betriebsvereinbarungen. Schreibt es als <strong>Frage</strong> auf eine
+zweite Liste und notiert dazu, wen Ihr fragt.</p>
+
+<h3 id="verbindlich-machen">Verbindlich machen</h3>
+
+<p>Bestimmt eine Person, die die Verabredung nächste Woche im Team vorstellt, und
+haltet fest, wann Ihr das erste Mal nachschaut, ob es trägt.</p>
+
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+
+<ul>
+  <li>Welche Regel war in Eurer Gruppe am strittigsten, und woran lag es?</li>
+  <li>Welche Eurer Regeln kann Eure Gruppe gar nicht selbst entscheiden?</li>
+  <li>Woran würdet Ihr in vier Wochen merken, dass Ihr Euch nicht daran halten?</li>
+  <li>Wer stellt die Verabredung nächste Woche im Team vor?</li>
+</ul>
+
+
+<textarea id="avd-academy-md-source" hidden aria-hidden="true"># Fünf Regeln, die ab Montag gelten
+
+**Als** Team, das dieselben Aufgaben teilt, **möchten wir** wenige, überprüfbare
+Regeln verabreden, **damit** nicht jeder eigene Wege geht und niemand heimlich
+arbeitet.
+
+## Lernziele
+
+Du…
+
+- formulierst mit Deiner Gruppe fünf Regeln, die am Montag überprüfbar sind.
+- unterscheidest, was Euer Team verabreden kann und was die Leitung entscheiden muss.
+- benennst, wer die Verabredung ins Team trägt.
+
+## Definition of Done
+
+* [ ] Genau fünf Regeln – nicht mehr.
+* [ ] Jede Regel deckt einen dieser Punkte ab: Werkzeug, was nicht hinein darf,
+      wer gegenliest, wo die Vorlagen liegen.
+* [ ] Jede Regel besteht den Montagstest: Man kann feststellen, ob sie eingehalten
+      wurde.
+* [ ] Die Fragen, die Eure Gruppe nicht entscheiden darf, stehen auf einer eigenen
+      Liste – mit Adressat.
+* [ ] Für die Vorstellung im Team ist eine Person benannt.
+* [ ] Du hast die Reflexionsfragen schriftlich beantwortet.
+
+## Arbeitsschritte
+
+### Sammeln, was schon da ist
+
+Legt zusammen, was aus den beiden Tagen bei Euch angefallen ist: die offenen Fragen
+aus der Ampel-Übung, Eure Vorlagen, die Aufgaben, die in mehreren Bereichen gleich
+sind.
+
+### Zu vier Punkten je einen Satz schreiben
+
+Formuliert zu jeder dieser Fragen eine Regel:
+
+```text
+1  Welches Werkzeug benutzen wir – und welches nicht?
+2  Was geben wir nicht hinein?
+3  Wer liest gegen, und bei welcher Art von Ergebnis?
+4  Wo liegen unsere Vorlagen, und wer pflegt sie?
+```
+
+Die fünfte Regel ist frei: Nehmt das, was in Eurem Bereich am dringendsten fehlt.
+
+&gt; **Hinweis:** Formuliert in der Wir-Form und im Präsens, so knapp wie möglich.
+&gt; Eine Regel, die länger als zwei Zeilen ist, ist noch nicht fertig gedacht.
+
+### Den Montagstest machen
+
+Geht jede Regel durch und fragt: Könnte am Montagabend jemand sagen, ob wir uns
+daran gehalten haben? Wenn nicht, umformulieren – oder streichen.
+
+Braucht Ihr eine sechste Regel, muss eine andere weichen.
+
+### Trennen, was Euch nicht gehört
+
+Streicht alles, was Eure Gruppe nicht entscheiden darf – Werkzeugfreigaben,
+Lizenzen, Verträge, Betriebsvereinbarungen. Schreibt es als **Frage** auf eine
+zweite Liste und notiert dazu, wen Ihr fragt.
+
+### Verbindlich machen
+
+Bestimmt eine Person, die die Verabredung nächste Woche im Team vorstellt, und
+haltet fest, wann Ihr das erste Mal nachschaut, ob es trägt.
+
+## Reflexionsfragen
+
+- Welche Regel war in Eurer Gruppe am strittigsten, und woran lag es?
+- Welche Eurer Regeln kann Eure Gruppe gar nicht selbst entscheiden?
+- Woran würdet Ihr in vier Wochen merken, dass Ihr Euch nicht daran halten?
+- Wer stellt die Verabredung nächste Woche im Team vor?</textarea>
+    </main><aside class="avd-academy-guide-sidebar"><details class="avd-academy-guide-side avd-academy-guide-side--toc avd-academy-fold" data-avd-academy-toc-box
+               data-avd-academy-toc-grenze="12" open hidden>
+        <summary class="avd-academy-guide-side__label">Auf dieser Seite</summary>
+        <nav class="avd-academy-toc avd-academy-fold__body" data-avd-academy-toc aria-label="Inhaltsverzeichnis"></nav>
+      </details>
+      <div class="avd-academy-guide-side avd-academy-guide-side--bordered" data-avd-academy-progress hidden><div class="avd-academy-guide-side__label">Fortschritt</div>
+        <div class="avd-academy-progress__bar"><div class="avd-academy-progress__fill"></div></div>
+        <div class="avd-academy-progress__text"></div>
+      </div>
+    </aside>
+  </div><div class="avd-academy-print-contact" aria-hidden="true">
+    <span>Kontakt: https://www.atvantage.com</span>
+    <span>academy@atvantage.com</span>
+  </div>
+
+  <footer class="avd-academy-footer">
+  <div class="avd-academy-footer__grid">
+    <div>
+      <strong>KI Trainings (Academy)</strong>
+      <p>Schulungsunterlagen der ATVANTAGE Academy.</p>
+    </div><div>
+      <strong>Kontakt</strong>
+      <p><a href="https://www.atvantage.com" target="_blank" rel="noopener">Website</a><br><a href="mailto:academy@atvantage.com">academy@atvantage.com</a><br>
+      </p>
+    </div></div>
+  <div class="avd-academy-footer__legal">
+    © <span data-avd-academy-year>2026</span> ATVANTAGE
+  </div>
+</footer>
+
+</body>
+</html>

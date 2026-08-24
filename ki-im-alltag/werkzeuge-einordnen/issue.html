@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!--
+  ATVANTAGE-Academy – EINZIGES Seitenlayout (Jekyll)
+  --------------------------------------------------
+  Ein Layout für alles: allgemeine Doku-Seiten UND Guides (Übungen/Anleitungen).
+  Optik nach der ATVANTAGE-Website: Meta-Nav, weiße sticky Kopfzeile, Hero-Band,
+  zweispaltig mit rechter Sidebar (automatisches Inhaltsverzeichnis, Fortschritt
+  aus Task-Listen, weiterführende Ressourcen). Überschriften ohne Emoji-Icons.
+
+  Verwendung im Front Matter:  layout: default   (oder `layout: guide` – Alias,
+  siehe guide.html; beides rendert dieselbe Guide-Ansicht)
+
+  `layout: visualization` (siehe visualization.html) rendert dieselbe Seite OHNE
+  obere Navigation (Meta-Leiste + Kopfzeile/TopNav), OHNE Brotkrumen und OHNE den
+  rechten Bereich (Inhaltsverzeichnis, Fortschritt, Ressourcen – auch bei gesetztem
+  `resources`), mit schmalerem Hero-Balken und breiterem, zentriertem Inhalt – für
+  eigenständige Visualisierungen/Simulationen.
+
+  Alle Front-Matter-Felder sind OPTIONAL (Convention over Configuration). Nur der
+  Titel ist faktisch erforderlich – als `title:` ODER als erste `#`-Überschrift:
+
+    title:       "…"                → sonst erste #-Überschrift (eins von beiden nötig)
+    description: "…"                → Meta-Description
+    duration:    8                  → Zahl in Minuten → Hero-Tag „ca. 8 Minuten“
+                                       (ungefähre LESEDAUER; bei Guides/Übungen die
+                                       Dauer der Übung). Entfällt bei
+                                       `layout: visualization`.
+    topics:      ["Cloud & DevOps"] → weitere Hero-Tags
+    resources:   [{title, url, icon}, …] → Sidebar-Karte „Weiterführende Informationen“.
+                                       title und/oder icon (Bildpfad); icon erscheint
+                                       rechts und wird kreisrund dargestellt.
+    breadcrumb:                     → Brotkrumen anpassen (beides optional):
+      label: "…"                    → überschreibt den Ordnernamen dieser Ebene;
+                                       in der Ordner-`index.md` gesetzt gilt es für
+                                       ALLE Seiten im Ordner und in Unterordnern.
+      ancestors: [{title, url}, …]  → explizite Vorfahren-Kette OHNE die aktuelle
+                                       Seite (diese wird automatisch angehängt); in
+                                       der `index.md` gesetzt wird sie vererbt.
+
+  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides (Übungen,
+  Anleitungen) – dort ist das Übernehmen des Quelltexts der Zweck. Bedingungen:
+  Markdown-Seite (`.md`, nicht reines HTML) UND als Guide erkennbar UND keine
+  Visualisierung. Guide ist eine Seite mit `layout: guide` ODER gesetztem
+  `duration` – letzteres ist der etablierte Marker, und die Guide-Vorlage des
+  Themes wie auch die von didaktikon erzeugten Übungen nutzen `layout: page`
+  plus `duration`. Nur auf `layout: guide` zu prüfen würde den Button dort
+  entfernen. Doku-Seiten haben kein `duration`; Visualisierungen sind
+  ausgeschlossen, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
+
+  QR-CODE der Seitenadresse + DRUCKEN-KNOPF: In dieser Ansicht (`visualization`)
+  stehen beide rechts im Hero – QR links, Drucken rechts. Sie hat weder Kopfzeile
+  noch Sidebar, in der sie sonst Platz hätten.
+
+  Auf `default`/`guide` steht im Hero KEINES von beiden: Der QR-Code sitzt in der
+  Kopfzeile neben dem Farbschema-Umschalter (siehe `_includes/header.html`), und zum
+  Drucken bleibt es beim Browser-Befehl (Strg/Cmd+P). Tooltip des QR-Codes überall:
+  „Diese Seite auf Deinem Smartphone öffnen“. Er wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
+  Adresse zur Build-Zeit nicht feststeht; ohne JavaScript erscheint er nicht.
+  Kein Front-Matter-Schalter: Es gibt keine Seite, auf der der Weg aufs eigene
+  Smartphone schaden würde.
+--><html lang="de">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Dieselbe Aufgabe, zwei Werkzeuge · KI Trainings (Academy)</title>
+<meta name="description" content="Denselben Auftrag in zwei verschiedenen Werkzeugen laufen lassen und die Unterschiede an festen Kriterien festhalten."><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1787572734"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1787572734">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1787572734"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1787572734">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1787572734" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1787572734" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1787572734">
+<script type="module">
+  const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
+  Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
+    .then(([core, java]) => {
+      const hljs = core.default;
+      hljs.registerLanguage("java", java.default);
+      document.querySelectorAll("pre code.language-java").forEach((el) => hljs.highlightElement(el));
+    });
+</script>
+<link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
+
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1787572734">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1787572734"></head><body class="avd-academy-guide">
+  <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav">
+    <span>ATVANTAGE Academy</span>
+  </div>
+
+  <header class="avd-academy-header">
+  <a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite">
+    <img class="avd-academy-header__logo"
+         src="/training-material-kitrainings/assets/logo-schulung.svg"
+         alt="ATVANTAGE Academy">
+  </a>
+  <button class="avd-academy-btn avd-academy-btn--ghost avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
+          aria-label="Navigation umschalten" aria-expanded="false">☰</button>
+  <nav class="avd-academy-header__nav" id="avd-academy-main-nav"><a href="/training-material-kitrainings/">Start</a><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
+  </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
+            title="Diese Seite auf Deinem Smartphone öffnen"
+            aria-label="Diese Seite auf Deinem Smartphone öffnen"></button>
+    <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-theme-toggle"
+            data-avd-academy-theme-toggle
+            title="Farbschema umschalten (hell/dunkel)"
+            aria-label="Farbschema umschalten">◐</button>
+  </div>
+</header>
+
+  <section class="avd-academy-guide-hero"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a><span>/</span><span aria-current="page">Dieselbe Aufgabe, zwei Werkzeuge</span></nav><div class="avd-academy-guide-hero__meta">
+      <div class="avd-academy-guide-hero__tags"><span class="avd-academy-tag avd-academy-tag--time">ca. 25 Minuten</span><span class="avd-academy-tag">Werkzeuglandschaft</span><span class="avd-academy-tag">Auswahl</span>
+      </div>
+      <div class="avd-academy-guide-hero__actions">
+        <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-copy-md"
+                data-avd-academy-copy-md="#avd-academy-md-source"
+                title="Markdown kopieren" aria-label="Markdown kopieren"></button>
+      </div>
+    </div><h1>Dieselbe Aufgabe, zwei Werkzeuge</h1>
+  </section><div class="avd-academy-guide-layout">
+    <main class="avd-academy-guide-main avd-academy-guide-main--numbered" id="avd-academy-content">
+      <h1 id="dieselbe-aufgabe-zwei-werkzeuge">Dieselbe Aufgabe, zwei Werkzeuge</h1>
+
+<p><strong>Als</strong> Mitarbeiterin, der mehrere KI-Werkzeuge zur Verfügung stehen, <strong>möchte ich</strong>
+wissen, wo die Unterschiede tatsächlich liegen, <strong>damit</strong> ich nicht bei jeder Aufgabe
+das Werkzeug wechsle, sondern den Auftrag verbessere.</p>
+
+<h2 id="lernziele">Lernziele</h2>
+
+<p>Du…</p>
+
+<ul>
+  <li>führst denselben Auftrag in zwei Werkzeugen aus und hältst die Unterschiede an
+festen Kriterien fest.</li>
+  <li>benennst, welches Werkzeug auf Material zugegriffen hat, das Du nicht mitgegeben
+hast.</li>
+  <li>begründest, welche Sorte Aufgabe zu welcher Sorte Werkzeug passt.</li>
+</ul>
+
+<h2 id="definition-of-done">Definition of Done</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Derselbe Auftrag ist in zwei Werkzeugen gelaufen – Wort für Wort derselbe.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Das Vergleichsblatt ist zu beiden Werkzeugen gefüllt.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Du hast einen Satz notiert, wofür Du künftig welches der beiden benutzt.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Du hast die Reflexionsfragen schriftlich beantwortet.</li>
+</ul>
+
+<h2 id="arbeitsschritte">Arbeitsschritte</h2>
+
+<h3 id="die-aufgabe-wählen">Die Aufgabe wählen</h3>
+
+<p>Nimm die Aufgabe, die Du mitgebracht hast – etwas, das bei Dir <strong>wiederkehrt</strong>:
+eine Antwortmail, eine Zusammenfassung, eine Auswertung, ein Protokoll.</p>
+
+<blockquote>
+  <p><strong>Hinweis:</strong> Wenn Du keine mitgebracht hast, nimm die Baustellennotiz aus der
+Übung „Vom Einzeiler zum Auftrag“. Wichtig ist nur, dass Du in beiden Werkzeugen
+dieselbe Aufgabe stellst.</p>
+</blockquote>
+
+<h3 id="den-auftrag-einmal-schreiben">Den Auftrag einmal schreiben</h3>
+
+<p>Schreibe den Auftrag vollständig – mit Material, Adressat, Ergebnisform und Grenzen,
+so wie in der Übung „Vom Einzeiler zum Auftrag“. Speichere ihn außerhalb des Chats,
+damit Du ihn unverändert wiederverwenden kannst.</p>
+
+<p>Achte darauf, dass keine echten personenbezogenen Daten darin stehen; ersetze Namen
+und Nummern durch Platzhalter.</p>
+
+<h3 id="in-zwei-werkzeugen-laufen-lassen">In zwei Werkzeugen laufen lassen</h3>
+
+<p>Gib denselben Auftrag in zwei verschiedenen Werkzeugen ein – zum Beispiel dem freien
+Assistenten im Browser und dem Assistenten in Deinem Arbeitsplatz. Steht Dir nur
+eines zur Verfügung, vergleiche stattdessen mit einer Suchmaschine, die eine
+KI-Antwort mit Quellen ausgibt.</p>
+
+<h3 id="das-vergleichsblatt-füllen">Das Vergleichsblatt füllen</h3>
+
+<p>Halte für <strong>jedes</strong> Werkzeug fest:</p>
+
+<pre><code class="language-text">Werkzeug:
+Hat es auf Material zugegriffen, das ich nicht mitgegeben habe?   ja / nein / unklar
+Nennt es Quellen, die ich öffnen kann?                            ja / nein
+Wie lange habe ich gebraucht, das Ergebnis zu prüfen?             ... Minuten
+Was war am Ergebnis besser als beim anderen Werkzeug?
+Was war schlechter?
+Würde ich diese Aufgabe künftig hier erledigen?                   ja / nein, weil ...
+</code></pre>
+
+<h3 id="eine-entscheidung-notieren">Eine Entscheidung notieren</h3>
+
+<p>Schreibe einen Satz: Welche Sorte Aufgabe erledigst Du künftig in welchem Werkzeug –
+und warum.</p>
+
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+
+<ul>
+  <li>Wo lag der größere Unterschied: zwischen den beiden Werkzeugen oder zwischen
+Deinen beiden Aufträgen aus der Übung „Vom Einzeiler zum Auftrag“?</li>
+  <li>Welches Werkzeug hat auf Material zugegriffen, das Du nicht mitgegeben hast – und
+was bedeutet das fürs Prüfen?</li>
+  <li>Welches Ergebnis konntest Du schneller prüfen, und woran lag das?</li>
+  <li>Was hat keines der beiden Werkzeuge geleistet?</li>
+</ul>
+
+
+<textarea id="avd-academy-md-source" hidden aria-hidden="true"># Dieselbe Aufgabe, zwei Werkzeuge
+
+**Als** Mitarbeiterin, der mehrere KI-Werkzeuge zur Verfügung stehen, **möchte ich**
+wissen, wo die Unterschiede tatsächlich liegen, **damit** ich nicht bei jeder Aufgabe
+das Werkzeug wechsle, sondern den Auftrag verbessere.
+
+## Lernziele
+
+Du…
+
+- führst denselben Auftrag in zwei Werkzeugen aus und hältst die Unterschiede an
+  festen Kriterien fest.
+- benennst, welches Werkzeug auf Material zugegriffen hat, das Du nicht mitgegeben
+  hast.
+- begründest, welche Sorte Aufgabe zu welcher Sorte Werkzeug passt.
+
+## Definition of Done
+
+* [ ] Derselbe Auftrag ist in zwei Werkzeugen gelaufen – Wort für Wort derselbe.
+* [ ] Das Vergleichsblatt ist zu beiden Werkzeugen gefüllt.
+* [ ] Du hast einen Satz notiert, wofür Du künftig welches der beiden benutzt.
+* [ ] Du hast die Reflexionsfragen schriftlich beantwortet.
+
+## Arbeitsschritte
+
+### Die Aufgabe wählen
+
+Nimm die Aufgabe, die Du mitgebracht hast – etwas, das bei Dir **wiederkehrt**:
+eine Antwortmail, eine Zusammenfassung, eine Auswertung, ein Protokoll.
+
+&gt; **Hinweis:** Wenn Du keine mitgebracht hast, nimm die Baustellennotiz aus der
+&gt; Übung „Vom Einzeiler zum Auftrag“. Wichtig ist nur, dass Du in beiden Werkzeugen
+&gt; dieselbe Aufgabe stellst.
+
+### Den Auftrag einmal schreiben
+
+Schreibe den Auftrag vollständig – mit Material, Adressat, Ergebnisform und Grenzen,
+so wie in der Übung „Vom Einzeiler zum Auftrag“. Speichere ihn außerhalb des Chats,
+damit Du ihn unverändert wiederverwenden kannst.
+
+Achte darauf, dass keine echten personenbezogenen Daten darin stehen; ersetze Namen
+und Nummern durch Platzhalter.
+
+### In zwei Werkzeugen laufen lassen
+
+Gib denselben Auftrag in zwei verschiedenen Werkzeugen ein – zum Beispiel dem freien
+Assistenten im Browser und dem Assistenten in Deinem Arbeitsplatz. Steht Dir nur
+eines zur Verfügung, vergleiche stattdessen mit einer Suchmaschine, die eine
+KI-Antwort mit Quellen ausgibt.
+
+### Das Vergleichsblatt füllen
+
+Halte für **jedes** Werkzeug fest:
+
+```text
+Werkzeug:
+Hat es auf Material zugegriffen, das ich nicht mitgegeben habe?   ja / nein / unklar
+Nennt es Quellen, die ich öffnen kann?                            ja / nein
+Wie lange habe ich gebraucht, das Ergebnis zu prüfen?             ... Minuten
+Was war am Ergebnis besser als beim anderen Werkzeug?
+Was war schlechter?
+Würde ich diese Aufgabe künftig hier erledigen?                   ja / nein, weil ...
+```
+
+### Eine Entscheidung notieren
+
+Schreibe einen Satz: Welche Sorte Aufgabe erledigst Du künftig in welchem Werkzeug –
+und warum.
+
+## Reflexionsfragen
+
+- Wo lag der größere Unterschied: zwischen den beiden Werkzeugen oder zwischen
+  Deinen beiden Aufträgen aus der Übung „Vom Einzeiler zum Auftrag“?
+- Welches Werkzeug hat auf Material zugegriffen, das Du nicht mitgegeben hast – und
+  was bedeutet das fürs Prüfen?
+- Welches Ergebnis konntest Du schneller prüfen, und woran lag das?
+- Was hat keines der beiden Werkzeuge geleistet?</textarea>
+    </main><aside class="avd-academy-guide-sidebar"><details class="avd-academy-guide-side avd-academy-guide-side--toc avd-academy-fold" data-avd-academy-toc-box
+               data-avd-academy-toc-grenze="12" open hidden>
+        <summary class="avd-academy-guide-side__label">Auf dieser Seite</summary>
+        <nav class="avd-academy-toc avd-academy-fold__body" data-avd-academy-toc aria-label="Inhaltsverzeichnis"></nav>
+      </details>
+      <div class="avd-academy-guide-side avd-academy-guide-side--bordered" data-avd-academy-progress hidden><div class="avd-academy-guide-side__label">Fortschritt</div>
+        <div class="avd-academy-progress__bar"><div class="avd-academy-progress__fill"></div></div>
+        <div class="avd-academy-progress__text"></div>
+      </div>
+    </aside>
+  </div><div class="avd-academy-print-contact" aria-hidden="true">
+    <span>Kontakt: https://www.atvantage.com</span>
+    <span>academy@atvantage.com</span>
+  </div>
+
+  <footer class="avd-academy-footer">
+  <div class="avd-academy-footer__grid">
+    <div>
+      <strong>KI Trainings (Academy)</strong>
+      <p>Schulungsunterlagen der ATVANTAGE Academy.</p>
+    </div><div>
+      <strong>Kontakt</strong>
+      <p><a href="https://www.atvantage.com" target="_blank" rel="noopener">Website</a><br><a href="mailto:academy@atvantage.com">academy@atvantage.com</a><br>
+      </p>
+    </div></div>
+  <div class="avd-academy-footer__legal">
+    © <span data-avd-academy-year>2026</span> ATVANTAGE
+  </div>
+</footer>
+
+</body>
+</html>
