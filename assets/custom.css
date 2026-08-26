@@ -57,8 +57,15 @@
       in oklab, var(--avd-schulung-base) 12%, var(--avd-academy-color-bg)
   );
 
-  --avd-schulung-block-gap: 1.5rem;
-  --paragraph-spacing: 1.5rem;
+  /* ---------------------------------------------------------------------------
+     VERTIKALER RHYTHMUS der Guide-Spalte (Register-Eintrag A-002). Drei Masse,
+     alle hier und nur hier. `--paragraph-spacing` ist ein Foundation-Token
+     (theme/atvantage/tokens/typography.css, Vorgabe 20px) und speist ueber
+     `p { margin: 0 0 var(--paragraph-spacing) }` jeden Absatz der Site.
+     --------------------------------------------------------------------------- */
+  --avd-schulung-section-gap: 1.8rem;   /* vor einem neuen Abschnitt (h1, h2) */
+  --avd-schulung-heading-gap: 1rem;     /* Luft um jede Ueberschrift */
+  --paragraph-spacing: 1.5rem;          /* Abstand unter Bloecken im Fluss */
 }
 
 /* -----------------------------------------------------------------------------
@@ -101,21 +108,35 @@
   border-bottom: 3px solid var(--avd-schulung-accent);
 }
 
+/* -----------------------------------------------------------------------------
+   Guide-Spalte auf Fluss-Margins statt Flex-`gap` (Register-Eintrag A-002).
+   Das Theme setzt hier `display: flex` mit `gap: 3.5rem`. Ein `gap` behandelt
+   alle Bloecke gleich: Eine Ueberschrift bekommt nach oben denselben Abstand wie
+   nach unten und laesst sich nicht an ihren Abschnitt binden.
+
+   `display: block` AUSDRUECKLICH, nicht `unset`: `display` erbt nicht, `unset`
+   ist also `initial` und das ist `inline`. Dass ein `unset` hier trotzdem
+   funktioniert, liegt allein daran, dass <main> Grid-Item von
+   `.avd-academy-guide-layout` ist und darum blockifiziert wird - es haengt an
+   einer Eigenschaft des Elternelements, nicht an dieser Regel.
+
+   KEIN `gap` mehr daneben: An einem Block-Container wirkt es nicht, die Zeile
+   war toter Code.
+   ----------------------------------------------------------------------------- */
 .avd-academy-guide-main {
-  display: unset;
-  gap: var(--avd-schulung-block-gap);
+  display: block;
 }
 
 .avd-academy-guide-main h1,
 .avd-academy-guide-main h2,
 .avd-academy-guide-main h3,
 .avd-academy-guide-main h4 {
-  margin-block: 1rem;
+  margin-block: var(--avd-schulung-heading-gap);
 }
 
 .avd-academy-guide-main h1,
 .avd-academy-guide-main h2 {
-  margin-block-start: 1.8rem;
+  margin-block-start: var(--avd-schulung-section-gap);
 }
 
 .avd-academy-guide-lead, .avd-academy-guide-main > h1:first-child + p, .avd-academy-guide-main > p:first-child,
@@ -125,6 +146,10 @@
   margin-block-end: var(--paragraph-spacing);
 }
 
-table {
+/* Auf die Inhaltsspalten begrenzt. Ein blankes `table` traefe auch Tabellen in
+   Theme-Bausteinen (Cards, Hero, Fusszeile) und veraenderte dort Abstaende, die
+   das Theme selbst setzt. */
+.avd-academy-guide-main table,
+.avd-academy-doc-main table {
   margin-block-end: var(--paragraph-spacing);
 }
