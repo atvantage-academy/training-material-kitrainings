@@ -42,12 +42,51 @@
           mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
 }
 
-/* Drucken-Button im Hero der Visualisierungs-Ansicht – gleiche Bauform wie die
-   Kopier-Buttons (kompakter Icon-Button, Icon als CSS-Maske in currentColor, KEIN
-   Emoji), damit er neben dem QR-Code eine Reihe bildet. Beschriftung nur als
-   Tooltip und aria-label. Verdrahtet von atvantage.js ([data-avd-academy-print]);
-   im Ausdruck ausgeblendet (print.css). */
-.avd-academy-print-btn { padding: 7px; gap: 0; line-height: 0; }
+/* --- Seitenwerkzeuge: EINE Knopfform, vier Standorte ----------------------
+   QR-Code, Farbschema, Drucken, Vollbild sind überall dieselben Knöpfe – sie
+   stehen nur an verschiedenen Stellen (Kopfzeile bei page/guide, Hero bei der
+   Visualisierung, Kopfleiste bei Präsentation und Simulation). Gerendert von
+   theme/jekyll/_includes/tools.html.
+
+   AUSSEHEN KOMMT VOM CONTAINER, nicht vom Knopf: Kantenlänge, Textfarbe und
+   Zeichengröße stehen in drei Variablen, die die umgebende Gruppe setzt. Deshalb
+   funktioniert derselbe Knopf auf der weißen Kopfzeile wie auf der dunklen
+   Kopfleiste der Präsentation, ohne eine Klasse je Standort. Die Vorgaben sind
+   die der Doku-Seiten; präsentation.css/simulation.css schrauben sie um.
+
+   ALIASSE: `avd-academy-theme-toggle` und `avd-academy-print-btn` sind ÖFFENTLICHE
+   Namen (theme/markup-contract.txt) – fremde Repos selektieren sie in ihrer
+   assets/custom.css, und print.css blendet sie darüber aus. Sie bleiben deshalb
+   auf den Knöpfen UND hier im Selektor, damit auch ein handgeschriebener Knopf mit
+   dem alten Namen richtig aussieht. */
+.avd-academy-tool,
+.avd-academy-theme-toggle,
+.avd-academy-print-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--avd-academy-tool-size, 34px);
+  height: var(--avd-academy-tool-size, 34px);
+  padding: 0;
+  border: 1px solid var(--avd-academy-color-border);
+  border-radius: var(--button-radius, 5px);
+  background: transparent;
+  color: var(--avd-academy-tool-ink, var(--avd-academy-color-headline));
+  font: inherit;
+  font-size: var(--avd-academy-tool-glyph, 18px);
+  line-height: 1;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.avd-academy-tool:hover,
+.avd-academy-tool:focus-visible {
+  color: var(--avd-academy-tool-ink-hover, var(--avd-academy-color-headline));
+  border-color: currentColor;
+}
+
+/* Drucken – kompakter Icon-Button wie die Kopier-Buttons: Icon als CSS-Maske in
+   currentColor, KEIN Emoji. Beschriftung nur als Tooltip und aria-label.
+   Verdrahtet von atvantage.js ([data-avd-academy-print]) bzw. presentation.js
+   ([data-avd-academy-present-print]); im Ausdruck ausgeblendet (print.css). */
+.avd-academy-tool--print::before,
 .avd-academy-print-btn::before {
   content: ""; display: block; width: 18px; height: 18px;
   background-color: currentColor;
@@ -651,15 +690,10 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   flex: none;
 }
 
-/* Farbschema-Umschalter als kompakter Icon-Button – gleiche Kantenlänge wie der
-   QR-Code daneben. Ohne diese Regel gilt das Button-Grundmaß (11px/26px
-   Polster), und der Umschalter stünde als breiter Block neben einer 34-px-Kachel. */
-.avd-academy-theme-toggle {
-  width: 34px; height: 34px;
-  padding: 0;
-  justify-content: center;
-  font-size: 18px; line-height: 1;
-}
+/* Die Knöpfe darin sind die Seitenwerkzeuge (`.avd-academy-tool`, oben im
+   Button-Abschnitt). Sie brauchen hier KEINE Variablen: Die Vorgaben der
+   Komponente – 34 px, Überschriftenfarbe – sind genau der Kopfzeilen-Look, und der
+   QR-Code daneben ist ebenso groß. */
 
 @media (max-width: 900px) {
   .avd-academy-header__burger { display: inline-flex; margin-left: auto; }

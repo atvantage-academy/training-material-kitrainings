@@ -23,8 +23,8 @@
     description: "…"                → Meta-Description
     duration:    8                  → Zahl in Minuten → Hero-Tag „ca. 8 Minuten“
                                        (ungefähre LESEDAUER; bei Guides/Übungen die
-                                       Dauer der Übung). Entfällt bei
-                                       `layout: visualization`.
+                                       Dauer der Übung, bei Visualisierungen die
+                                       Bearbeitungszeit – dort unüblich, aber erlaubt).
     topics:      ["Cloud & DevOps"] → weitere Hero-Tags
     resources:   [{title, url, icon}, …] → Sidebar-Karte „Weiterführende Informationen“.
                                        title und/oder icon (Bildpfad); icon erscheint
@@ -37,40 +37,38 @@
                                        Seite (diese wird automatisch angehängt); in
                                        der `index.md` gesetzt wird sie vererbt.
 
-  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides (Übungen,
-  Anleitungen) – dort ist das Übernehmen des Quelltexts der Zweck. Bedingungen:
-  Markdown-Seite (`.md`, nicht reines HTML) UND als Guide erkennbar UND keine
-  Visualisierung. Guide ist eine Seite mit `layout: guide` ODER gesetztem
-  `duration` – letzteres ist der etablierte Marker, und die Guide-Vorlage des
-  Themes wie auch die von didaktikon erzeugten Übungen nutzen `layout: page`
-  plus `duration`. Nur auf `layout: guide` zu prüfen würde den Button dort
-  entfernen. Doku-Seiten haben kein `duration`; Visualisierungen sind
-  ausgeschlossen, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
+  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides – dort ist das
+  Übernehmen des Quelltexts der Zweck. Bedingungen: Markdown-Seite (`.md`, nicht
+  reines HTML) UND der Schalter `toolbar.copy` (Vorgabe: nur `layout: guide`, siehe
+  `_includes/avd-switch.html`). Doku-Seiten und Visualisierungen haben ihn nicht –
+  bei letzteren, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
 
-  QR-CODE der Seitenadresse + DRUCKEN-KNOPF: In dieser Ansicht (`visualization`)
-  stehen beide rechts im Hero – QR links, Drucken rechts. Sie hat weder Kopfzeile
-  noch Sidebar, in der sie sonst Platz hätten.
+  DIE SEITENWERKZEUGE – QR-Code, Farbschema-Umschalter, Drucken – sind EINE
+  Komponente (`_includes/tools.html`) an zwei Standorten in diesem Rahmen:
 
-  Auf `default`/`guide` steht im Hero KEINES von beiden: Der QR-Code sitzt in der
-  Kopfzeile neben dem Farbschema-Umschalter (siehe `_includes/header.html`), und zum
-  Drucken bleibt es beim Browser-Befehl (Strg/Cmd+P). Tooltip des QR-Codes überall:
-  „Diese Seite auf Deinem Smartphone öffnen“. Er wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
+    Kopfzeile   `chrome: true`  (page, guide)      QR + Farbschema
+    Hero rechts `hero_tools`    (visualization)    QR + Farbschema + Drucken
+
+  Die Regel dahinter ist die Kopfzeile: Wo es sie gibt, tragen die Werkzeuge sie;
+  wo nicht, tritt der Hero an ihre Stelle. Drucken gibt es nur dort, weil auf einer
+  gewöhnlichen Seite der Browser-Befehl (Strg/Cmd+P) genügt, die rahmenlose
+  Ansicht aber keinen anderen Weg aufs Papier hat.
+
+  Der QR-Code wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
   Adresse zur Build-Zeit nicht feststeht; ohne JavaScript erscheint er nicht.
-  Kein Front-Matter-Schalter: Es gibt keine Seite, auf der der Weg aufs eigene
-  Smartphone schaden würde.
 --><html lang="de">
 <head>
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title> · KI Trainings (Academy)</title>
 <meta name="description" content="Schulungskonzepte der ATVANTAGE Academy."><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1787600325"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1787600325">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1787600325">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1787600325">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1787600325"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1787600325">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1787600325" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1787600325" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1787600325">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1787756722"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1787756722">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1787756722">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1787756722">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1787756722"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1787756722">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1787756722" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1787756722" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1787756722">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
@@ -82,8 +80,8 @@
 </script>
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1787600325">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1787600325"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1787756722">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1787756722"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav">
     <span>ATVANTAGE Academy</span>
   </div>
@@ -98,13 +96,10 @@
           aria-label="Navigation umschalten" aria-expanded="false">☰</button>
   <nav class="avd-academy-header__nav" id="avd-academy-main-nav"><a href="/training-material-kitrainings/" aria-current="page">Start</a><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
   </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
-            title="Diese Seite auf Deinem Smartphone öffnen"
-            aria-label="Diese Seite auf Deinem Smartphone öffnen"></button>
-    <button type="button" class="avd-academy-btn avd-academy-btn--ghost avd-academy-theme-toggle"
-            data-avd-academy-theme-toggle
-            title="Farbschema umschalten (hell/dunkel)"
-            aria-label="Farbschema umschalten">◐</button>
-  </div>
+                title="Diese Seite auf Deinem Smartphone öffnen"
+                aria-label="Diese Seite auf Deinem Smartphone öffnen"></button><button type="button" class="avd-academy-tool avd-academy-tool--theme avd-academy-theme-toggle" data-avd-academy-theme-toggle
+              title="Farbschema umschalten (hell/dunkel)"
+              aria-label="Farbschema umschalten">◐</button></div>
 </header>
 
   <section class="avd-academy-guide-hero"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/">Home</a></nav><div class="avd-academy-guide-hero__meta">
@@ -117,15 +112,11 @@
     <main class="avd-academy-guide-main" id="avd-academy-content">
       <h1 id="ki-trainings">KI Trainings</h1>
 
-<p>Hier liegen die Unterlagen zu Deinem Training – Übungen, Material zum Nachschlagen
-und die Kursbeschreibung. Wähle Deinen Kurs.</p>
-
 <div class="avd-academy-grid">
 
   <div class="avd-academy-card">
     <h3 id="ki-im-alltag"><a href="ki-im-alltag/">🧭 KI im Alltag</a></h3>
-    <p>Zwei Tage: was KI-Assistenten leisten, wo sie irren, was hineindarf – und welche
-eigene Aufgabe danach anders läuft.</p>
+    <p>Zwei Tage: verstehen, wie das Werkzeug zu seiner Antwort kommt, es sauber beauftragen, das Ergebnis verantworten – und den eigenen Arbeitstag danach durchsehen.</p>
   </div>
 
 </div>

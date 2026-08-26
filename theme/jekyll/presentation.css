@@ -74,8 +74,17 @@
   font-variant-numeric: tabular-nums;
   color: var(--avd-academy-color-ink-muted);
 }
-.avd-academy-present__tools { display: flex; align-items: center; gap: var(--avd-academy-space-2); }
-/* Der QR-Code ist genauso groß wie die Werkzeug-Knöpfe daneben (2 rem, s. u.). */
+/* Werkzeuggruppe: positioniert nur – wie die Knöpfe darin AUSSEHEN, steht in
+   components.css (`.avd-academy-tool`). Die drei Variablen ziehen sie von der
+   Doku-Seiten-Vorgabe (34 px, Überschriftenfarbe) auf das Maß dieser schmalen
+   Kopfleiste. Der QR-Code daneben ist genauso groß. */
+.avd-academy-present__tools {
+  display: flex; align-items: center; gap: var(--avd-academy-space-2);
+  --avd-academy-tool-size: 2rem;
+  --avd-academy-tool-glyph: 1rem;
+  --avd-academy-tool-ink: var(--avd-academy-color-ink-muted);
+  --avd-academy-tool-ink-hover: var(--avd-academy-color-accent);
+}
 .avd-academy-present__tools .avd-academy-qr { --avd-academy-qr-size: 2rem; }
 .avd-academy-present__back {
   border: 0;
@@ -89,21 +98,6 @@
 }
 .avd-academy-present__back[hidden] { display: none; }
 .avd-academy-present__back:hover { color: var(--avd-academy-color-accent); }
-.avd-academy-present__tool {
-  border: 1px solid var(--avd-academy-color-border);
-  background: transparent;
-  color: var(--avd-academy-color-ink-muted);
-  border-radius: var(--avd-academy-radius);
-  width: 2rem; height: 2rem;
-  line-height: 1;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: color var(--avd-academy-transition), border-color var(--avd-academy-transition);
-}
-.avd-academy-present__tool:hover {
-  color: var(--avd-academy-color-accent);
-  border-color: var(--avd-academy-color-accent);
-}
 
 /* --- Bühne + Schiene --------------------------------------------------------
    Ohne [data-ready] (kein JS) bleibt der Bereich ein normaler, scrollbarer
@@ -279,7 +273,7 @@
      übernimmt die Rechtsausrichtung vom ausgeblendeten Folienzähler. */
   .avd-academy-present__tools { margin-left: auto; }
   .avd-academy-present__back,
-  .avd-academy-present__tool { display: none !important; }
+  .avd-academy-tool { display: none !important; }
   /* Kleiner als auf Doku-Seiten (25 mm): Die Kopfleiste ist schmal, und 20 mm
      bleiben bei rund 33 Modulen zuverlässig scannbar. */
   .avd-academy-present__tools .avd-academy-qr { --avd-academy-qr-print: 20mm; }

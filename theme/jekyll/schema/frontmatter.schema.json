@@ -62,7 +62,7 @@
     "duration": {
       "type": "integer",
       "minimum": 0,
-      "description": "Zeit in MINUTEN; erscheint als Zeit-Tag im Hero. GILT IN: `page`, `guide` – die übrigen Layouts zeigen kein Zeit-Tag. STANDARD: keine Angabe = kein Tag. Was gemessen wird, hängt an der Art der Seite: bei einer Übung die Bearbeitungszeit, bei einer gewöhnlichen Seite die Lesedauer. Ein Richtwert, keine Vorgabe. Nicht zu verwechseln mit `simulation.step.interval`, das in Millisekunden zählt."
+      "description": "Zeit in MINUTEN; erscheint als Zeit-Tag im Hero. GILT IN: `page`, `guide`, `visualization` – die eigenständigen Layouts (`presentation`, `simulation`) haben keinen Hero. STANDARD: keine Angabe = kein Tag. Was gemessen wird, hängt an der Art der Seite: bei einer Übung die Bearbeitungszeit, bei einer gewöhnlichen Seite die Lesedauer. Ein Richtwert, keine Vorgabe. Nicht zu verwechseln mit `simulation.step.interval`, das in Millisekunden zählt."
     },
     "topics": {
       "type": "array",

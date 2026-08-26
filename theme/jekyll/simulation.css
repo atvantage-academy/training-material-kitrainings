@@ -70,7 +70,16 @@
   color: var(--avd-academy-color-ink-muted);
   white-space: nowrap;
 }
-.avd-academy-sim__tools { display: flex; align-items: center; gap: var(--avd-academy-space-2); }
+/* Werkzeuggruppe: positioniert nur – wie die Knöpfe darin AUSSEHEN, steht in
+   components.css (`.avd-academy-tool`). Dieselben Variablen wie in der
+   Präsentation, damit beide Kopfleisten gleich aussehen. */
+.avd-academy-sim__tools {
+  display: flex; align-items: center; gap: var(--avd-academy-space-2);
+  --avd-academy-tool-size: 2rem;
+  --avd-academy-tool-glyph: 1rem;
+  --avd-academy-tool-ink: var(--avd-academy-color-ink-muted);
+  --avd-academy-tool-ink-hover: var(--avd-academy-color-accent);
+}
 .avd-academy-sim__tools .avd-academy-qr { --avd-academy-qr-size: 2rem; }
 .avd-academy-sim__back {
   border: 0;
@@ -84,21 +93,6 @@
 }
 .avd-academy-sim__back[hidden] { display: none; }
 .avd-academy-sim__back:hover { color: var(--avd-academy-color-accent); }
-.avd-academy-sim__tool {
-  border: 1px solid var(--avd-academy-color-border);
-  background: transparent;
-  color: var(--avd-academy-color-ink-muted);
-  border-radius: var(--avd-academy-radius);
-  width: 2rem; height: 2rem;
-  line-height: 1;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: color var(--avd-academy-transition), border-color var(--avd-academy-transition);
-}
-.avd-academy-sim__tool:hover {
-  color: var(--avd-academy-color-accent);
-  border-color: var(--avd-academy-color-accent);
-}
 
 /* --- Bühne + Erklärspalte ---------------------------------------------------
    Die Erklärspalte ist bewusst SCHMAL und fest: Sie trägt einen Gedanken, nicht
@@ -881,7 +875,7 @@
   .avd-academy-sim__tools { margin-left: auto; }
   .avd-academy-sim__tools .avd-academy-qr { --avd-academy-qr-print: 20mm; }
   .avd-academy-sim__back,
-  .avd-academy-sim__tool,
+  .avd-academy-tool,
   .avd-academy-sim__progress,
   .avd-academy-sim__controls,
   .avd-academy-sim__speed-menu,

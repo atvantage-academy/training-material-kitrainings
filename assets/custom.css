@@ -2,33 +2,129 @@
    Schulungs-Customization – VERPFLICHTEND für jedes Schulungs-Repo.
    -----------------------------------------------------------------------------
    Sorgt für eine klar erkennbare Abweichung vom academy-online-Look:
-   „Schulungs-Grün“ als Akzentfarbe plus Schulungs-Logo (siehe `logo:` in
-   _config.yml). Diese Datei wird über `custom_css` in _config.yml NACH dem Theme
-   geladen und überschreibt daher die Design-Tokens (`--avd-*`) – für Light & Dark.
+   „Schulungs-Blau“ als Akzentfarbe plus Schulungs-Logo (siehe `brand.logo` in
+   _config.yml). Diese Datei wird über `styles` in _config.yml NACH dem Theme
+   geladen und überschreibt daher die Design-Tokens (`--avd-*`).
 
    Trainer:innen dürfen die Werte anpassen (andere Farbe, eigenes Logo). Die Datei
    MUSS aber bestehen bleiben, damit Schulungsunterlagen erkennbar anders aussehen
    als die öffentliche Academy-Website. Siehe academy-theme-Doku, Abschnitt
    „Customizations“.
+
+   EINE FARBE, KEIN ZWEITER SATZ WERTE FÜR DARK.
+   Angegeben wird nur der Farbton. Die HELLIGKEIT kommt aus den Theme-Tokens
+   `--avd-academy-color-ink` (Textfarbe) und `--avd-academy-color-bg`
+   (Seitenfläche) – die schaltet das Theme beim Moduswechsel selbst um. Deshalb
+   steht hier NUR EIN Block: Light und Dark fallen aus derselben Formel.
+
+   WER HIER EINEN `[data-avd-academy-theme="dark"]`-BLOCK ODER EINEN
+   `prefers-color-scheme`-BLOCK ERGÄNZT, MACHT DIE ABLEITUNG KAPUTT: Ein solcher
+   Block gewinnt gegen die Formel und friert genau einen Modus auf einen
+   Handwert ein. Beim Bauen fällt das nicht auf, weil nur der jeweils andere
+   Modus geprüft wird. Farbe ändern heißt: `--avd-schulung-base` ändern.
    ============================================================================= */
 
 :root {
-  --avd-schulung-accent: #0e7c66;              /* Schulungs-Grün (Light) */
-  --avd-orange: var(--avd-schulung-accent);    /* Akzent: Links, Hover, Icons, aria-current */
-  --avd-academy-hero-bg: #e6f4ee;              /* Hero-Band (Light) */
+  /* ===========================================================================
+     DIE SCHULUNGSFARBE. Der einzige Wert, der hier von Hand gepflegt wird.
+     =========================================================================== */
+  --avd-schulung-base: #0198FF;
+
+  /* Akzent (Links, Hover, Icons, aria-current) – in zwei Schritten, weil eine
+     relative Farbe nur EINE Ursprungsfarbe hat und wir aus zwei Quellen etwas
+     brauchen: die Helligkeit aus dem Modus, den Farbton aus der Basis.
+       Schritt 1 (`color-mix`) mischt die Basis Richtung Theme-Textfarbe. Das
+         setzt die Helligkeit passend zum Modus – in Light dunkler, in Dark
+         heller –, nimmt der Farbe dabei aber Buntheit, weil die Textfarbe fast
+         neutral ist.
+       Schritt 2 (`oklch(from …)`) übernimmt Helligkeit und Farbwinkel des
+         Ergebnisses und dreht die Buntheit wieder auf.
+     `in oklab`, NICHT `in oklch`: Die polare Mischung interpoliert auch den
+     Farbwinkel und zieht das Blau Richtung Türkis der Textfarbe (249° -> 231°).
+     `calc(c * 3)` ist kein Faktor, sondern ein Anschlag: Der Wert liegt bewusst
+     ausserhalb von sRGB, der Browser bildet ihn auf das Maximum herunter, das
+     bei dieser Helligkeit möglich ist.
+     Den Mischanteil NICHT erhöhen: Bei 65 % fällt der Kontrast auf Weiß unter
+     die 4.5:1 der WCAG AA, und das Token trägt Fließtext-Links. */
+  --avd-schulung-accent: oklch(
+      from color-mix(in oklab, var(--avd-schulung-base) 55%, var(--avd-academy-color-ink)) l calc(c * 3) h
+  );
+  --avd-orange: var(--avd-schulung-accent);
+
+  /* Hero-Band: dieselbe Mechanik gegen die Seitenfläche, nur ohne Schritt 2 –
+     es ist eine Fläche, kein Signal, und bleibt darum blass. */
+  --avd-academy-hero-bg: color-mix(
+      in oklab, var(--avd-schulung-base) 12%, var(--avd-academy-color-bg)
+  );
+
+  --avd-schulung-block-gap: 1.5rem;
+  --paragraph-spacing: 1.5rem;
 }
 
-:root[data-avd-academy-theme="dark"] {
-  --avd-schulung-accent: #34d3ac;              /* Schulungs-Grün (Dark, heller) */
-  --avd-academy-hero-bg: #10322a;              /* Hero-Band (Dark) */
-}
+/* -----------------------------------------------------------------------------
+   Wortmarke in der Akzentfarbe.
+   Das Theme bindet sie als <img src> ein (theme/jekyll/_includes/header.html):
+   ein eigenes Dokument, das WEDER die Tokens dieser Seite noch `currentColor`
+   noch den Dark-Umschalter sieht. Eine Farbe im SVG selbst wäre also ein zweiter
+   Handwert neben `--avd-schulung-base` – genau das, was oben abgeschafft wurde.
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-avd-academy-theme="light"]) {
-    --avd-schulung-accent: #34d3ac;
-    --avd-academy-hero-bg: #10322a;
+   Deshalb wird die Datei hier nicht als Bild gezeigt, sondern als MASKE: `content`
+   entfernt den Bildinhalt, `background-color` liefert die Fläche, `mask-image` die
+   Form. Damit folgt das Logo der abgeleiteten Akzentfarbe und dem Moduswechsel,
+   ohne dass die Farbe zweimal gepflegt wird.
+
+   `url()` steht BEWUSST RELATIV: In CSS wird es gegen den Ort dieser Datei
+   aufgelöst, nicht gegen den Seitenpfad. Ein absolutes `/assets/…` bräche in der
+   Lernenden-Ausgabe, die auf GitHub-Projektseiten unter einem `baseurl` liegt.
+
+   Die Grössenangaben sind nötig, weil `content: ""` die Eigengrösse des Bildes
+   entfernt – ohne sie fiele die Breite auf 0. Verhältnis = viewBox des SVG.
+
+   @supports als Riegel: Kann eine Engine keine Masken, bleibt das unveränderte
+   <img> stehen. Ohne den Riegel wäre die Kopfzeile dort logolos, und ein
+   fehlendes Logo sieht man nicht im Build, sondern erst beim Kunden.
+   ----------------------------------------------------------------------------- */
+@supports (mask-image: url("logo-schulung.svg")) {
+  .avd-academy-header__logo {
+    content: "";
+    background-color: var(--avd-schulung-accent);
+    mask: url("logo-schulung.svg") no-repeat left center / contain;
+    /* Zahlen = viewBox des SVG. Bleiben in Sync, sonst wird verzerrt oder es
+       entsteht Leerraum: `content: ""` entfernt die Eigengroesse des Bildes. */
+    aspect-ratio: 260 / 24;
+    width: calc(22px * 260 / 24);
   }
 }
 
-/* Grüner Akzentstreifen unter der Kopfzeile – deutliches Erkennungsmerkmal. */
-.avd-academy-header { border-bottom: 3px solid var(--avd-schulung-accent); }
+/* Akzentstreifen unter der Kopfzeile – deutliches Erkennungsmerkmal. */
+.avd-academy-header {
+  border-bottom: 3px solid var(--avd-schulung-accent);
+}
+
+.avd-academy-guide-main {
+  display: unset;
+  gap: var(--avd-schulung-block-gap);
+}
+
+.avd-academy-guide-main h1,
+.avd-academy-guide-main h2,
+.avd-academy-guide-main h3,
+.avd-academy-guide-main h4 {
+  margin-block: 1rem;
+}
+
+.avd-academy-guide-main h1,
+.avd-academy-guide-main h2 {
+  margin-block-start: 1.8rem;
+}
+
+.avd-academy-guide-lead, .avd-academy-guide-main > h1:first-child + p, .avd-academy-guide-main > p:first-child,
+.avd-academy-guide-main ul, .avd-academy-guide-main ol,
+.avd-academy-guide-main blockquote {
+  margin: unset;
+  margin-block-end: var(--paragraph-spacing);
+}
+
+table {
+  margin-block-end: var(--paragraph-spacing);
+}

@@ -67,6 +67,7 @@
   .avd-academy-copy,
   .avd-academy-print-btn,
   .avd-academy-theme-toggle,
+  .avd-academy-tool,
   [data-avd-academy-toc-box],
   [data-avd-academy-progress] { display: none !important; }
 
