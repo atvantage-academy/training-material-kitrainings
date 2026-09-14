@@ -5,17 +5,17 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string",
-      "description": "JEKYLL-STANDARD – Titel der Site – erscheint in der Kopfzeile neben dem Logo und in `<title>`. STANDARD: „ATVANTAGE Academy“."
+      "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+      "description": "JEKYLL-STANDARD – Titel der Site – erscheint in der Kopfzeile neben dem Logo und in `<title>`. STANDARD: „ATVANTAGE Academy“. MEHRSPRACHIG: auch als Sprachkarte `{ de: …, en: … }`."
     },
     "description": {
-      "type": "string",
-      "description": "JEKYLL-STANDARD – Kurzbeschreibung der Site; Rückfall für `<meta name=\"description\">`, wenn eine Seite keine eigene trägt. STANDARD: keine."
+      "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+      "description": "JEKYLL-STANDARD – Kurzbeschreibung der Site; Rückfall für `<meta name=\"description\">`, wenn eine Seite keine eigene trägt. STANDARD: keine. MEHRSPRACHIG: auch als Sprachkarte."
     },
     "lang": {
       "type": "string",
       "default": "de",
-      "description": "Sprache der Site (BCP-47) – landet in `<html lang>`. Einzelne Seiten überschreiben sie im Front Matter."
+      "description": "Sprache der Site (BCP-47) – landet in `<html lang>` und ist zugleich die STANDARDSPRACHE: Bei Mehrsprachigkeit wohnt ihr Sprachbaum in der Wurzel (ohne Pfad-Präfix), und eine fehlende Übersetzung fällt auf sie zurück. Einzelne Seiten überschreiben sie im Front Matter."
     },
     "url": {
       "type": "string",
@@ -124,8 +124,38 @@
       "description": "JEKYLL-STANDARD – bricht den Build bei syntaktisch fehlerhaftem Front Matter ab. Prüft NUR die YAML-Syntax – die Feldnamen prüft dieses Schema."
     },
     "collections": {
+      "type": [
+        "object",
+        "array"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "JEKYLL-STANDARD – eigene Collections. Als Abschnitt (`neuigkeiten: { output: true }`) oder als bloße Namensliste. Die Schema-Prüfung liest diesen Schlüssel: Dokumente der hier erklärten Collections werden wie Seiten geprüft – zusammen mit `_posts`, das Jekyll eingebaut kennt."
+    },
+    "relative_links": {
       "type": "object",
-      "description": "JEKYLL-STANDARD – eigene Collections."
+      "additionalProperties": false,
+      "description": "Optionen von `jekyll-relative-links` – dem Plugin, das relative Verweise auf `.md`-Quelldateien in die Adressen der gebauten Seiten umschreibt.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "`false` schaltet das Umschreiben ab. Dann zeigt jeder `.md`-Verweis im Markdown ins Leere – das Theme setzt das Umschreiben voraus."
+        },
+        "collections": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auch Collection-Dokumente umschreiben. OHNE diesen Schalter bleibt ein `.md`-Verweis in einem Collection-Dokument unverändert stehen und ist im Browser tot; Jekyll meldet dabei nichts. Die Theme-Defaults setzen ihn auf `true` – wer sie nicht lädt, setzt ihn selbst."
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Dateien, deren Verweise unangetastet bleiben (Glob-Muster relativ zur Quelle)."
+        }
+      }
     },
     "sass": {
       "type": "object",
@@ -215,6 +245,85 @@
       "type": "string",
       "description": "Die Zielgruppe DIESES Builds. Wird nicht von Hand gesetzt, sondern vom Build als Overlay (`_config.audience.yml`); Seiten und Einträge fremder Zielgruppe entfallen dann. STANDARD: keine – dann ist alles sichtbar (die lokale Vorschau). Der Wert muss in `audiences` deklariert sein."
     },
+    "i18n": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Mehrsprachigkeit. OHNE DIESEN SCHLÜSSEL IST DIE SITE EINSPRACHIG – kein Pfad-Präfix, kein Umschalter, alles wie bisher in `lang`. Je Sprache ein Ordnerbaum; die Standardsprache (`lang`) wohnt in der Wurzel, jede weitere unter `/«code»/`. Zusammengehörende Seiten verbindet `page_id` im Front Matter – nicht der Pfad, denn Ordner und Dateien tragen je Sprache ihre eigenen Namen. Konfigurierte Texte und Adressen dürfen überall eine Sprachkarte sein (`title: { de: …, en: … }`).",
+      "properties": {
+        "languages": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Die Sprachen, die diese Site führt – die Deklaration, gegen die `lang` je Seite, jede `page_id` und jede Sprachkarte geprüft wird. Die Standardsprache (`lang` der Site) gehört mit in die Liste. Mit weniger als zwei Einträgen bleibt die Site einsprachig.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code"
+            ],
+            "description": "Eine Sprache der Site.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Sprachcode (BCP-47, meist zweistellig) – erscheint in `<html lang>`, im Pfad-Präfix und auf dem Umschalter.",
+                "examples": [
+                  "de",
+                  "en"
+                ]
+              },
+              "base": {
+                "type": "string",
+                "description": "Wurzel des Sprachbaums in der URL. STANDARD: `/` für die Standardsprache, sonst `/«code»/`. Nur setzen, wer anders ausliefert.",
+                "examples": [
+                  "/",
+                  "/en/"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "description": "Beschriftung im Umschalter-Tooltip. STANDARD: der Eigenname der Sprache (Deutsch, English, …), sonst der Code in Großbuchstaben.",
+                "examples": [
+                  "Deutsch",
+                  "English"
+                ]
+              }
+            }
+          }
+        },
+        "switch": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Der Sprachumschalter in der Werkzeugleiste (neben dem Farbschema-Umschalter).",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Umschalter anbieten. STANDARD: an – er erscheint aber nur dort, wo es die Seite in einer anderen Sprache überhaupt gibt. Auf `false` für eine Site, die beide Fassungen getrennt verteilt."
+            },
+            "fallback": {
+              "type": "string",
+              "enum": [
+                "none",
+                "base"
+              ],
+              "default": "none",
+              "description": "Wohin, wenn es zu DIESER Seite keine Fassung in der Zielsprache gibt. `none` = kein Knopf (Standard). `base` = auf die Wurzel des anderen Sprachbaums – sinnvoll bei einer erst teilweise übersetzten Site."
+            }
+          }
+        },
+        "detect": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Auswertung der Browsersprache (`navigator.languages`; ein Accept-Language-Header ist auf einem statischen Hoster nicht lesbar).",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Beim ersten Aufruf einer Sitzung auf die bevorzugte Sprache umleiten, sofern es diese Seite darin gibt. STANDARD: aus – eine Umleitung ist eine Verhaltensänderung. Eine ausdrückliche Wahl am Umschalter gewinnt immer, `?nolang` schaltet sie fallweise ab."
+            }
+          }
+        }
+      }
+    },
     "brand": {
       "type": "object",
       "additionalProperties": false,
@@ -231,9 +340,8 @@
           "description": "Logo (Wortmarke) in der Kopfzeile, site-relativer Pfad."
         },
         "tagline": {
-          "type": "string",
-          "default": "ATVANTAGE Academy",
-          "description": "Eine Zeile Markentext in der Metaleiste über der Kopfzeile."
+          "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+          "description": "Eine Zeile Markentext in der Metaleiste über der Kopfzeile. MEHRSPRACHIG: auch als Sprachkarte."
         },
         "website": {
           "type": "string",
@@ -346,8 +454,8 @@
       "description": "Fußzeile der Site.",
       "properties": {
         "tagline": {
-          "type": "string",
-          "description": "Ein Satz unter dem Site-Titel in der linken Spalte. STANDARD: keiner. Nicht zu verwechseln mit `brand.tagline`, der Zeile in der Metaleiste über der Kopfzeile."
+          "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+          "description": "Ein Satz unter dem Site-Titel in der linken Spalte. STANDARD: keiner. Nicht zu verwechseln mit `brand.tagline`, der Zeile in der Metaleiste über der Kopfzeile. MEHRSPRACHIG: auch als Sprachkarte."
         },
         "legal": {
           "type": "object",
@@ -355,12 +463,12 @@
           "description": "Rechtliche Verweise in der Schlusszeile. STANDARD: keine – dann zeigt die Zeile nur das Copyright.",
           "properties": {
             "imprint": {
-              "type": "string",
-              "description": "Ziel des Impressum-Links."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Ziel des Impressum-Links. MEHRSPRACHIG: auch als Sprachkarte – Rechtstexte liegen je Sprache unter eigener Adresse."
             },
             "privacy": {
-              "type": "string",
-              "description": "Ziel des Datenschutz-Links."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Ziel des Datenschutz-Links. MEHRSPRACHIG: auch als Sprachkarte – Rechtstexte liegen je Sprache unter eigener Adresse."
             }
           }
         },
@@ -370,9 +478,8 @@
           "description": "Rechte Spalte der Fußzeile. STANDARD: keine – ohne `items` wird die Spalte gar nicht gerendert.",
           "properties": {
             "title": {
-              "type": "string",
-              "default": "Weitere Informationen",
-              "description": "Überschrift der Spalte."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Überschrift der Spalte. MEHRSPRACHIG: auch als Sprachkarte."
             },
             "items": {
               "type": "array",
@@ -438,6 +545,9 @@
                     },
                     "qr": {
                       "$ref": "frontmatter.schema.json#/properties/toolbar/properties/qr"
+                    },
+                    "lang": {
+                      "$ref": "frontmatter.schema.json#/properties/toolbar/properties/lang"
                     }
                   }
                 }
@@ -458,6 +568,9 @@
                     },
                     "qr": {
                       "$ref": "frontmatter.schema.json#/properties/toolbar/properties/qr"
+                    },
+                    "lang": {
+                      "$ref": "frontmatter.schema.json#/properties/toolbar/properties/lang"
                     }
                   }
                 }
@@ -475,6 +588,9 @@
                   "properties": {
                     "qr": {
                       "$ref": "frontmatter.schema.json#/properties/toolbar/properties/qr"
+                    },
+                    "lang": {
+                      "$ref": "frontmatter.schema.json#/properties/toolbar/properties/lang"
                     }
                   }
                 }
@@ -504,6 +620,9 @@
             },
             "qr": {
               "$ref": "frontmatter.schema.json#/properties/toolbar/properties/qr"
+            },
+            "lang": {
+              "$ref": "frontmatter.schema.json#/properties/toolbar/properties/lang"
             }
           }
         }
@@ -522,7 +641,13 @@
           "required": [
             "url"
           ],
-          "description": "gewöhnlicher Verweis"
+          "description": "gewöhnlicher Verweis (`url`)"
+        },
+        {
+          "required": [
+            "page"
+          ],
+          "description": "Verweis auf eine Seite dieser Site (`page`)"
         },
         {
           "required": [
@@ -538,6 +663,9 @@
         },
         "url": {
           "$ref": "frontmatter.schema.json#/definitions/verweis/properties/url"
+        },
+        "page": {
+          "$ref": "frontmatter.schema.json#/definitions/seitenverweis"
         },
         "icon": {
           "$ref": "frontmatter.schema.json#/definitions/verweis/properties/icon"

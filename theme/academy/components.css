@@ -82,6 +82,28 @@
   border-color: currentColor;
 }
 
+/* Sprachumschalter – der einzige Werkzeugknopf mit TEXT statt Zeichen: Er trägt den
+   Sprachcode der Zielsprache („EN“). Ein Globus-Symbol sagt „irgendeine Sprache“,
+   zwei Buchstaben sagen WELCHE – und zwar ohne Grafik, ohne Menü und in jeder Sprache
+   verständlich. Gerendert von theme/jekyll/_includes/tools.html, je anderer Sprache
+   ein Knopf.
+
+   ES IST EIN `<a>`, kein `<button>`: Der Wechsel ist eine Navigation und soll ohne
+   JavaScript, im neuen Tab und für Suchmaschinen funktionieren. Deshalb hier die
+   beiden Eigenschaften, die ein Link von sich aus mitbringt und die die Knopfform
+   nicht vorsieht: keine Unterstreichung, Farbe vom Knopf statt vom Linktext.
+
+   ZWEI ZEICHEN BRAUCHEN WENIGER GRÖSSE als ein Glyph: Bei der Zeichengröße der
+   übrigen Werkzeuge (18px) stießen sie an den Rand. Abgeleitet wird sie aus derselben
+   Variablen, damit der Knopf in der Präsentation mitschrumpft. */
+.avd-academy-tool--lang {
+  text-decoration: none;
+  color: var(--avd-academy-tool-ink, var(--avd-academy-color-headline));
+  font-size: calc(var(--avd-academy-tool-glyph, 18px) * 0.66);
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
 /* Drucken – kompakter Icon-Button wie die Kopier-Buttons: Icon als CSS-Maske in
    currentColor, KEIN Emoji. Beschriftung nur als Tooltip und aria-label.
    Verdrahtet von atvantage.js ([data-avd-academy-print]) bzw. presentation.js

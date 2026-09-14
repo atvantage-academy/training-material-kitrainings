@@ -143,6 +143,24 @@ jobs:
             --config "node_modules/${THEME_PACKAGE}/jekyll/_config.defaults.yml,_config.yml,_config.ci.yml" \
             --strict_front_matter --trace
 
+      # NACH dem Build, weil gegen das FERTIGE HTML geprüft wird: Ein Verweis entsteht
+      # an fünf verschiedenen Stellen (Fließtext, `resources`, `nav`, Sprachkarten,
+      # Brotkrumen) und kommt erst dort als `<a href>` zusammen. Ein Verweis ins Leere
+      # ist für Jekyll KEIN Baufehler – die Seite entsteht, der Link ist tot, und es
+      # fällt erst beim Klicken auf.
+      #
+      # `--config`, damit die Prüfung denselben `baseurl` liest wie der Build. Wer
+      # stattdessen mit `--baseurl` baut, gibt hier denselben Wert mit.
+      #
+      # Bedient die ANWENDUNG Adressen, die im `_site` nicht liegen (z. B.
+      # `/schemas/*.json` aus einem laufenden Dienst), nimmt `--ignore «Präfix»` sie
+      # aus – sonst meldet die Prüfung etwas, das gar kein Fehler ist.
+      #
+      # ERFORDERT THEME >= 2.5.3. Ältere Themes bringen die Datei nicht mit; dann
+      # diesen Schritt streichen oder erst das Theme nachziehen.
+      - name: Interne Verweise im gebauten HTML prüfen
+        run: ruby theme/jekyll/links.rb --require-site --config _config.yml --config _config.ci.yml
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

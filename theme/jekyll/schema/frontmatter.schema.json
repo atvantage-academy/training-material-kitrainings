@@ -39,6 +39,14 @@
         "en"
       ]
     },
+    "page_id": {
+      "type": "string",
+      "description": "Stabile ID DIESER Seite – ihre Identität, unabhängig vom Pfad. Zwei Verwendungen: (1) Ein Verweis in `nav.items`, `footer.links.items`, `resources` oder `breadcrumb.ancestors` zeigt mit `page: «id»` hierher, statt eine Adresse zu führen. (2) Dieselbe ID in einem anderen Sprachbaum macht zwei Dateien zu Fassungen derselben Seite; der Sprachumschalter findet das Gegenstück darüber. GILT IN: allen. STANDARD: keine – dann ist der DATEINAME ohne Endung die Identität. Eine ausdrückliche ID lohnt für sprechende, dateinamen-unabhängige Namen, für Ordner-Indizes (die alle `index` heißen) und für die Paarung über Sprachbäume hinweg.",
+      "examples": [
+        "theme-academy",
+        "modul-tcp-ip"
+      ]
+    },
     "permalink": {
       "type": "string",
       "description": "Jekyll-Standard: abweichende Ziel-URL dieser Seite. STANDARD: der Pfad der Datei."
@@ -53,7 +61,27 @@
         "string",
         "object"
       ],
-      "description": "Jekyll-Standard: Datum der Seite (ISO-8601). YAML liest ein unquotiertes Datum als Datumsobjekt."
+      "description": "Jekyll-Standard: Datum der Seite (ISO-8601). YAML liest ein unquotiertes Datum als Datumsobjekt. In einem Collection-Dokument gehört die UHRZEIT dazu, wenn das Datum eine Reihenfolge tragen soll – zwei Dokumente mit demselben Zeitstempel sind für einen Leser sortierbar, für einen Feed-Abonnenten nicht."
+    },
+    "categories": {
+      "type": [
+        "string",
+        "array"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Jekyll-Standard: Kategorien eines Dokuments (vor allem in `_posts`). Das Theme liest sie NICHT – sie stehen hier, weil Jekyll sie selbst auswertet (Adresse, `site.categories`) und die Prüfung sie sonst als Tippfehler meldete."
+    },
+    "tags": {
+      "type": [
+        "string",
+        "array"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Jekyll-Standard: Schlagworte eines Dokuments (vor allem in `_posts`); ausgewertet von Jekyll (`site.tags`), nicht vom Theme. Die Tags im Hero einer Seite sind `topics` – nicht zu verwechseln."
     },
     "audiences": {
       "$ref": "#/definitions/zielgruppen",
@@ -68,7 +96,8 @@
       "type": "array",
       "uniqueItems": true,
       "items": {
-        "type": "string"
+        "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+        "description": "Ein Thema – Text oder Sprachkarte `{ de: …, en: … }`."
       },
       "description": "Schlagworte, die im Hero als Tags erscheinen. Kurze Substantive, keine Sätze. GILT IN: `page`, `guide`, `visualization` – die eigenständigen Layouts haben keinen Hero. STANDARD: keine Tags."
     },
@@ -83,8 +112,8 @@
       "description": "Brotkrumen-Steuerung. GILT IN: `page`, `guide` – die Visualisierung blendet die Brotkrumen aus, `presentation` und `simulation` haben keine. STANDARD: der Pfad wird automatisch aus der Ordnerstruktur gebaut.",
       "properties": {
         "label": {
-          "type": "string",
-          "description": "Anzeigename DIESES Ordners in den Brotkrumen. Gehört in die `index`-Seite des Ordners und gilt zentral für alle Seiten darunter. STANDARD: der Ordnername."
+          "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+          "description": "Anzeigename DIESES Ordners in den Brotkrumen. Gehört in die `index`-Seite des Ordners und gilt zentral für alle Seiten darunter. STANDARD: der Ordnername. MEHRSPRACHIG: auch als Sprachkarte – der englische Baum beschriftet seine Ordner selbst."
         },
         "ancestors": {
           "type": "array",
@@ -92,18 +121,34 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-              "title",
-              "url"
+            "description": "Eine Station der Vorfahren-Kette.",
+            "anyOf": [
+              {
+                "required": [
+                  "title",
+                  "url"
+                ],
+                "description": "Station mit Adresse (`url`)"
+              },
+              {
+                "required": [
+                  "title",
+                  "page"
+                ],
+                "description": "Station als Seite dieser Site (`page`)"
+              }
             ],
             "properties": {
               "title": {
-                "type": "string",
-                "description": "Anzeigename dieser Station."
+                "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+                "description": "Anzeigename dieser Station. MEHRSPRACHIG: auch als Sprachkarte."
               },
               "url": {
-                "type": "string",
-                "description": "Ziel dieser Station, site-relativ (führender `/`)."
+                "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+                "description": "Ziel dieser Station, site-relativ (führender `/`). MEHRSPRACHIG: auch als Sprachkarte. Für Seiten DIESER Site ist `page` der bessere Weg."
+              },
+              "page": {
+                "$ref": "frontmatter.schema.json#/definitions/seitenverweis"
               }
             }
           }
@@ -133,9 +178,8 @@
               "description": "Erscheint die Karte? STANDARD: an."
             },
             "title": {
-              "type": "string",
-              "default": "Auf dieser Seite",
-              "description": "Überschrift der Karte. STANDARD: „Auf dieser Seite“. Site-weit unter `components.sidebar.toc.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Überschrift der Karte. STANDARD: „Auf dieser Seite“. Site-weit unter `components.sidebar.toc.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab. MEHRSPRACHIG: auch als Sprachkarte."
             },
             "open": {
               "type": "boolean",
@@ -153,9 +197,8 @@
               "description": "Erscheint die Karte? STANDARD: an in `guide`, sonst aus."
             },
             "title": {
-              "type": "string",
-              "default": "Fortschritt",
-              "description": "Überschrift der Karte. STANDARD: „Fortschritt“. Site-weit unter `components.sidebar.progress.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Überschrift der Karte. STANDARD: „Fortschritt“. Site-weit unter `components.sidebar.progress.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab. MEHRSPRACHIG: auch als Sprachkarte."
             }
           }
         },
@@ -170,9 +213,8 @@
               "description": "Erscheint die Karte? STANDARD: an."
             },
             "title": {
-              "type": "string",
-              "default": "Weiterführende Informationen",
-              "description": "Überschrift der Karte. STANDARD: „Weiterführende Informationen“. Site-weit unter `components.sidebar.resources.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Überschrift der Karte. STANDARD: „Weiterführende Informationen“. Site-weit unter `components.sidebar.resources.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab. MEHRSPRACHIG: auch als Sprachkarte."
             },
             "open": {
               "type": "boolean",
@@ -205,9 +247,8 @@
               "description": "Erscheint der Knopf? STANDARD: an in `guide`, sonst aus. Enthält die Seite Liquid-Anweisungen, entfällt er automatisch (der Rohtext wäre irreführend) – `force` erzwingt ihn trotzdem."
             },
             "title": {
-              "type": "string",
-              "default": "Markdown kopieren",
-              "description": "Tooltip und Beschriftung für Screenreader. STANDARD: „Markdown kopieren“. Site-weit unter `components.toolbar.copy.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Tooltip und Beschriftung für Screenreader. STANDARD: „Markdown kopieren“. Site-weit unter `components.toolbar.copy.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab. MEHRSPRACHIG: auch als Sprachkarte."
             }
           }
         },
@@ -222,9 +263,8 @@
               "description": "Erscheint der Knopf? STANDARD: an."
             },
             "title": {
-              "type": "string",
-              "default": "Diese Seite drucken",
-              "description": "Tooltip und Beschriftung für Screenreader. In der Präsentation lautet die Vorgabe „Drucken (alle Folien)“ – dort druckt der Knopf alle. STANDARD: „Diese Seite drucken“. Site-weit unter `components.toolbar.print.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Tooltip und Beschriftung für Screenreader. In der Präsentation lautet die Vorgabe „Drucken (alle Folien)“ – dort druckt der Knopf alle. STANDARD: „Diese Seite drucken“. Site-weit unter `components.toolbar.print.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab. MEHRSPRACHIG: auch als Sprachkarte."
             }
           }
         },
@@ -239,9 +279,20 @@
               "description": "Erscheint der Knopf? STANDARD: an."
             },
             "title": {
-              "type": "string",
-              "default": "Diese Seite auf Deinem Smartphone öffnen",
-              "description": "Tooltip und Beschriftung für Screenreader. STANDARD: „Diese Seite auf Deinem Smartphone öffnen“. Site-weit unter `components.toolbar.qr.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab."
+              "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+              "description": "Tooltip und Beschriftung für Screenreader. STANDARD: „Diese Seite auf Deinem Smartphone öffnen“. Site-weit unter `components.toolbar.qr.title`, je Seite hier – ein Repo, das seine Übungen anders nennt, soll das auch hier tun können, ohne das Theme anzufassen. Eine leere Zeichenkette gilt NICHT als Angabe; wer die Beschriftung loswerden will, schaltet den Baustein über `enabled` ab. MEHRSPRACHIG: auch als Sprachkarte."
+            }
+          }
+        },
+        "lang": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Der Sprachumschalter – je anderer Sprache, in der es DIESE Seite gibt, ein Knopf mit deren Code. GILT IN: allen Standard-Layouts. STANDARD: an – er erscheint aber nur dort, wo es ein Gegenstück gibt, in einer einsprachigen Site also nie. Er trägt KEINE eigene Beschriftung: Sein Tooltip nennt die Zielsprache und kommt aus dem Wörterbuch des Themes.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Umschalter anbieten. Auf `false` für eine Site, die beide Sprachen führt, den Wechsel aber nicht anbieten will."
             }
           }
         }
@@ -301,28 +352,66 @@
           "description": "Repo-eigenes Feld – vom Theme nicht gelesen."
         }
       },
-      "required": [
-        "url"
-      ],
-      "description": "Ein Verweis. Dieselbe Form gilt für `resources`, `nav.items` und `footer.links.items` – wer eine kennt, kennt alle.",
+      "description": "Ein Verweis. Dieselbe Form gilt für `resources`, `nav.items` und `footer.links.items` – wer eine kennt, kennt alle. Das Ziel steht entweder als Adresse in `url` oder als `page_id` einer Seite dieser Site in `page`; für interne Ziele ist `page` der bessere Weg.",
       "properties": {
         "title": {
-          "type": "string",
-          "description": "Anzeigetext. Bei einem Eintrag mit `icon` optional (dann dient er als Alternativtext), sonst nötig."
+          "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+          "description": "Anzeigetext. Bei einem Eintrag mit `icon` optional (dann dient er als Alternativtext), sonst nötig. MEHRSPRACHIG: auch als Sprachkarte `{ de: …, en: … }`."
         },
         "url": {
-          "type": "string",
-          "description": "Ziel, site-relativ (führender `/`). Absolute URLs (`://`) öffnen in einem neuen Tab."
+          "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+          "description": "Ziel, site-relativ (führender `/`). Absolute URLs (`://`) öffnen in einem neuen Tab. MEHRSPRACHIG: auch als Sprachkarte `{ de: …, en: … }`."
+        },
+        "page": {
+          "$ref": "frontmatter.schema.json#/definitions/seitenverweis"
         },
         "icon": {
-          "type": "string",
-          "description": "Icon-Pfad, site-relativ. Mit `title` erscheint es davor, ohne `title` allein. Das Theme liefert u. a. `/theme/academy/icons/icon-guide.svg`."
+          "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+          "description": "Icon-Pfad, site-relativ. Mit `title` erscheint es davor, ohne `title` allein. Das Theme liefert u. a. `/theme/academy/icons/icon-guide.svg`. MEHRSPRACHIG: auch als Sprachkarte `{ de: …, en: … }`."
         },
         "audiences": {
           "$ref": "#/definitions/zielgruppen",
           "description": "Beschränkt DIESEN Eintrag auf die genannten Zielgruppen; in den übrigen Builds fehlt er. STANDARD: keine Angabe = immer sichtbar. Bleibt in einer Liste kein Eintrag übrig, entfällt der ganze Bereich."
         }
-      }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "url"
+          ],
+          "description": "Verweis auf eine Adresse (`url`)"
+        },
+        {
+          "required": [
+            "page"
+          ],
+          "description": "Verweis auf eine Seite dieser Site (`page`)"
+        }
+      ]
+    },
+    "sprachtext": {
+      "description": "Text oder Adresse – entweder EINE Zeichenkette (gilt für alle Sprachen) oder eine SPRACHKARTE mit einem Eintrag je Sprachcode.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "eine Zeichenkette für alle Sprachen"
+        },
+        {
+          "type": "object",
+          "description": "Sprachkarte: je Sprachcode ein Wert, z. B. `{ de: \"Vorlagen\", en: \"Templates\" }`. Erlaubt sind die Codes, die die Site in `i18n.languages` deklariert; eine fehlende Sprache fällt auf die Standardsprache zurück.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "seitenverweis": {
+      "type": "string",
+      "description": "Ziel als SEITE DIESER SITE, statt als Adresse. Angegeben wird die Identität der Zielseite: ihre ausdrückliche `page_id` – oder, wenn sie keine hat, ihr DATEINAME ohne Endung (`schnellstart.md` → `schnellstart`). Die ID wird zuerst gesucht. Vorzuziehen gegenüber `url`, wo das Ziel zur Site gehört: Der Verweis löst sich vom Pfad, ein Umbenennen oder Verschieben bricht ihn nicht, und bei mehreren Sprachen bildet das Theme je Sprachbaum die passende Adresse. Schließt `url` aus – genau eines von beiden. Zeigt die Angabe auf keine oder auf mehrere gleichnamige Seiten, ist das ein Fehler.",
+      "examples": [
+        "theme-overview",
+        "quickstart"
+      ]
     }
   }
 }

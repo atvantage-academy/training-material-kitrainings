@@ -41,6 +41,24 @@
     } catch (e) { /* egal */ }
   }
 
+  /* --- Beschriftungen, die erst im Browser entstehen -----------------------
+     Die meisten Texte des Themes setzt Liquid beim Bauen (siehe
+     theme/jekyll/_includes/avd-i18n.html). Diese drei nicht: Sie gehören zu
+     Elementen, die dieses Skript SELBST erzeugt – die Kopieren-Knöpfe an
+     Codeblöcken und den Schließen-Knopf eines Reveals.
+
+     GELESEN WIRD `<html lang>`. Das Attribut setzt jedes Theme-Layout aus der
+     Sprache der Seite; damit gilt hier dieselbe Sprache wie im übrigen Markup.
+     Auch die eigenständige Seitenvorlage (theme/academy/page-template.html) trägt
+     es – deshalb funktioniert dieser Weg auch ohne Jekyll.
+
+     Unbekannte Sprache fällt auf Deutsch zurück, wie im Wörterbuch des Layouts. */
+  var TEXTE = {
+    de: { kopieren: "Kopieren", kopiert: "Kopiert!", schließen: "Schließen" },
+    en: { kopieren: "Copy",     kopiert: "Copied!",  schließen: "Close" }
+  };
+  var T = TEXTE[(document.documentElement.getAttribute("lang") || "de").split("-")[0].toLowerCase()] || TEXTE.de;
+
   /* --- Kopieren-Buttons an Code-Blöcken ----------------------------------- */
   function initCopyButtons() {
     document.querySelectorAll("pre > code").forEach(function (code) {
@@ -49,8 +67,8 @@
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "avd-academy-btn avd-academy-btn--primary avd-academy-copy";
-      btn.title = "Kopieren";
-      btn.setAttribute("aria-label", "Kopieren");
+      btn.title = T.kopieren;
+      btn.setAttribute("aria-label", T.kopieren);
       btn.style.position = "absolute";
       btn.style.top = "0.5rem";
       btn.style.right = "0.5rem";
@@ -58,10 +76,10 @@
       btn.addEventListener("click", function () {
         navigator.clipboard.writeText(code.innerText).then(function () {
           btn.classList.add("is-copied");
-          btn.title = "Kopiert!";
+          btn.title = T.kopiert;
           setTimeout(function () {
             btn.classList.remove("is-copied");
-            btn.title = "Kopieren";
+            btn.title = T.kopieren;
           }, 1500);
         });
       });
@@ -123,7 +141,7 @@
         navigator.clipboard.writeText(text).then(function () {
           var oldTitle = btn.title || btn.getAttribute("aria-label");
           btn.classList.add("is-copied");
-          btn.title = "Kopiert!";
+          btn.title = T.kopiert;
           setTimeout(function () {
             btn.classList.remove("is-copied");
             btn.title = oldTitle;
@@ -510,7 +528,7 @@
         var knopf = document.createElement("button");
         knopf.type = "button";
         knopf.className = "avd-academy-reveal__close";
-        knopf.setAttribute("aria-label", "Schließen");
+        knopf.setAttribute("aria-label", T.schließen);
         knopf.innerHTML = "&times;";
         knopf.addEventListener("click", function () { details.open = false; });
         body.appendChild(knopf);

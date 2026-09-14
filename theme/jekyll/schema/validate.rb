@@ -204,14 +204,51 @@ end
 # bestandene Prüfung und ist keine.
 IMMER_AUS = %w[theme dist vendor _site].freeze
 
-def uebersprungen?(rel, ausschluss)
+# Die Verzeichnisse der Collections – aus `collections` und `collections_dir` der
+# Konfiguration. `_posts` ist IMMER dabei: Diese Collection kennt Jekyll eingebaut, sie
+# steht in keiner `collections:`-Liste, und ihre Dokumente werden gerendert.
+#
+# WOFÜR: Ein Collection-Dokument ist eine Quelle wie eine Seite – es hat Front Matter,
+# wird gerendert und bekommt eine Adresse. Die `_`-Regel unten hat es trotzdem
+# ausgelassen, und die Schlussmeldung sagte danach „N Seite(n) geprüft, keine
+# Verstöße“, als wäre nichts übrig geblieben. Eine Auswahl, die stillschweigend Dateien
+# auslässt, sieht aus wie eine bestandene Prüfung und ist keine – dieselbe Begründung
+# wie bei IMMER_AUS.
+def sammlungsverzeichnisse(konfigurationen)
+  namen = ['posts']
+  wurzel = ''
+  konfigurationen.each do |daten|
+    erklaert = daten['collections']
+    namen += case erklaert
+             when Hash  then erklaert.keys
+             when Array then erklaert
+             else []
+             end
+    wurzel = daten['collections_dir'].to_s if daten['collections_dir']
+  end
+  namen.map(&:to_s).uniq.map { |n| [wurzel, "_#{n}"].reject(&:empty?).join('/') }
+end
+
+# Liegt die Datei in einer Collection? Geprüft wird der PFADANFANG und nicht ein
+# einzelnes Segment: Eine Collection gibt es genau dort, wo Jekyll sie erwartet – im
+# Wurzelverzeichnis der Quelle bzw. unter `collections_dir`. Ein `en/_neuigkeiten/`
+# unter einem Sprachbaum ist KEINE Collection; Jekyll rendert es nicht, und die Prüfung
+# würde sonst Dateien melden, die gar nicht in die Site kommen.
+def in_sammlung?(rel, sammlungen)
+  sammlungen.any? { |verzeichnis| rel.start_with?(verzeichnis + '/') }
+end
+
+def uebersprungen?(rel, ausschluss, sammlungen = [])
   teile = rel.split('/')
   return true if teile.any? { |t| t.start_with?('.') }
   return true if teile.include?('node_modules')
   return true if IMMER_AUS.include?(teile.first) || teile.first.start_with?('_site')
-  # Jekyll rendert `_`-Verzeichnisse nicht (Collections ausgenommen – die gibt es
-  # in Academy-Repos nicht; käme eine hinzu, gehört sie hier ergänzt).
-  return true if teile[0..-2].any? { |t| t.start_with?('_') }
+  # Jekyll rendert `_`-Verzeichnisse nicht – AUSGENOMMEN die Collections, die die
+  # Konfiguration erklärt. Deren Dokumente werden wie Seiten geprüft; `_data`,
+  # `_includes`, `_layouts` und alles übrige bleiben draußen.
+  unless in_sammlung?(rel, sammlungen)
+    return true if teile[0..-2].any? { |t| t.start_with?('_') }
+  end
   # Jekylls `exclude`-Semantik: Pfade RELATIV zur Quelle. `README.md` schließt also
   # nur die im Wurzelverzeichnis aus, `**/README.md` alle. Deshalb KEIN Rückfall auf
   # den Dateinamen – der schlösse zu viel aus.
@@ -289,6 +326,142 @@ def zielgruppen_pruefen(daten, deklariert, quelle, pfad = [])
     daten.each_with_index { |v, i| meldungen += zielgruppen_pruefen(v, deklariert, quelle, pfad + [i.to_s]) }
   end
   meldungen
+end
+
+# ---------------------------------------------------------------------------
+# Sprachen: deklarierte Codes gegen benutzte Codes
+# ---------------------------------------------------------------------------
+# DIESELBE BEGRÜNDUNG WIE BEI DEN ZIELGRUPPEN: Welche Sprachen eine Site führt, legt
+# die Site fest (`i18n.languages`), nicht das Theme – ein `enum` im Schema wäre der falsche
+# Ort. Ohne Prüfung dagegen wirkt aber jeder Tippfehler STILL: Eine Sprachkarte
+# `{ de: …, eng: … }` ist gueltiges YAML, gueltig gegen das Schema, und die englische
+# Seite zeigt einfach den deutschen Text. Genau die Sorte Fehler, die niemandem auffällt.
+#
+# GEPRUEFT WERDEN NUR DIE FELDER, DIE DAS THEME ALS SPRACHKARTE LIEST. Die Liste steht
+# hier ausgeschrieben und nicht als Formerkennung („ein Hash aus kurzen Schluesseln“):
+# Eine Heuristik würde irgendwann ein fremdes Feld erwischen, dessen Schlüssel zufällig
+# wie Sprachcodes aussehen. Wer ein Feld sprachfähig macht, ergaenzt es hier – so wie er
+# es im Schema und in avd-lang-value.html ergaenzt.
+# WIE DIE SPRACHKARTEN GEFUNDEN WERDEN: aus dem SCHEMA, nicht aus einer Namensliste.
+# Erster Versuch war eine Liste der Feldnamen (title, url, icon, …) – und sie war sofort
+# falsch: `brand.icon` ist ein Hash mit `default`/`small`/`apple` (die Favicon-Groessen),
+# heißt aber `icon`. Derselbe Name bedeutet an verschiedenen Stellen Verschiedenes; eine
+# Liste von Namen kann das nicht wissen.
+#
+# Das Schema weiss es: Jedes sprachfähige Feld verweist auf
+# `frontmatter.schema.json#/definitions/sprachtext`. Der Durchlauf unten laeuft deshalb
+# durch Wert UND Schema gleichzeitig und prüft genau dort, wo eine Sprachkarte erlaubt
+# ist. Wer ein Feld sprachfaehig macht, aendert nur das Schema – die Prüfung folgt.
+#
+# DERSELBE DURCHLAUF FINDET AUCH DIE SEITENVERWEISE (`page: «id»`). Ein Durchlauf, zwei
+# Befunde – und aus demselben Grund schemagetrieben: Ein Schluessel `page` kann anderswo
+# etwas anderes bedeuten (`defaults` traegt `layout: page` als WERT). Gesammelt wird nur,
+# was im Schema als `seitenverweis` deklariert ist.
+class SchemaDurchlauf
+  attr_reader :seitenverweise
+
+  def initialize(validator, deklariert)
+    @v = validator
+    @deklariert = deklariert
+    @meldungen = []
+    @seitenverweise = []
+  end
+
+  def lauf(wert, schema, datei, pfad = [])
+    @meldungen = []
+    @seitenverweise = []
+    gehe(wert, schema, datei, pfad)
+    @meldungen
+  end
+
+  private
+
+  def gehe(wert, schema, datei, pfad)
+    return unless schema.is_a?(Hash)
+
+    if (ref = schema['$ref'])
+      ziel, fragment = ref.split('#', 2)
+      ziel_datei = ziel.nil? || ziel.empty? ? datei : File.expand_path(ziel, File.dirname(datei))
+      begin
+        unter = @v.dokument(ziel_datei)
+      rescue StandardError
+        return
+      end
+      (fragment || '').split('/').reject(&:empty?).each { |t| unter = unter.is_a?(Hash) ? unter[t] : nil }
+      return if unter.nil?
+      # DER TREFFER: eine Sprachkarte an dieser Stelle erlaubt, und der Wert ist eine.
+      if ref.end_with?('/definitions/sprachtext') && wert.is_a?(Hash)
+        pruefe_codes(wert, pfad)
+        return
+      end
+      if ref.end_with?('/definitions/seitenverweis') && wert.is_a?(String)
+        @seitenverweise << [pfad.join('.'), wert]
+        return
+      end
+      return gehe(wert, unter, ziel_datei, pfad)
+    end
+
+    %w[oneOf anyOf allOf].each { |c| Array(schema[c]).each { |s| gehe(wert, s, datei, pfad) } }
+
+    if wert.is_a?(Hash)
+      eigenschaften = schema['properties'] || {}
+      muster = schema['patternProperties'] || {}
+      wert.each do |k, v|
+        unter_pfad = pfad + [k.to_s]
+        if eigenschaften.key?(k)
+          gehe(v, eigenschaften[k], datei, unter_pfad)
+          next
+        end
+        treffer = muster.keys.select { |m| Regexp.new(m).match?(k.to_s) }
+        if treffer.any?
+          treffer.each { |m| gehe(v, muster[m], datei, unter_pfad) }
+          next
+        end
+        gehe(v, schema['additionalProperties'], datei, unter_pfad) if schema['additionalProperties'].is_a?(Hash)
+      end
+    elsif wert.is_a?(Array) && schema['items'].is_a?(Hash)
+      wert.each_with_index { |v, i| gehe(v, schema['items'], datei, pfad + [i.to_s]) }
+    end
+  end
+
+  def pruefe_codes(karte, pfad)
+    voll = pfad.join('.')
+    karte.each_key do |code|
+      next if @deklariert.include?(code.to_s)
+      text = if @deklariert.empty?
+               "Sprachkarte benutzt (`#{code}`), aber die Site deklariert keine " \
+               '`i18n.languages`. Ohne Deklaration ist der Code nicht prüfbar – ' \
+               'ein Tippfehler fiele nirgends auf.'
+             else
+               "`#{code}` ist keine deklarierte Sprache. Deklariert sind: " \
+               "#{@deklariert.join(', ')} (Schlüssel `i18n.languages` in der _config.yml)."
+             end
+      @meldungen << [voll, text]
+    end
+  end
+end
+
+# Die Sprache einer QUELLDATEI aus ihrem Pfad – dieselbe Ableitung wie im Layout
+# (avd-i18n.html), nur auf dem Quellbaum statt auf der URL: Der laengste passende
+# Praefix gewinnt, die Standardsprache wohnt in der Wurzel.
+#
+# VORAUSSETZUNG ist die dokumentierte Konvention, dass der Quellordner dem `base` der
+# Sprache entspricht (`base: "/en/"` -> `en/…`). Wer anders ausliefert, verliert hier die
+# Doppelungspruefung – nicht die Übersetzung.
+def sprache_von_pfad(rel, sprachen, standard)
+  treffer = standard
+  laenge = 0
+  sprachen.each do |sp|
+    code = sp['code'].to_s
+    basis = (sp['base'] || (code == standard ? '/' : "/#{code}/")).to_s
+    praefix = basis.sub(%r{\A/}, '')
+    next if praefix.empty?
+    next unless rel.start_with?(praefix)
+    next unless praefix.length > laenge
+    laenge = praefix.length
+    treffer = code
+  end
+  treffer
 end
 
 # ---------------------------------------------------------------------------
@@ -447,6 +620,8 @@ meldungen = []
 # --- _config.yml ---------------------------------------------------------
 ausschluss = []
 zielgruppen = []
+sprachen = []
+standardsprache = 'de'
 konfigurationen_daten = []
 configs.each do |cfg|
   unless File.exist?(cfg)
@@ -461,6 +636,8 @@ configs.each do |cfg|
   end
   ausschluss += Array(daten['exclude'])
   zielgruppen += Array(daten['audiences'])
+  sprachen += Array(daten.dig('i18n', 'languages')).select { |sp| sp.is_a?(Hash) && sp['code'] }
+  standardsprache = daten['lang'].to_s if daten['lang']
   anzeige = cfg.sub(/\A#{Regexp.escape(wurzel)}\/?/, '')
   konfigurationen_daten << [anzeige, cfg, daten]
   validator.pruefen(daten, validator.dokument(pfade[:config]), pfade[:config]).each do |f|
@@ -471,24 +648,76 @@ end
 
 # --- Zielgruppen in den Konfigurationen (nav, audience des Builds) -------
 # Erst NACH allen Konfigurationen, denn `audiences` kann im Overlay stehen.
+sprachcodes = sprachen.map { |sp| sp['code'].to_s }.uniq
+karten = SchemaDurchlauf.new(validator, sprachcodes)
+# Alle vergebenen `page_id` und alle `page:`-Verweise – geprüft wird nach dem Durchlauf,
+# denn ein Verweis darf auf eine Seite zeigen, die spaeter im Baum kommt.
+vergebene_ids = []
+verweise = []
 konfigurationen_daten.each do |anzeige, cfg, daten|
   zielgruppen_pruefen(daten, zielgruppen.uniq, anzeige).each do |feld, text|
     zeile = zeile_von(cfg, '/' + feld.split('.').first, 0)
     meldungen << "#{anzeige}#{zeile ? ":#{zeile}" : ''}: `#{feld}` #{text}"
   end
+  # `i18n.languages` ist die Deklaration selbst und wird nicht gegen sich geprüft.
+  ohne_deklaration = daten.reject { |k, _| k == 'i18n' }
+  karten.lauf(ohne_deklaration, validator.dokument(pfade[:config]), pfade[:config]).each do |feld, text|
+    zeile = zeile_von(cfg, '/' + feld.split('.').first, 0)
+    meldungen << "#{anzeige}#{zeile ? ":#{zeile}" : ''}: `#{feld}` #{text}"
+  end
+  karten.seitenverweise.each { |feld, id| verweise << [anzeige, cfg, 0, feld, id] }
 end
 
-# --- Front Matter aller Seiten ------------------------------------------
+# Die Standardsprache MUSS mit deklariert sein – sonst hätte der Wurzelbaum keine
+# Sprache, und `page_id` liesse sich ihm nicht zuordnen.
+if sprachcodes.any? && !sprachcodes.include?(standardsprache)
+  meldungen << "_config.yml: `lang` ist `#{standardsprache}`, steht aber nicht in " \
+               "`i18n.languages` (dort: #{sprachcodes.join(', ')}). Die Standardsprache gehört " \
+               'mit in die Deklaration – ihr Sprachbaum ist die Wurzel der Site.'
+end
+
+# --- Front Matter aller Seiten und Collection-Dokumente ------------------
+# Die Collections stehen erst hier fest: Sie können in einem Overlay erklärt werden,
+# und gelesen sind alle Konfigurationen erst nach der Schleife oben.
+sammlungen = sammlungsverzeichnisse(konfigurationen_daten.map { |_, _, daten| daten })
 seiten = 0
+sammlungsseiten = 0
+uebersetzungen = {}
+dateinamen = {}
 Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
   rel = pfad.sub(/\A#{Regexp.escape(wurzel)}\/?/, '')
-  next if uebersprungen?(rel, ausschluss)
+  next if uebersprungen?(rel, ausschluss, sammlungen)
   daten, fehler = front_matter(pfad)
   if fehler
     meldungen << "#{rel}: #{fehler}"
     next
   end
   seiten += 1
+  sammlungsseiten += 1 if in_sammlung?(rel, sammlungen)
+
+  # ZWEI WEGE, EINE SEITE ZU ADRESSIEREN – dieselbe Rangfolge wie in avd-page-url.html:
+  # die ausdrückliche `page_id`, sonst der Dateiname ohne Endung.
+  #
+  # DAS STEHT VOR `next if daten.nil?`, UND ZWAR AUS EINEM GRUND: Eine Seite OHNE Front
+  # Matter ist im Theme ausdruecklich erlaubt (jekyll-optional-front-matter). Sie hat
+  # keine `page_id`, aber sie hat einen Dateinamen – und muss darueber verlinkbar sein.
+  # Stand die Sammlung hinter dem `next`, meldete die Prüfung jeden Verweis auf eine
+  # solche Seite als „gibt es nicht", obwohl das Layout sie findet. Genau so ist es beim
+  # ersten Versuch passiert.
+  #
+  # ID UND DATEINAME WERDEN GETRENNT GEFUEHRT, denn nur so lässt sich sagen, ob ein
+  # Verweis EINDEUTIG ist: Zwei Seiten mit demselben Dateinamen in verschiedenen Ordnern
+  # sind der Normalfall (jeder Ordner hat eine `index.md`) und erst dann ein Problem, wenn
+  # jemand darauf verweist.
+  seitensprache = sprache_von_pfad(rel, sprachen, standardsprache)
+  seitensprache = daten['lang'] if daten.is_a?(Hash) && daten['lang'].is_a?(String)
+  if daten.is_a?(Hash) && daten['page_id'].is_a?(String)
+    vergebene_ids << daten['page_id']
+    (uebersetzungen[[seitensprache, daten['page_id']]] ||= []) << rel
+  end
+  dateiname = File.basename(rel).sub(/\.(md|markdown|html?)\z/i, '')
+  (dateinamen[[seitensprache, dateiname]] ||= []) << rel
+
   next if daten.nil?
   validator.pruefen(daten, validator.dokument(pfade[:frontmatter]), pfade[:frontmatter]).each do |f|
     zeile = zeile_von(pfad, f[:zeiger], 1)
@@ -498,6 +727,66 @@ Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
     zeile = zeile_von(pfad, '/' + feld.split('.').first, 1)
     meldungen << "#{rel}#{zeile ? ":#{zeile}" : ''}: `#{feld}` #{text}"
   end
+  karten.lauf(daten, validator.dokument(pfade[:frontmatter]), pfade[:frontmatter]).each do |feld, text|
+    zeile = zeile_von(pfad, '/' + feld.split('.').first, 1)
+    meldungen << "#{rel}#{zeile ? ":#{zeile}" : ''}: `#{feld}` #{text}"
+  end
+  karten.seitenverweise.each { |feld, id| verweise << [rel, pfad, 1, feld, id] }
+
+
+  # `lang` je Seite gegen die Deklaration – wie eine Zielgruppe.
+  if daten['lang'].is_a?(String) && sprachcodes.any? && !sprachcodes.include?(daten['lang'])
+    zeile = zeile_von(pfad, '/lang', 1)
+    meldungen << "#{rel}#{zeile ? ":#{zeile}" : ''}: `lang` `#{daten['lang']}` ist keine " \
+                 "deklarierte Sprache. Deklariert sind: #{sprachcodes.join(', ')}."
+  end
+
+end
+
+# --- Seitenverweise: zeigt jede `page`-Angabe auf eine vorhandene `page_id`? ------
+# EIN TIPPFEHLER WAERE SONST EIN STILLER AUSFALL: `avd-page-url.html` findet nichts,
+# liefert eine leere Zeichenkette, und der Aufrufer lässt den Verweis weg. Im HTML fehlt
+# dann einfach ein Menuepunkt – niemand sieht, dass er fehlen sollte.
+verweise.each do |anzeige, datei, versatz, feld, id|
+  zeile = zeile_von(datei, '/' + feld.split('.').first, versatz)
+  ort = "#{anzeige}#{zeile ? ":#{zeile}" : ''}"
+
+  per_id   = uebersetzungen.select { |(_spr, wert), _| wert == id }
+  per_name = dateinamen.select { |(_spr, wert), _| wert == id }
+
+  if per_id.empty? && per_name.empty?
+    bekannt = vergebene_ids.uniq.sort
+    meldungen << "#{ort}: `#{feld}` verweist mit `page: #{id}` auf eine Seite, die es " \
+                 'nicht gibt – keine Seite trägt diese `page_id`, und keine Datei heißt ' \
+                 "so.#{bekannt.empty? ? '' : " Vergebene IDs: #{bekannt.join(', ')}."}"
+    next
+  end
+
+  # MEHRDEUTIG IST NUR, WAS AUCH GENOMMEN WIRD. Greift der Verweis über eine
+  # ausdrückliche `page_id`, sind gleichnamige DATEIEN gleichgültig – die ID hat Vorrang
+  # (siehe avd-page-url.html). Erst wenn er über den Dateinamen geht, zählt dessen
+  # Eindeutigkeit. Sonst wäre `page: schnellstart` in jedem Repo ein Fehler, das
+  # irgendwo eine zweite `schnellstart.md` liegen hat, auf die niemand verweist.
+  quelle = per_id.empty? ? per_name : per_id
+  quelle.each do |(spr, _wert), dateien|
+    next if dateien.size < 2
+    meldungen << "#{ort}: `#{feld}` verweist mit `page: #{id}` mehrdeutig – in der " \
+                 "Sprache `#{spr}` passen #{dateien.size} Seiten (#{dateien.join(', ')}). " \
+                 'Einer davon eine ausdrückliche `page_id` geben; über den Dateinamen ' \
+                 'ist nicht bestimmt, welche gemeint ist.'
+  end
+end
+
+# --- page_id: je Sprache eindeutig --------------------------------------
+# ZWEI SEITEN DERSELBEN SPRACHE MIT DERSELBEN ID sind keine Übersetzung, sondern eine
+# Mehrdeutigkeit: Der Umschalter nimmt die erste, die er findet, und welche das ist,
+# entscheidet die Sortierung des Dateisystems. Das fällt beim Bauen nicht auf.
+uebersetzungen.each do |(sprache, id), dateien|
+  next if dateien.size < 2
+  meldungen << "#{dateien.first}: `page_id` `#{id}` kommt in der Sprache " \
+               "`#{sprache}` mehrfach vor (#{dateien.join(', ')}). Je Sprache darf es zu " \
+               'einer ID nur EINE Seite geben – sonst ist weder bestimmt, wohin der ' \
+               'Sprachumschalter führt, noch wohin ein `page`-Verweis zeigt.'
 end
 
 # Eine Prüfung über die leere Menge ist kein Erfolg.
@@ -510,7 +799,12 @@ end
 
 if meldungen.empty?
   zg = zielgruppen.uniq.empty? ? 'keine Zielgruppen deklariert' : "Zielgruppen: #{zielgruppen.uniq.join(', ')}"
-  puts "Schema #{version}: #{configs.size} Konfiguration(en) und #{seiten} Seite(n) geprüft, #{zg} – keine Verstöße."
+  spr = sprachcodes.empty? ? 'einsprachig' : "Sprachen: #{sprachcodes.join(', ')}"
+  # Die Collection-Dokumente werden EIGENS genannt: Wer eine Collection anlegt, soll der
+  # Meldung ansehen, dass sie mit geprüft wurde – und nicht raten müssen, ob die Zahl
+  # sie enthält.
+  aus_sammlungen = sammlungsseiten.zero? ? '' : " (darunter #{sammlungsseiten} aus Collections)"
+  puts "Schema #{version}: #{configs.size} Konfiguration(en) und #{seiten} Seite(n)#{aus_sammlungen} geprüft, #{zg}, #{spr} – keine Verstöße."
   exit 0
 end
 
