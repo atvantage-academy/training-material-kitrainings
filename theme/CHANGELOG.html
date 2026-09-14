@@ -1,0 +1,2786 @@
+<!DOCTYPE html>
+<!--
+  ATVANTAGE-Academy – EINZIGES Seitenlayout (Jekyll)
+  --------------------------------------------------
+  Ein Layout für alles: allgemeine Doku-Seiten UND Guides (Übungen/Anleitungen).
+  Optik nach der ATVANTAGE-Website: Meta-Nav, weiße sticky Kopfzeile, Hero-Band,
+  zweispaltig mit rechter Sidebar (automatisches Inhaltsverzeichnis, Fortschritt
+  aus Task-Listen, weiterführende Ressourcen). Überschriften ohne Emoji-Icons.
+
+  Verwendung im Front Matter:  layout: default   (oder `layout: guide` – Alias,
+  siehe guide.html; beides rendert dieselbe Guide-Ansicht)
+
+  `layout: visualization` (siehe visualization.html) rendert dieselbe Seite OHNE
+  obere Navigation (Meta-Leiste + Kopfzeile/TopNav), OHNE Brotkrumen und OHNE den
+  rechten Bereich (Inhaltsverzeichnis, Fortschritt, Ressourcen – auch bei gesetztem
+  `resources`), mit schmalerem Hero-Balken und breiterem, zentriertem Inhalt – für
+  eigenständige Visualisierungen/Simulationen.
+
+  Alle Front-Matter-Felder sind OPTIONAL (Convention over Configuration). Nur der
+  Titel ist faktisch erforderlich – als `title:` ODER als erste `#`-Überschrift:
+
+    title:       "…"                → sonst erste #-Überschrift (eins von beiden nötig)
+    description: "…"                → Meta-Description
+    duration:    8                  → Zahl in Minuten → Hero-Tag „ca. 8 Minuten“
+                                       (ungefähre LESEDAUER; bei Guides/Übungen die
+                                       Dauer der Übung, bei Visualisierungen die
+                                       Bearbeitungszeit – dort unüblich, aber erlaubt).
+    topics:      ["Cloud & DevOps"] → weitere Hero-Tags
+    resources:   [{title, url, icon}, …] → Sidebar-Karte „Weiterführende Informationen“.
+                                       title und/oder icon (Bildpfad); icon erscheint
+                                       rechts und wird kreisrund dargestellt.
+    breadcrumb:                     → Brotkrumen anpassen (beides optional):
+      label: "…"                    → überschreibt den Ordnernamen dieser Ebene;
+                                       in der Ordner-`index.md` gesetzt gilt es für
+                                       ALLE Seiten im Ordner und in Unterordnern.
+      ancestors: [{title, url}, …]  → explizite Vorfahren-Kette OHNE die aktuelle
+                                       Seite (diese wird automatisch angehängt); in
+                                       der `index.md` gesetzt wird sie vererbt.
+
+  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides – dort ist das
+  Übernehmen des Quelltexts der Zweck. Bedingungen: Markdown-Seite (`.md`, nicht
+  reines HTML) UND der Schalter `toolbar.copy` (Vorgabe: nur `layout: guide`, siehe
+  `_includes/avd-switch.html`). Doku-Seiten und Visualisierungen haben ihn nicht –
+  bei letzteren, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
+
+  DIE SEITENWERKZEUGE – QR-Code, Farbschema-Umschalter, Drucken – sind EINE
+  Komponente (`_includes/tools.html`) an zwei Standorten in diesem Rahmen:
+
+    Kopfzeile   `chrome: true`  (page, guide)      QR + Farbschema
+    Hero rechts `hero_tools`    (visualization)    QR + Farbschema + Drucken
+
+  Die Regel dahinter ist die Kopfzeile: Wo es sie gibt, tragen die Werkzeuge sie;
+  wo nicht, tritt der Hero an ihre Stelle. Drucken gibt es nur dort, weil auf einer
+  gewöhnlichen Seite der Browser-Befehl (Strg/Cmd+P) genügt, die rahmenlose
+  Ansicht aber keinen anderen Weg aufs Papier hat.
+
+  Der QR-Code wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
+  Adresse zur Build-Zeit nicht feststeht; ohne JavaScript erscheint er nicht.
+--><html lang="de">
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Änderungen am ATVANTAGE Academy Theme · ATVANTAGE Academy</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789379247"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789379247">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789379247">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789379247">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789379247"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789379247">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789379247" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789379247" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789379247">
+<script type="module">
+  const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
+  Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
+    .then(([core, java]) => {
+      const hljs = core.default;
+      hljs.registerLanguage("java", java.default);
+      document.querySelectorAll("pre code.language-java").forEach((el) => hljs.highlightElement(el));
+    });
+</script>
+<link rel="apple-touch-icon" sizes="180x180" href="/training-material-kitrainings/theme/atvantage/assets/icon-180.png">
+<link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
+<link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
+
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789379247">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789379247"></head><body class="avd-academy-guide">
+  <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
+  </div>
+
+  <header class="avd-academy-header"><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite">
+    <img class="avd-academy-header__logo"
+         src="/training-material-kitrainings/assets/logo-schulung.svg"
+         alt="ATVANTAGE Academy">
+  </a>
+  <button class="avd-academy-btn avd-academy-btn--ghost avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
+          aria-label="Navigation umschalten" aria-expanded="false">☰</button>
+  <nav class="avd-academy-header__nav" id="avd-academy-main-nav">
+      <a href="/training-material-kitrainings/">Start</a>
+      <a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
+  </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
+                title="Diese Seite auf Deinem Smartphone öffnen"
+                aria-label="Diese Seite auf Deinem Smartphone öffnen"></button><button type="button" class="avd-academy-tool avd-academy-tool--theme avd-academy-theme-toggle" data-avd-academy-theme-toggle
+              title="Farbschema umschalten (hell/dunkel)"
+              aria-label="Farbschema umschalten">◐</button></div>
+</header>
+
+  <section class="avd-academy-guide-hero"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/">Home</a><span>/</span><span>Theme</span><span>/</span><span aria-current="page">Änderungen am ATVANTAGE Academy Theme</span></nav><div class="avd-academy-guide-hero__meta">
+      <div class="avd-academy-guide-hero__tags">
+      </div>
+      <div class="avd-academy-guide-hero__actions">
+      </div>
+    </div><h1>Änderungen am ATVANTAGE Academy Theme</h1>
+  </section><div class="avd-academy-guide-layout">
+    <main class="avd-academy-guide-main" id="avd-academy-content">
+      <h1 id="änderungen-am-atvantage-academy-theme">Änderungen am ATVANTAGE Academy Theme</h1>
+
+<p>Dieses Paket folgt ab <code>1.0.0</code> der <strong>semantischen Versionierung</strong>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Stelle</th>
+      <th>wann</th>
+      <th>für Konsumenten</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Major</strong></td>
+      <td>inkompatible Änderung</td>
+      <td>Umstellung nötig – Migrationshinweis steht hier</td>
+    </tr>
+    <tr>
+      <td><strong>Minor</strong></td>
+      <td>neue Funktion, verträglich</td>
+      <td>gefahrlos</td>
+    </tr>
+    <tr>
+      <td><strong>Patch</strong></td>
+      <td>Korrektur, verträglich</td>
+      <td>gefahrlos</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Die Spanne <code>^1</code> (<code>&gt;=1.0.0 &lt;2.0.0</code>) ist damit die empfohlene Bindung. Was als
+inkompatibel gilt und wie eingestuft wird, steht in
+<a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/AGENTS.md"><code>AGENTS.md</code></a>,
+Abschnitt „Theme-Version“.</p>
+
+<hr />
+
+<h2 id="260">2.6.0</h2>
+
+<h3 id="title--ließ-die-überschrift-ganz-verschwinden"><code>title: ""</code> ließ die Überschrift ganz verschwinden</h3>
+
+<p>Eine Seite mit einem <strong>leeren</strong> Front-Matter-<code>title</code> trug am Ende <strong>gar keine sichtbare
+Überschrift</strong> – und einen <code>&lt;title&gt;</code>, der nur aus dem Trennzeichen und dem Site-Namen
+bestand (<code>· Academy</code>). Betroffen war jede solche Seite, und <code>title: ""</code> war die
+verbreitete Schreibweise aus der Zeit, als <code>title</code> noch Pflichtfeld war.</p>
+
+<p><strong>Warum es so lange unentdeckt blieb:</strong> In Liquid ist der Leerstring <strong>truthy</strong>. Die
+Ableitung stand als</p>
+
+<pre><code>{%- assign pageTitle = page.title -%}
+{%- unless pageTitle -%}  … erste #-Überschrift …  {%- endunless -%}
+</code></pre>
+
+<p>Bei <code>title: ""</code> war <code>pageTitle</code> damit „gesetzt”, der 2.0 eingeführte Rückfall auf die
+erste <code>#</code>-Überschrift griff <strong>nicht</strong>, und die Hero-Prüfung
+auf <code>pageTitle</code> erzeugte ein leeres <code>&lt;h1&gt;&lt;/h1&gt;</code>. Die Überschrift aus dem Inhalt blieb zwar im HTML, wurde
+aber von <code>.avd-academy-guide-main &gt; h1:first-child { display: none }</code> als vermeintliches
+Duplikat ausgeblendet – die Regel, die sonst genau das doppelte Anzeigen verhindert.
+Beides zusammen ergab die leere Seitenüberschrift. Dieselbe Ursache erzeugte eine
+<strong>leere Brotkrume</strong>.</p>
+
+<p>Der Build lief dabei grün, das Schema war zufrieden, und die Seite sah auf den ersten
+Blick plausibel aus – der Fehler zeigte sich nur im Vergleich.</p>
+
+<p><strong>Behoben:</strong> Die Ableitung liegt jetzt in einem gemeinsamen Include
+<code>_includes/avd-page-title.html</code>, prüft den Leerstring <strong>ausdrücklich</strong> und setzt
+<code>pageTitle</code> auf <code>nil</code>, wenn nichts übrig bleibt. Damit funktionieren alle vorhandenen
+<code>if pageTitle</code>-Prüfungen wieder wie gedacht. <code>head.html</code> vergleicht zusätzlich gegen
+<code>''</code>, weil der <code>default</code>-Filter zwar <code>nil</code> ersetzt, ein <code>''</code> aber durchreicht.</p>
+
+<p><strong>Nebenbei entfernt: dreifache Kopie.</strong> Dieselben sechs Zeilen standen in
+<code>default.html</code>, <code>presentation.html</code> und <code>simulation.html</code>. Ein Fehler darin war ein
+Fehler an drei Stellen – und genau so ist er entstanden.</p>
+
+<p><strong>Was sich für Konsumenten ändert.</strong> Seiten mit <code>title: ""</code> zeigen ihre Überschrift
+<strong>wieder an</strong> und bekommen einen richtigen Browser-Titel. Das ist eine <strong>sichtbare
+Änderung am Ergebnis bestehender Seiten</strong> – deshalb Minor und nicht Patch. Seiten
+<strong>ohne</strong> <code>title</code> und Seiten mit <strong>gesetztem</strong> <code>title</code> bauen byte-identisch wie zuvor
+(verifiziert per Vorher/Nachher-Diff über vier Fälle; einziger Unterschied war der
+Cache-Buster). Nichts ist umzustellen: Wer <code>title: ""</code> stehen lässt, bekommt das
+Verhalten, das seit 2.0 zugesagt ist. Wer den Hero-Titel absichtlich leer halten
+möchte, hat dafür bislang kein Feld – bitte melden, dann wird daraus eines.</p>
+
+<hr />
+
+<h2 id="256">2.5.6</h2>
+
+<h3 id="mehr-host-adressen-gemessen-statt-vermutet">Mehr-Host-Adressen: gemessen statt vermutet</h3>
+
+<p>Zu 2.5.5 stand in der Doku ein Muster für Sites, die aus <strong>einem</strong> Image unter mehreren
+Adressen laufen – ein Platzhalter zur Bauzeit, den der ausliefernde Dienst je Anfrage
+ersetzt. Ein Consumer hat es nachgestellt, und die Messung hat zwei Annahmen korrigiert:</p>
+
+<ul>
+  <li><strong>Es sind zwei Werte, nicht einer.</strong> <code>jekyll-github-metadata</code> berechnet <code>url</code> <strong>und</strong>
+<code>baseurl</code>. Wer auf GHE nur <code>url</code> setzt, sieht den Abbruch bloß weiterwandern:
+<code>Error processing value 'url'</code> wird zu <code>… value 'baseurl'</code>. Erst beide zusammen bauen
+durch (ein <code>--baseurl</code> auf der Kommandozeile zählt mit). <code>head.html</code> und die Doku
+sagten bisher nur <code>url</code>.</li>
+  <li><strong>Der Platzhalter gehört in die Vorlage, nicht in <code>site.url</code>.</strong> <code>absolute_url</code>
+normalisiert die Adresse und prozentkodiert dabei die Prozentzeichen – aus <code>%%ORIGIN%%</code>
+wird <code>%25%25ORIGIN%25%25</code>, und zwar auch ohne jedes Plugin. Dieselbe Normalisierung
+schreibt klein (<code>https://ORIGIN</code> → <code>https://origin</code>). Wer einen Platzhalter dennoch
+durch den Filter schicken muss, nimmt einen Hostnamen unter der reservierten TLD
+<code>.invalid</code> (RFC 2606) – er übersteht sie unverändert, und eine ausgebliebene Ersetzung
+zeigt auf einen Namen, der nie auflösen kann.</li>
+</ul>
+
+<p>Dazu eine Einordnung, die bisher fehlte: <strong>Die GHE-Falle greift nur, wo
+<code>jekyll-github-metadata</code> überhaupt installiert ist</strong> (über das <code>github-pages</code>-Gem). Ein
+Repo, das nur <code>jekyll</code>, <code>jekyll-optional-front-matter</code> und <code>jekyll-relative-links</code> zieht,
+kann sie nicht treffen. Dass das Theme trotzdem überall relativ verweist, bleibt Absicht –
+sonst müsste jeder Consumer wissen, in welcher der beiden Welten er gerade baut.</p>
+
+<p>Nur Doku und Kommentare; am Verhalten ändert sich nichts.</p>
+
+<h2 id="255">2.5.5</h2>
+
+<h3 id="collection-dokumente-werden-geprüft--und-ihre-md-verweise-umgeschrieben">Collection-Dokumente werden geprüft – und ihre <code>.md</code>-Verweise umgeschrieben</h3>
+
+<p>Eine Jekyll-Collection (<code>collections:</code> in der <code>_config.yml</code>) lief bisher an zwei
+Prüfungen des Themes <strong>vorbei</strong>, ohne dass das irgendwo sichtbar wurde:</p>
+
+<ul>
+  <li><strong><code>validate.rb</code> übersprang sie.</strong> Unterstrich-Ordner rendert Jekyll nicht – bis auf die
+Collections. Der Prüfer nahm die Ausnahme nicht mit und meldete danach „N Seite(n)
+geprüft, keine Verstöße“, als wäre nichts übrig geblieben. Jetzt sind die in
+<code>collections:</code> erklärten Verzeichnisse ausgenommen, <code>_posts</code> immer; <code>_data</code>,
+<code>_includes</code> und <code>_layouts</code> bleiben draußen. Die Schlussmeldung nennt die
+Collection-Dokumente eigens: <code>… 34 Seite(n) (darunter 32 aus Collections) geprüft …</code>.</li>
+  <li><strong><code>jekyll-relative-links</code> fasste sie nicht an.</strong> Ein <code>[Text](../konfiguration/foo.md)</code>
+in einem Collection-Dokument blieb unverändert im HTML stehen und war im Browser tot –
+ohne Baufehler. Die Defaults setzen deshalb <code>relative_links.collections: true</code>; das
+Plugin löst den Verweis gegen den <strong>Quellpfad</strong> auf und schreibt die Adresse der
+gebauten Seite hin. In einer Collection gilt damit dieselbe Regel wie überall: im
+Markdown auf die <code>.md</code> verweisen.</li>
+</ul>
+
+<div class="avd-academy-callout avd-academy-callout--warning">
+  <p><strong>Für Repos mit Collections kann dieses Update rot werden.</strong> Front Matter, das bisher
+ungeprüft durchlief, wird ab jetzt gegen das Schema geprüft. Repo-eigene Felder brauchen
+dort – wie auf jeder Seite – das Präfix <code>x_</code> (<code>x_version</code>, <code>x_highlights</code>). Das ist der
+Zweck der Änderung: Die Prüfung sagt jetzt, was sie wirklich angeschaut hat.</p>
+
+  <p>Wer die Theme-Defaults <strong>nicht</strong> lädt (Build mit <code>_config.yml</code> + <code>_config.audience.yml</code>),
+trägt <code>relative_links: { collections: true }</code> in seine eigene <code>_config.yml</code> ein.</p>
+</div>
+
+<p>Neu im Front-Matter-Schema: <strong><code>categories</code></strong> und <strong><code>tags</code></strong> – beides liest Jekyll selbst
+(Adresse eines Beitrags, <code>site.categories</code>/<code>site.tags</code>), nicht das Theme. Ohne sie meldete
+die frisch erweiterte Prüfung jeden <code>_posts</code>-Eintrag als Tippfehler. Die Tags im Hero einer
+Seite heißen weiterhin <code>topics</code>. Im Konfigurations-Schema steht jetzt <code>relative_links</code>, und
+<code>collections</code> ist auch als Namensliste erlaubt – beides kennt Jekyll so. <strong>Die
+Schema-Versionen bleiben bei 2:</strong> nur Ergänzungen, nichts entfällt, nichts wird enger.</p>
+
+<h3 id="doku-eine-site-unter-mehreren-adressen">Doku: eine Site unter mehreren Adressen</h3>
+
+<p><code>head.html</code> begründet ausführlich, warum das Theme ausschließlich <code>relative_url</code> nutzt, und
+schloss mit „wer vollqualifizierte Verweise braucht, setzt <code>url</code> in der eigenen
+<code>_config.yml</code>“. Das trägt für eine Site unter <strong>einer</strong> Adresse. Wird dieselbe gebaute Site
+unter mehreren Hosts ausgeliefert – lokal, im Container, in der Cloud, alles aus demselben
+Image –, kann der Build die Adresse gar nicht kennen; <code>url</code> ist dort die falsche Antwort.
+Die Doku benennt den Fall jetzt und beschreibt das Muster dafür (Platzhalter zur Bauzeit,
+den der ausliefernde Dienst je Anfrage ersetzt):
+<a href="../docs/verwendung/einbindung.md#mehr-host">Einbindung → Eine Site unter mehreren Adressen</a>.</p>
+
+<h2 id="254">2.5.4</h2>
+
+<h3 id="hreflang-nennt-nur-noch-fassungen-die-es-gibt"><code>hreflang</code> nennt nur noch Fassungen, die es gibt</h3>
+
+<p><code>i18n.switch.fallback: base</code> schickt den Sprachumschalter auf die <strong>Wurzel</strong> des anderen
+Sprachbaums, wenn es die Seite dort nicht gibt – damit ein Leser überhaupt in den anderen
+Baum kommt. Als Knopf ist das richtig; <strong>als Angabe über die Seite war es falsch.</strong></p>
+
+<p>Dieser Rückfall lief bisher auch in den Kopf der Seite:</p>
+
+<pre><code class="language-html">&lt;link rel="alternate" hreflang="en" href="/en/"&gt;
+</code></pre>
+
+<p>Das behauptet, <code>/en/</code> sei die englische Fassung <strong>dieser</strong> Seite. Auf einer erst teilweise
+übersetzten Site behaupten das Hunderte Seiten gleichzeitig, und keine bekommt von <code>/en/</code>
+eine Bestätigung zurück – <code>hreflang</code> verlangt aber Gegenseitigkeit, sonst wertet eine
+Suchmaschine die Angabe ab, statt sie zu nutzen. In der Doku dieses Repos trugen <strong>20 von
+52</strong> Seiten mit Sprachangaben eine Übersetzung, die es nicht gibt; jetzt sind es <strong>null</strong>,
+und jede verbliebene Angabe zeigt zurück.</p>
+
+<p>Dieselbe Trennung gilt für die Browsersprachen-Erkennung (<code>i18n.detect</code>): Sie leitet nur
+noch dorthin um, wo es <strong>diese</strong> Seite in der bevorzugten Sprache wirklich gibt. Vorher
+verlor ein englischsprachiger Leser auf einer unübersetzten Seite genau die Seite, die er
+aufgerufen hatte, und landete auf der englischen Startseite.</p>
+
+<p><strong>Am Umschalter ändert sich nichts</strong> – der Rückfall bleibt genau da, wofür er gedacht war.
+Intern führt <code>avd-i18n.html</code> dafür zwei Listen: <code>iAlt</code> (echte Gegenstücke, gelesen von
+<code>head.html</code>) und <code>iAltSchalter</code> (echte Gegenstücke plus Rückfall, gelesen von
+<code>tools.html</code>).</p>
+
+<p><strong>Was Projekte tun müssen:</strong> nichts. Wer <code>fallback: base</code> gesetzt hat, behält den
+Umschalter und verliert nur eine Angabe, die ohnehin nicht stimmte.</p>
+
+<hr />
+
+<h2 id="253">2.5.3</h2>
+
+<p><strong>Eine Prüfung, die tote Verweise findet – und die 60 toten Verweise, die sie gefunden
+hat.</strong> Angestoßen von einem Hinweis aus demselben zweisprachigen Consumer-Repo, das
+schon 2.5.1 und 2.5.2 gemeldet hat.</p>
+
+<h3 id="neu-themejekylllinksrb">Neu: <code>theme/jekyll/links.rb</code></h3>
+
+<p>Ein Verweis ins Leere ist für Jekyll <strong>kein Baufehler</strong>. Die Seite entsteht, der Link
+ist tot, und es fällt erst beim Klicken auf – oft Wochen später und einem Leser, nicht
+dem Autor. Das Paket bringt deshalb eine Prüfung mit, die gegen das <strong>gebaute <code>_site</code></strong>
+läuft und dreierlei meldet:</p>
+
+<ul>
+  <li><strong>Ziel fehlt</strong> – das <code>href</code> trifft keine Datei. Ein Ordner ohne <code>index.html</code> gehört
+dazu: Auf GitHub Pages ist er ein 404, kein Verzeichnislisting.</li>
+  <li><strong>Anker fehlt</strong> – <code>#kapitel</code> trifft auf der Zielseite keine <code>id</code>. Geprüft im gebauten
+HTML, weil kramdown den Slug dort schon erzeugt hat. Wer ihn aus der Überschrift
+<strong>nachbaut</strong>, trifft die Umlautregel falsch und meldet <code>#löschen</code> als tot.</li>
+  <li><strong>Sprachbaum gewechselt</strong> – der Verweis führt in eine andere Sprache, <strong>obwohl es die
+Zielseite in der Sprache der verweisenden Seite gibt</strong>. Zugehörigkeit und Gegenstück
+kommen aus dem gebauten HTML (<code>&lt;html lang&gt;</code>, <code>&lt;link rel="alternate"&gt;</code>), der Befund
+nennt deshalb gleich die richtige Adresse. Ein Verweis mit <code>hreflang</code> ist Absicht und
+wird übergangen.</li>
+</ul>
+
+<p><strong>Warum gegen das Gebaute:</strong> Ein Verweis entsteht an <strong>fünf</strong> Stellen – Fließtext,
+<code>resources</code>, <code>nav</code>, Sprachkarten, <code>breadcrumb.ancestors</code> – und sieht in der Quelle jedes
+Mal anders aus. Ein Prüfer über die Quellen kennt immer nur einige davon und hat sein
+Loch genau dort, wo der echte tote Verweis steht. Im <code>_site</code> steht überall dasselbe.</p>
+
+<p><code>--baseurl</code> (derselbe Wert wie beim Bauen) und <code>--ignore «Praefix»</code> (Adressen, die erst
+die laufende Anwendung bedient) sind die beiden Angaben, die eine Site braucht. Externe
+Links prüft sie nicht: Ein Prüflauf, der aus fremden Gründen rot wird, wird
+abgeschaltet. <code>--self-test</code> prüft die Prüfung an einer Site, die jeden Befund einmal
+enthält – im eigenen Repo entstehen die interessanten Fälle nicht, und genau diese
+Blindheit hat 2.5.1 grün durchlaufen lassen.</p>
+
+<p><strong>Für Konsumenten:</strong> Beide Workflow-Vorlagen (<code>github-pages/deploy.example.yml</code>,
+<code>theme/jekyll/starter/pages.yml</code>, Vorlagenversion <strong>10</strong>) rufen die Prüfung nach dem
+Build auf. Wer eine ältere Kopie hat, zieht den Schritt nach – nötig ist er nicht.
+Doku: <a href="../github-pages/#verweise-pruefen">GitHub Pages → Tote Verweise finden</a>.</p>
+
+<h3 id="behoben-die-automatische-brotkrume-verlinkte-ordner-die-es-nicht-gibt">Behoben: die automatische Brotkrume verlinkte Ordner, die es nicht gibt</h3>
+
+<p>Die aus der Ordnerstruktur gebaute Kette verlinkte <strong>jeden</strong> Vorfahren – auch einen
+Ordner <strong>ohne <code>index</code>-Seite</strong>. <code>/docs/</code> ist auf GitHub Pages dann ein 404, und zwar auf
+jeder Seite darunter. In der Doku dieses Repos waren es <strong>56 tote Verweise</strong>, die
+niemandem aufgefallen sind, weil eine Brotkrume selten angeklickt wird.</p>
+
+<p>Ein Vorfahre ohne <code>index</code>-Seite steht jetzt als <strong>Text</strong> statt als Link; eine statische
+<code>index.html</code> zählt dabei mit. Sichtbare Folge: Diese Krumen sind nicht mehr anklickbar –
+sie waren es vorher auch nicht, sie sahen nur so aus.</p>
+
+<h3 id="behoben-vier-tote-und-37-sprachfremde-verweise-in-der-englischen-doku">Behoben: vier tote und 37 sprachfremde Verweise in der englischen Doku</h3>
+
+<p>Gefunden von der neuen Prüfung, alle aus der Übersetzung in 2.5.0:</p>
+
+<ul>
+  <li>ein Markdown-Verweis über <strong>zwei Zeilen</strong> – <code>jekyll-relative-links</code> schreibt ihn nicht
+um, und die Seite lieferte <code>href="docs/usage/quickstart.md"</code> aus;</li>
+  <li>zwei Verweise in <strong>rohem HTML</strong> (<code>&lt;a href="academy.md#…"&gt;</code>) – auch die schreibt das
+Plugin nicht um, denn es kennt nur Markdown-Syntax;</li>
+  <li>ein relativer Verweis im CHANGELOG, der eine Ebene zu hoch zeigte;</li>
+  <li>37 Verweise aus dem englischen Baum auf die <strong>deutsche</strong> Fassung einer Seite, die es
+auf Englisch gibt – samt der Klammern „(German)“, die dazu nicht mehr stimmten.</li>
+</ul>
+
+<hr />
+
+<h2 id="252">2.5.2</h2>
+
+<p><strong>Zwei Fehler aus 2.5.1, beide von außen gemeldet</strong> – aus einem zweisprachigen
+Consumer-Repo, in dem Englisch in der Wurzel und Deutsch unter <code>/de/</code> liegt.</p>
+
+<h3 id="der-sprachhinweis-klebte-am-vorigen-attribut">Der Sprachhinweis klebte am vorigen Attribut</h3>
+
+<p>An jedem Verweis, der in eine andere Sprache zeigte, entstand <strong>ungültiges HTML</strong>: Dem
+Attributnamen fehlte das trennende Leerzeichen zum schließenden Anführungsstrich des
+vorigen Attributs.</p>
+
+<p><strong>Die Ursache war unsichtbar.</strong> <code>_includes/avd-link-target.html</code> baute die Attribute per
+<code>capture</code>, mit dem trennenden Leerzeichen als <strong>erstem Zeichen</strong> des Blocks – und genau
+den Whitespace danach schneidet das <code>-%}</code> der öffnenden Anweisung weg. Alle sechs
+Verweisstellen verlassen sich darauf, dass das Leerzeichen im Wert steckt.</p>
+
+<p>Das Leerzeichen wird jetzt <strong>angehängt</strong> (<code>' ' | append: …</code>) statt hingeschrieben. Ein
+Leerzeichen, das nur als Whitespace in einer Liquid-Anweisung existiert, ist beim nächsten
+Aufräumen der Delimiter wieder weg – und der Fehler fällt nicht auf, weil Browser das HTML
+trotzdem darstellen. Bemerkt wird er erst von einem Validator, einem Parser oder einem
+Screenreader.</p>
+
+<p><strong>Warum der eigene Build nichts zeigte:</strong> In derselben Runde war jedes Verweisziel der
+Doku-Site übersetzt worden – damit entstand dort <strong>kein einziger</strong> fremdsprachiger Verweis,
+und die betroffene Codezeile lief nie. Ein grüner Build war in diesem Fall kein Beleg.</p>
+
+<h3 id="was-keine-seite-ist-bekam-trotzdem-eine-sprache">Was keine Seite ist, bekam trotzdem eine Sprache</h3>
+
+<p><code>avd-lang-of-url.html</code> nahm nur <strong>externe</strong> Adressen (<code>://</code>) aus. Eine <strong>wurzel-absolute</strong>
+Adresse wie <code>/schemas/client.schema.json</code> durchlief dagegen die Sprachbaum-Erkennung, fand
+keinen Treffer und landete beim Rückfall auf der Standardsprache. Damit galt eine
+JSON-Datei als Seite in dieser Sprache, und auf einer Seite der anderen Sprache stand
+daran ein Sprachhinweis – eine Behauptung über etwas, das gar keine Seite ist. Betroffen
+war jeder Verweis auf Asset, PDF, Schema oder eine von der Anwendung ausgelieferte Datei.</p>
+
+<p>Geprüft wird jetzt gegen <strong><code>site.pages</code></strong> – denselben Index, den der Umschalter ohnehin
+nutzt. Trifft nichts zu, wird wie bei einer externen Adresse verfahren: kein <code>hreflang</code>,
+kein <code>title</code>. Fragment und Abfrage (<code>#kapitel</code>, <code>?x=1</code>) zählen beim Vergleich nicht mit,
+denn sie bezeichnen eine Stelle <strong>in</strong> einer Seite: <code>/a.html#kapitel</code> <strong>ist</strong> die Seite
+<code>/a.html</code>.</p>
+
+<h3 id="regressionsschutz-binhtml-attributessh">Regressionsschutz: <code>bin/html-attributes.sh</code></h3>
+
+<p>Neue Prüfung über das <strong>gebaute</strong> <code>_site</code>: Klebt irgendwo ein Attributname am vorigen
+Attribut? Sie hängt in <code>make check</code> und – mit <code>--require-site</code> – hinter dem Build der
+Pages-Pipeline.</p>
+
+<p><strong>Zweistufig, und beides war nötig.</strong> Erst werden die echten Tags herausgeschnitten (ein
+Codebeispiel steht gebaut als <code>&amp;lt;a …&amp;gt;</code> und ist keines), dann werden die
+Attributwerte durch ein Zeichen ersetzt. Ohne den zweiten Schritt kann ein Muster
+öffnende und schließende Anführungsstriche nicht unterscheiden und meldet jeden Wert, der
+selbst ein <code>=</code> enthält – <code>content="width=device-width, initial-scale=1"</code> also auf <strong>jeder</strong>
+Seite. <code>&lt;script&gt;</code> und <code>&lt;style&gt;</code> fallen heraus: Die Simulations-Vorlage baut ihre Bühne mit
+JS-Template-Literalen, die wie Markup aussehen und keines sind.</p>
+
+<h3 id="mitgefunden-pagedescription-wurde-unescaped-in-ein-attribut-geschrieben">Mitgefunden: <code>page.description</code> wurde unescaped in ein Attribut geschrieben</h3>
+
+<p>Die neue Prüfung hat auf Anhieb einen <strong>zweiten, älteren</strong> Fehler derselben Art gefunden:
+<code>head.html</code> schrieb <code>content=""</code> ohne <code>escape</code>. Ein
+Anführungsstrich in der Beschreibung beendet damit den Attributwert, und der Rest des
+Satzes wird zu Pseudo-Attributen. Aufgefallen ist es an den Skill-Referenzen des Plugins –
+ihre Beschreibungen führen Trigger-Sätze in Anführungsstrichen. Jetzt mit <code>escape</code>.</p>
+
+<hr />
+
+<h2 id="251">2.5.1</h2>
+
+<p><strong>Ein Verweis wird in der Sprache seines Ziels beschriftet.</strong> Das korrigiert einen
+Fehler aus 2.5.0, und zwar einen sichtbaren: Auf der englischen Fassung der Doku-Site
+standen <strong>elf von vierzehn</strong> Menüpunkten englisch beschriftet da und öffneten deutsche
+Seiten. Wer „With Claude“ anklickt und Deutsch bekommt, hält nicht die Übersetzung für
+unfertig, sondern die Site für kaputt.</p>
+
+<p>Jetzt erscheint dort „Mit Claude“ – in der Sprache der Zielseite –, dazu <code>hreflang="de"</code>
+am Verweis und ein Hinweis im Tooltip („Diese Seite ist auf Deutsch“). Zu konfigurieren
+ist nichts.</p>
+
+<p><strong>Warum das keine Notlösung ist:</strong> Die Beschriftung beschreibt eine Seite, also spricht
+sie deren Sprache. Nebenwirkung mit Absicht – eine unfertige Übersetzung ist im Menü zu
+<strong>sehen</strong>, statt sich hinter englischen Wörtern zu verstecken.</p>
+
+<p><strong>Die Regel steckt in EINEM Auflöser</strong> (<code>avd-link-target.html</code>), den alle sechs
+Verweisstellen benutzen: Kopfzeile (Haupteintrag und Untermenü), Fußbereich, <code>resources</code>,
+Brotkrumen-Vorfahren und die Kopie im Markdown. Der Fehler war entstanden, weil die
+Auflösung an jeder Stelle einzeln stand; gebündelt kann sie an keiner vergessen werden.</p>
+
+<p><strong>Kein neues sichtbares Element.</strong> Erwogen war ein Sprach-Abzeichen („DE“) neben dem
+englischen Label – eine neue Komponente, eigenes CSS, und der Sprachwechsel wäre eine
+Überraschung geblieben, nur eine angekündigte. Das deutsche Wort selbst ist der
+ehrlichere Hinweis.</p>
+
+<p><strong>Der Sprachhinweis steht in der Sprache des ZIELS.</strong> Der erste Versuch setzte ihn in der
+Sprache des Lesers zusammen und lieferte „This page is in Deutsch“ – ein englischer Satz
+mit deutschem Sprachnamen. Ein Satz je Sprache genügt (<code>avd-lang-name.html</code>,
+<code>form="hint"</code>); die Alternative wäre eine Tabelle je Sprachpaar, also quadratisch.</p>
+
+<p><strong>Ausnahmen, beide begründet:</strong> Menü-<strong>Gruppen</strong> (Einträge mit <code>children</code>) sind keine
+Seiten und behalten die Sprache der aktuellen Seite. <strong>Externe Ziele</strong> (<code>://</code>) ebenfalls –
+welche Sprache dort wartet, kann das Theme nicht wissen, und ein Hinweis, den niemand
+belegen kann, ist schlimmer als keiner.</p>
+
+<p><strong>Eingestuft als PATCH, nicht als Minor.</strong> Es ist eine Korrektur eines Fehlers aus
+2.5.0 und keine neue Funktion – die drei neuen Includes sind Innenleben, kein neues
+Angebot an Projekte. Für Repos gibt es nichts zu tun und nichts zu entscheiden: Wer
+einsprachig ist, merkt nichts; wer zweisprachig ist, bekommt die Beschriftungen
+richtig.</p>
+
+<p><strong>Einsprachige Repos sind erneut nachweislich unberührt:</strong> derselbe Build aus <code>main</code> und
+aus diesem Stand, jeweils ohne <code>i18n</code>, <strong>60 Seiten, null</strong> inhaltliche Abweichung.</p>
+
+<p><strong>Und die Faustregel dazu: <code>page</code> für alles Interne, <code>url</code> nur für Externes.</strong> Weil der
+Dateiname als Identität einspringt (2.5.0), ist jede Seite über <code>page</code> erreichbar – ein
+interner <code>url</code>-Eintrag hat keinen Vorteil mehr, aber drei Nachteile: Er bricht beim
+Verschieben, muss bei mehreren Sprachen doppelt gepflegt werden, und ein Tippfehler darin
+fällt erst beim Klicken auf. <code>url</code> bleibt intern nur bei Ordner-Indizes (alle heißen
+<code>index</code>), bei Dateien, die keine Seite sind, und bei Verweisen mit Anker – ein Fragment
+trägt <code>page</code> nicht. Die Doku-Site führt jetzt <strong>keinen</strong> internen <code>url</code>-Eintrag mehr.</p>
+
+<p>Neu: <code>theme/jekyll/_includes/avd-link-target.html</code> (Adresse, Sprache und Sprachhinweis
+eines Verweises), <code>avd-lang-of-url.html</code> (Sprache einer Adresse),
+<code>avd-lang-name.html</code> (Eigenname und Hinweissatz je Sprache – die Tabelle stand vorher
+in <code>avd-i18n.html</code> und wird jetzt an zwei Stellen gebraucht).</p>
+
+<hr />
+
+<h2 id="250">2.5.0</h2>
+
+<p><strong>Das Theme kann zwei Sprachen.</strong> Seine Beschriftungen lagen als deutsche Literale im
+Markup – eine englische Seite war damit nicht darstellbar, ohne das Theme anzufassen.
+Jetzt bringt es Deutsch und Englisch mit, und eine Site kann je Sprache einen
+Ordnerbaum führen.</p>
+
+<p><strong>Für einsprachige Repos ändert sich nichts, und zwar nachweislich.</strong> Derselbe Build
+aus <code>main</code> und aus diesem Stand, 54 Seiten, whitespace-normalisiert <strong>null</strong>
+inhaltliche Abweichung. Ohne den neuen Schlüssel <code>i18n</code> gibt es kein Pfad-Präfix,
+keinen Umschalter und keine Umleitung; <code>lang: de</code> bleibt die Vorgabe, und eine
+unbekannte Sprache bekommt weiterhin die deutschen Texte.</p>
+
+<p><strong>Neu in der <code>_config.yml</code>:</strong></p>
+
+<pre><code class="language-yaml">lang: de                    # Standardsprache – ihr Sprachbaum ist die WURZEL
+i18n:
+  languages:
+    - code: de
+    - code: en              # base: "/en/" ist die Vorgabe
+  switch: { enabled: true, fallback: none }
+  detect: { enabled: false }
+</code></pre>
+
+<p><strong>Neu im Front Matter:</strong> <code>page_id</code> – die stabile Identität einer Seite.</p>
+
+<p><strong>Und ein Verweis nennt die Seite, nicht ihren Ort.</strong> <code>nav.items</code>, <code>footer.links.items</code>,
+<code>resources</code> und <code>breadcrumb.ancestors</code> kennen neben <code>url</code> jetzt <code>page</code>:</p>
+
+<pre><code class="language-yaml">nav:
+  items:
+    - title: Getting Started
+      page: schnellstart          # statt url: /docs/verwendung/schnellstart.html
+</code></pre>
+
+<p>Adressierbar ist eine Seite über ihre ausdrückliche <code>page_id</code> – oder, wenn sie keine
+hat, über ihren <strong>Dateinamen ohne Endung</strong>. Die ID wird zuerst gesucht. <strong>Das lohnt sich
+auch einsprachig:</strong> Der Verweis löst sich vom Pfad, ein Umbenennen oder Verschieben
+bricht ihn nicht mehr. Bei mehreren Sprachen bildet das Theme daraus je Sprachbaum die
+passende Adresse – es gibt also nichts zu übersetzen –, und fehlt die Übersetzung, zeigt
+der Verweis von selbst auf die Standardsprache.</p>
+
+<p>Ein Tippfehler ist dabei ein <strong>Build-Fehler</strong>, kein fehlender Menüpunkt: Ohne Prüfung
+fände das Theme nichts, ließe den Verweis weg, und niemand sähe, dass er fehlen sollte.
+Dasselbe für Mehrdeutigkeit – und die wird nur dort gemeldet, wo sie auch greift: Zwei
+<code>index.md</code> in verschiedenen Ordnern sind der Normalfall und erst dann ein Problem, wenn
+jemand <code>page: index</code> schreibt.</p>
+
+<p><strong>Ordnerbäume, nicht Dateinamen-Suffixe.</strong> Zur Wahl stand, die Übersetzung neben das
+Original zu legen (<code>einbindung_en.md</code>). Dagegen sprach der Zuschnitt: Ordner und Dateien
+tragen je Sprache eigene Namen (<code>docs/verwendung/einbindung.md</code> ↔
+<code>en/docs/usage/setup.md</code>) – die URL ist Teil der Unterlage. Ein Suffix-Schema erzwingt
+dagegen deutsche Dateinamen im englischen Baum.</p>
+
+<p><strong>Deshalb eine ID und keine Pfad-Arithmetik.</strong> Bei eigenen Namen je Sprache lässt sich
+das Gegenstück aus dem Pfad nicht berechnen. <code>page_id</code> verbindet die Fassungen
+symmetrisch und für beliebig viele Sprachen. Fehlt das Gegenstück, erscheint kein
+Umschalter – ein Knopf ins 404 ist schlimmer als keiner.</p>
+
+<p><strong>Ein Jekyll-Build, nicht zwei.</strong> Beide Bäume entstehen in einem Lauf; es gibt kein
+zweites Kommando, kein Config-Overlay und keine Pipeline-Änderung. Nebeneffekt, auf dem
+der Umschalter beruht: In einem Build kennt jede Seite alle anderen, das Theme kann die
+Existenz der anderen Fassung also <strong>prüfen</strong> statt eine Adresse zu raten.</p>
+
+<p><strong>Jeder konfigurierte Text darf eine Sprachkarte sein</strong> – <code>title</code>, <code>url</code> und <code>icon</code> in
+TopNav, Fußbereich und <code>resources</code>, dazu <code>site.title</code>, <code>brand.tagline</code>, die Rechtstexte,
+<code>topics</code>, <code>breadcrumb</code> und die Beschriftungen unter <code>components</code>:</p>
+
+<pre><code class="language-yaml">nav:
+  items:
+    - title: { de: "Design-System", en: "Design system" }
+      url:   { de: "/theme.html", en: "/en/theme.html" }
+</code></pre>
+
+<p><strong>Auch die Adresse, nicht nur der Titel.</strong> Wäre nur der Titel mehrsprachig, zeigte die
+englische Leiste mit englischer Beschriftung auf die deutsche Seite. Die Alternative
+wäre ein parallel gepflegter Navigationsbaum je Sprache gewesen – zwei Bäume driften,
+und es fällt niemandem auf, weil beide für sich gültig sind. Nebeneinander im selben
+Eintrag sieht man beim Schreiben, dass eine Übersetzung fehlt.</p>
+
+<p><strong>Das Wörterbuch steht in einem Include, nicht in <code>_config.defaults.yml</code>.</strong> Zwei der
+drei Consumer laden diese Datei nicht – <code>bin/build.sh</code> einer Unterlage baut mit
+<code>_config.yml</code> + <code>_config.audience.yml</code>. Ein Wörterbuch dort wäre für sie nicht vorhanden,
+und jede Beschriftung käme leer heraus; dieselbe Begründung wie bei den harten Vorgaben
+in <code>avd-switch.html</code>.</p>
+
+<p><strong>Die Prüfung kommt aus dem Schema, nicht aus einer Namensliste.</strong> <code>validate.rb</code>
+vergleicht jeden Sprachcode gegen <code>i18n.languages</code> und meldet doppelte <code>page_id</code> je
+Sprache. Der erste Versuch war eine Liste der Feldnamen und war sofort falsch:
+<code>brand.icon</code> ist ein Hash aus <code>default</code>/<code>small</code>/<code>apple</code>, heißt aber <code>icon</code> – dasselbe
+Wort bedeutet an verschiedenen Stellen Verschiedenes. Jetzt läuft die Prüfung durch Wert
+und Schema gleichzeitig; wer ein Feld sprachfähig macht, ändert nur das Schema.</p>
+
+<p><strong>Browsersprache statt <code>Accept-Language</code>.</strong> GitHub Pages liefert statische Dateien aus –
+es gibt keinen Prozess, der den Header sähe. <code>navigator.languages</code> ist dieselbe
+Einstellung, clientseitig gelesen. Mit <code>i18n.detect.enabled: true</code> leitet das Theme
+einmal je Sitzung um; eine ausdrückliche Wahl am Umschalter gewinnt immer, und <code>?nolang</code>
+schaltet es fallweise ab. Vorgabe ist <strong>aus</strong>: Eine Umleitung ist eine
+Verhaltensänderung.</p>
+
+<p><strong>Was das Theme nicht übernimmt:</strong> das Übersetzen. Prosa auf Satzebene zu verschlüsseln
+(``) macht das Markdown unlesbar, zerstört die Vorschau und erzwingt
+Übersetzungen, die nicht auseinandergehen dürfen – obwohl Beispiele, Redewendungen und
+Screenshots das müssen.</p>
+
+<p>Neu: <code>theme/jekyll/_includes/avd-i18n.html</code> (Sprache, Sprachfassungen, Wörterbuch),
+<code>theme/jekyll/_includes/avd-lang-value.html</code> (Sprachkarten auflösen), die Klasse
+<code>avd-academy-tool--lang</code>. Doku: <a href="../docs/theme/mehrsprachigkeit.md">Mehrsprachigkeit</a>.</p>
+
+<hr />
+
+<h2 id="241">2.4.1</h2>
+
+<p><strong>Das Tempo-Menü der Simulation ging nicht mehr auf.</strong></p>
+
+<p>Der Umzug auf englische Namen (2.0, #136) hat das Markup umbenannt – aus
+<code>data-avd-academy-sim-tempo</code>, <code>…-tempo-label</code> und <code>…-tempo-menu</code> wurden <code>…-speed*</code> –,
+die drei zugehörigen Suchen in <code>simulation.js</code> aber nicht. Sie fragten weiter nach
+<code>…-tempo*</code>, fanden nichts, und <code>menuVerdrahten()</code> stieg an den <code>null</code>-Elementen sofort
+wieder aus. Betroffen war beides: der Klick auf den Tempo-Knopf <strong>und</strong> die Taste <code>T</code>.</p>
+
+<p>Nachgemessen im gebauten Beispiel: <code>[data-avd-academy-sim-tempo-menu]</code> gibt es im HTML
+nicht mehr.</p>
+
+<p><strong>Warum der Knopf jetzt <code>…-speed-toggle</code> heißt.</strong> Er trug denselben Namen wie der
+Wurzelknoten, auf dem die Startvorgabe aus <code>page.simulation.speed</code> steht. <code>q()</code> arbeitet
+mit <code>document.querySelector</code> – bei gleichem Namen findet die Suche den Wurzelknoten, weil
+er im Dokument vorher steht. Die Suche auf den Knopf einzugrenzen hätte den Klick
+reparieren können, aber nicht die Ursache: <strong>ein Name, der zwei Dinge bezeichnet.</strong> Der
+Knopf heißt daher eindeutig, und die Startvorgabe behält <code>…-speed</code>.</p>
+
+<p>Das Attribut ist Layout-intern (der Steuerungsbalken wird vom Layout gerendert, nicht von
+Autoren geschrieben) und steht nicht im Markup-Vertrag – für Projekte ändert sich nichts.</p>
+
+<h2 id="240">2.4.0</h2>
+
+<p><strong>Eine Visualisierung darf eine Dauer nennen – und zeigt sie jetzt auch.</strong></p>
+
+<p><code>layout: visualization</code> setzte <code>duration_tag: false</code>. Eine Seite mit <code>duration</code> im Front
+Matter bekam also <strong>kein Zeit-Tag</strong>, ohne Hinweis: Das Feld war erlaubt, wurde geprüft
+und dann verschluckt. Begründet war das mit „kein zeitgebundener Inhalt“ – das trifft auf
+ein projiziertes Schaubild zu, nicht auf Selbstlernmaterial, das jemand in einer
+Viertelstunde durcharbeitet.</p>
+
+<p>Neu gilt für alle Layouts mit Hero dasselbe: <strong><code>duration</code> gesetzt → Tag da, sonst nicht.</strong>
+Auf Visualisierungen bleibt die Angabe unüblich, aber sie ist erlaubt, und wer sie macht,
+sieht sie. Nachgezogen in der Layout-Eigenschaftstabelle, im Schema (<code>GILT IN</code>) und in der
+Doku.</p>
+
+<p>Für bestehende Seiten ändert sich nichts: Im ganzen Bestand setzt keine Visualisierung
+eine <code>duration</code>. Sichtbar wird die Korrektur erst bei der ersten, die es tut.</p>
+
+<h2 id="230">2.3.0</h2>
+
+<p><strong>Die Seitenwerkzeuge sind eine Komponente – und der Farbschema-Umschalter fehlt
+nicht mehr in der Visualisierung.</strong></p>
+
+<p>QR-Code, Farbschema-Umschalter, Drucken und Vollbild standen viermal im Markup: in
+<code>_includes/header.html</code>, im Hero von <code>_layouts/default.html</code> und in den Kopfleisten
+von <code>presentation</code> und <code>simulation</code>. Der QR-Block war wortgleich kopiert, der
+Umschalter dreimal mit drei verschiedenen Klassen – und an der vierten Stelle, dem
+Hero der Visualisierung, war er darum <strong>vergessen</strong> worden. Eine <code>visualization</code> hatte
+als einziges Layout keine Möglichkeit, zwischen hell und dunkel zu wechseln.</p>
+
+<p>Neu rendert <strong><code>_includes/tools.html</code></strong> alle Werkzeuge, und die Aufrufstelle sagt nur
+noch, welche sie führt und wie sie verdrahtet sind:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Layout</th>
+      <th>Wo</th>
+      <th>Werkzeuge</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>page</code>, <code>guide</code></td>
+      <td>Kopfzeile</td>
+      <td>QR, Farbschema</td>
+    </tr>
+    <tr>
+      <td><code>visualization</code></td>
+      <td>Hero rechts</td>
+      <td>QR, Farbschema (<strong>neu</strong>), Drucken</td>
+    </tr>
+    <tr>
+      <td><code>presentation</code></td>
+      <td>Kopfleiste</td>
+      <td>QR, Farbschema, Drucken, Vollbild</td>
+    </tr>
+    <tr>
+      <td><code>simulation</code></td>
+      <td>Kopfleiste</td>
+      <td>QR, Farbschema, Vollbild</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Aussehen kommt vom Container, nicht vom Knopf.</strong> Alle Knöpfe tragen
+<code>avd-academy-tool</code> und lesen Kantenlänge, Zeichengröße und Farbe aus vier Variablen,
+die die umgebende Gruppe setzt: <code>--avd-academy-tool-size</code>, <code>-glyph</code>, <code>-ink</code>,
+<code>-ink-hover</code>. Deshalb sieht derselbe Knopf auf der weißen Kopfzeile richtig aus wie
+auf der dunklen Kopfleiste der Präsentation. <code>avd-academy-present__tool</code> und
+<code>avd-academy-sim__tool</code> entfallen – beide waren zeichengleiche Kopien und standen
+nicht im Markup-Vertrag.</p>
+
+<p><strong>Für Projekte ändert sich nichts.</strong> <code>avd-academy-theme-toggle</code> und
+<code>avd-academy-print-btn</code> sind öffentliche Namen und bleiben auf den Knöpfen (siehe
+Register unten). Der Drucken-Knopf der Präsentation zeigt statt des Zeichens <code>⎙</code> jetzt
+dasselbe Masken-Icon wie im Hero – eine Vereinheitlichung, kein Verhaltenswechsel.</p>
+
+<p>Nebenbei: Der Tooltip des Umschalters ist über <code>toolbar.theme.title</code> konfigurierbar
+geworden, weil die Komponente ihn wie jeden anderen Text über <code>avd-text.html</code> auflöst.</p>
+
+<h2 id="221">2.2.1</h2>
+
+<p><strong>Warnung ergänzt: die Info-Schaltfläche trägt in einem Markdown-Listenpunkt nicht.</strong>
+Die Doku empfahl <code>avd-academy-reveal--info</code> für Stellen ohne Platz für einen Titel –
+„eine Tabellenzelle, das Ende einer Zeile“. In einer <strong>Aufzählung</strong> führt genau das in
+den Fehler: Kramdown behandelt das <code>&lt;details&gt;</code> dort als Inline-HTML und maskiert seinen
+Inhalt, im Ergebnis steht <code>&amp;lt;summary&amp;gt;</code> und die Schaltfläche ist kaputt. <code>markdown="1"</code>
+am umgebenden Element hilft nicht.</p>
+
+<p>Nachgemessen und in die Doku übernommen, samt Ausweg (die ganze Liste als Block-HTML)
+und dem Hinweis, dass dieser Preis hoch genug ist, um die Erläuterung lieber neben die
+Liste zu stellen. Gemeldet aus einem Konzept-Repo (A-013).</p>
+
+<hr />
+
+<h2 id="220">2.2.0</h2>
+
+<p><strong>Zehn Jekyll-Schlüssel mehr im Konfigurations-Schema</strong> – durchgegangen anhand von
+<a href="https://www.schemastore.org/jekyll.json">json.schemastore.org/jekyll</a> und aufgenommen,
+was in einem Academy-Repo realistisch vorkommt: <code>source</code>, <code>destination</code>, <code>data_dir</code>,
+<code>collections_dir</code>, <code>markdown_ext</code>, <code>highlighter</code>, <code>liquid</code>, <code>future</code>, <code>unpublished</code>,
+<code>incremental</code>.</p>
+
+<p>Zwei davon lohnen den Blick: <strong><code>future</code> und <code>unpublished</code></strong> entscheiden, ob eine Seite mit
+künftigem <code>date</code> bzw. <code>published: false</code> überhaupt gebaut wird – beide Felder kennt das
+Front-Matter-Schema, die zugehörigen Schalter fehlten. Und <strong><code>highlighter</code></strong> steht in
+Spannung zu <code>code.highlight</code>: Das Theme färbt clientseitig und schaltet Rouge in seinen
+Defaults ab; beides zugleich erzeugt doppeltes Markup. Das steht jetzt in der Beschreibung.</p>
+
+<p><strong>Jede Beschreibung eines Jekyll-Schlüssels beginnt mit <code>JEKYLL-STANDARD –</code>.</strong> Im Tooltip
+soll ohne Nachschlagen klar sein, ob der Schlüssel dem Theme gehört oder Jekyll.</p>
+
+<p><strong>Nicht aufgenommen:</strong> die Server- und CLI-Optionen (<code>port</code>, <code>host</code>, <code>livereload*</code>,
+<code>quiet</code>, <code>safe</code>, <code>whitelist</code>, <code>webrick</code>, <code>rdiscount</code>, <code>redcarpet</code> …). Sie gehören in den
+Aufruf; in diesen Repos steuert sie der Container, in der Datei hätten sie keine Wirkung.</p>
+
+<p><strong>Das Schema erweitert das Jekyll-Schema weiterhin nicht</strong> – es zählt die Schlüssel selbst
+auf. Ein <code>$ref</code> auf die veröffentlichte Fassung schiede aus zwei Gründen aus: Der Prüfer
+löst <code>$ref</code> relativ zur Datei auf und kann keine URL holen, und eine Netzabhängigkeit ist
+genau das, was der lokale Schema-Pfad beseitigt hat. Die Schema-Version bleibt <strong>2</strong>: rein
+ergänzend, die Wurzel war schon vorher offen.</p>
+
+<hr />
+
+<h2 id="216">2.1.6</h2>
+
+<p><strong>Festgehalten, dass Markdown-Front-Matter keinen IDE-Support bekommt.</strong> Die Doku sagte
+das schon, aber als Vermutung. Der naheliegende Ausweg – den Repos eine IDE-Zuordnung
+erzeugen (<code>.idea/jsonSchemas.xml</code>, <code>yaml.schemas</code> in VS Code) und das Front-Matter-Schema
+auf <code>**/*.md</code> mappen – ist am 21.08.2026 ausprobiert worden und <strong>greift nicht</strong>: Eine
+Zuordnung ordnet einer <em>Datei</em> ein Schema zu, und eine <code>.md</code> ist für die IDE eine
+Markdown-Datei. <code>docs/theme/schemas.md</code> nennt jetzt Datum und Grund, damit die Idee nicht
+alle paar Monate neu gebaut statt gemessen wird.</p>
+
+<hr />
+
+<h2 id="215">2.1.5</h2>
+
+<p><strong>Die Schemas kommen für die IDE aus dem Paket, nicht von der veröffentlichten URL.</strong>
+Liegen die veröffentlichten Schemas hinter einem Login – bei GHE-Pages der Regelfall –,
+löst die IDE sie <strong>nicht</strong> auf, und sie sagt es nicht: Vervollständigung und Prüfung
+bleiben stumm aus. <code>theme/jekyll/starter/_config.yml</code> trägt deshalb jetzt als erste Zeile</p>
+
+<pre><code class="language-yaml"># yaml-language-server: $schema=theme/jekyll/schema/config.schema.json
+</code></pre>
+
+<p>also denselben relativen Pfad, den dieses Repo selbst benutzt.</p>
+
+<p><code>docs/theme/schemas.md</code> schreibt aus, wie das Theme dafür lokal landet: ein Make-Ziel, das
+die <strong>gepinnte</strong> Version per <code>npm pack</code> holt – kein <code>package.json</code>, kein
+<code>package-lock.json</code>, kein <code>node_modules/</code>, das Repo wird also kein npm-Projekt – und das
+<code>theme/</code> <strong>vor</strong> dem Download leert. Dazu die Regel, dass der Pin (<code>THEME_VERSION</code>) an
+genau einer Stelle steht und Pipelines wie Container ihn von dort lesen.</p>
+
+<p>Die Vorlage <strong>ohne</strong> npm (<code>github-pages/_config.example.yml</code> mit <code>deploy.example.yml</code>)
+behält die URL – sie zieht kein Paket. Ihr Kommentar nennt jetzt den Unterschied und die
+Folge.</p>
+
+<hr />
+
+<h2 id="214">2.1.4</h2>
+
+<p><strong><code>bin/migrate.rb</code> baut <code>footer.more</code> kindweise um.</strong> Bisher benannte die Regel nur den
+Kopf um (<code>footer.more</code> → <code>footer.links</code>) – die Liste darunter hieß weiter <code>links:</code>,
+obwohl das Schema unter <code>footer.links</code> nur <code>title</code> und <code>items</code> erlaubt. Ein migriertes
+Repo fiel damit durch die eigene Schema-Prüfung. Ursache ist die Reihenfolge im Werkzeug:
+Greift die Regel für den Elternteil, wird das Kind nicht mehr angesehen. Jetzt stehen
+<code>footer.more.title</code> → <code>footer.links.title</code> und <code>footer.more.links</code> → <code>footer.links.items</code>
+einzeln in der Tabelle; <code>footer.more</code> bleibt als leer gewordener Block nicht stehen.</p>
+
+<hr />
+
+<h2 id="213">2.1.3</h2>
+
+<p><strong>Die Kopiervorlage bindet <code>^2.1.1</code>.</strong> <code>theme/jekyll/starter/pages.yml</code> schreibt seit 2.1.0
+<code>contact.website</code> ins Config-Overlay – unter einem Theme 2.0.x weist das geschlossene
+Config-Schema den Schlüssel ab und die Prüfung vor dem Build schlägt fehl. Die Bindung <code>^2</code>
+war damit erfüllbar mit einer Fassung, unter der die Vorlage nicht durchläuft.
+<code>starter/README.md</code> und <code>docs/verwendung/einbindung.md</code> nennen die Mindestversion und ihren
+Grund.</p>
+
+<p><strong><code>bin/migrate.rb</code> migriert direkt auf <code>contact.website</code>.</strong> Bisher schrieb es
+<code>footer.homepage</code> nach <code>brand.website</code> – dem Namen von 2.0, der seit 2.1.0 nur noch
+Rückfall ist. Ein Repo, das heute von 1.x migriert, geht den Schritt jetzt <strong>einmal</strong>. Eine
+zweite Regel greift, wenn eine Konfiguration den Zwischenstand <code>brand.website</code> beim Lauf
+der Stufe schon trägt. Der Migrationsleitfaden
+sagt dazu, dass der Footer-Marker <code>homepage: true</code> <strong>ersatzlos</strong> entfällt und welcher
+Pipeline-Schritt auf <code>contact.website</code> umzustellen ist.</p>
+
+<p><strong>Neue Kopiervorlagen für den Plugin-Hook:</strong> <code>github-pages/ensure-plugins.sh</code> und
+<code>github-pages/settings.example.json</code>. <code>enabledPlugins</code> in einer <code>.claude/settings.json</code>
+aktiviert die Claude-Plugins eines Repos, installiert sie aber nicht – ein geklontes Repo
+hat die Datei und keine Skills. Das Skript holt das beim Sitzungsstart nach (Theme zuerst,
+weil darauf aufbauende Plugins es als Abhängigkeit deklarieren). Beide Dateien liegen dem
+Plugin-Skill <code>theme-migrieren</code> bei.</p>
+
+<hr />
+
+<h2 id="212">2.1.2</h2>
+
+<p><strong>Der Website-Link im Footer heißt „Website“, nicht mehr die URL.</strong> Auf dem Bildschirm
+ist der Link anklickbar – die ausgeschriebene Adresse ist dort überflüssig und sprengt
+als lange URL die schmale Footer-Spalte. <strong>Im Ausdruck bleibt die URL ausgeschrieben:</strong>
+Dort gibt es nichts zum Klicken, und ein Text, der die Adresse verschweigt, nützt auf
+Papier niemandem.</p>
+
+<hr />
+
+<h2 id="211">2.1.1</h2>
+
+<p><strong>Die Kopiervorlage band das Theme auf <code>^1</code>.</strong> <code>theme/jekyll/starter/pages.yml</code> setzte
+<code>THEME_VERSION</code> per Default auf <code>^1</code> – wer damit ein Repo einrichtete, installierte
+<strong>Theme 1.x</strong> und bekam keinen einzigen Schlüssel von Theme 2, während die
+Migrationsseite allen bestehenden Repos genau diese Zeile auf <code>^2</code> umzustellen aufgab.
+Der Default ist jetzt <code>^2</code>; <code>theme/jekyll/starter/README.md</code> und
+<code>docs/verwendung/einbindung.md</code> nennen dieselbe Spanne.</p>
+
+<p><strong>Die Org-Variable <code>ACADEMY_WEBSITE</code> ist eine Konvention, keine Anforderung des
+Themes.</strong> Das Theme liest <code>contact.website</code> und hat einen Default – woher der Wert
+kommt, entscheidet das Repo. Die Vorlagen und der Skill <code>github-pages-einrichten</code>
+verlangten bisher, den Schritt „Academy-Website aus Org-Variable ins Config-Overlay
+schreiben“ <em>unverändert</em> zu übernehmen; sie nennen jetzt beide Wege: In einer
+Academy-Organisation hält die Variable die URL zentral, außerhalb wird der Schritt
+gestrichen und <code>contact.website</code> in der eigenen <code>_config.yml</code> gepflegt (oder
+weggelassen).</p>
+
+<p>Nur Kommentare und Doku – die Vorlagenversion bleibt bei <strong>9</strong>, es ist nichts
+nachzuziehen.</p>
+
+<hr />
+
+<h2 id="210">2.1.0</h2>
+
+<p><strong>Die Academy-Website heißt <code>contact.website</code>, und der Ausdruck druckt die Adresse statt
+eines Ankertextes.</strong></p>
+
+<h3 id="brandwebsite--contactwebsite"><code>brand.website</code> → <code>contact.website</code></h3>
+
+<p>Die URL der Academy-Website ist eine <strong>Kontaktangabe</strong>, keine Marken-Eigenschaft:
+<code>brand.*</code> beschreibt sonst nur, wie die Site aussieht (Logo, Icons, Markentext). Sie steht
+deshalb jetzt neben <code>contact.email</code> und <code>contact.phone</code> – dieselbe Gruppe, dieselbe
+Ausgabe.</p>
+
+<pre><code class="language-yaml">contact:
+  website: "https://…"     # neu (ersetzt brand.website)
+  email:   "academy@atvantage.com"
+  phone:   "+49 …"         # optional
+</code></pre>
+
+<p><strong>Nichts zu tun.</strong> <code>brand.website</code> wird weiter gelesen, wenn <code>contact.website</code> fehlt –
+siehe Register unten. In den Pipelines geschieht der Umzug von selbst: Die Kopiervorlagen
+(<code>theme/jekyll/starter/pages.yml</code>, <code>github-pages/deploy.example.yml</code>, <strong>Vorlagenversion 9</strong>)
+schreiben die Org-Variable <code>ACADEMY_WEBSITE</code> jetzt nach <code>contact.website</code>. <strong>Diese Vorlage
+setzt Theme ≥ 2.1.0 voraus</strong> – wer noch auf 2.0.x steht, zieht erst das Theme nach.</p>
+
+<h3 id="die-website-erscheint-jetzt-auch-im-footer">Die Website erscheint jetzt auch im Footer</h3>
+
+<p>In der Footer-Spalte „Kontakt“ steht sie <strong>über</strong> der E-Mail-Adresse, verlinkt. Bisher
+kannte nur der Ausdruck die Adresse; im Footer musste jedes Repo sie als gewöhnlichen
+Eintrag in <code>footer.links.items</code> von Hand pflegen – eine zweite Adresse, die nach einem
+Domain-Wechsel niemand nachzieht. <strong>Empfehlung:</strong> einen solchen Eintrag aus der eigenen
+<code>_config.yml</code> entfernen, sonst steht die Academy zweimal im Footer.</p>
+
+<h3 id="der-ausdruck-trägt-die-adressen-nicht-ihre-namen">Der Ausdruck trägt die Adressen, nicht ihre Namen</h3>
+
+<p>Die Druck-Kontaktzeile zeigt <strong>Website, E-Mail, Telefon</strong> – in dieser Reihenfolge, wie die
+Footer-Spalte, und <strong>ohne Links</strong>: die blanke URL statt „ATVANTAGE Academy“, die blanke
+E-Mail-Adresse statt eines <code>mailto:</code>-Verweises. Auf Papier ist ein Link nur sein Text; ein
+Text, der die Adresse verschweigt, nützt dort niemandem. <strong><code>contact.phone</code> erscheint neu
+auch im Ausdruck</strong> – bisher stand die Nummer nur im Footer, der beim Drucken ausgeblendet
+wird.</p>
+
+<p>Betroffen sind <code>theme/jekyll/_layouts/default.html</code> (und alle Layouts, die darauf
+aufsetzen) sowie <code>theme/jekyll/_layouts/presentation.html</code>.</p>
+
+<hr />
+
+<h2 id="200">2.0.0</h2>
+
+<p><strong>Veröffentlicht am 20.08.2026</strong> (PR #137, als Merge-Commit – die Begründungen der einzelnen
+Brüche bleiben damit in der Historie). Hier steht, was sich ändert und was Projekte deshalb tun
+müssen.</p>
+
+<p>Sammelstelle und Reihenfolge waren <strong>Issue #123</strong>.</p>
+
+<p>Vollständiger Weg für Projekte: <strong>Doku → Design-System → Migration auf 2.0</strong>
+(<code>docs/theme/migration-2.0.md</code>).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Bruch</th>
+      <th>Issue</th>
+      <th>Stand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Benamung von Front Matter und <code>_config.yml</code></td>
+      <td>#122</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+    <tr>
+      <td><code>audience</code>: Werteliste gehört dem Schulungsprozess, nicht dem Theme</td>
+      <td>#130</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+    <tr>
+      <td><code>default</code> wird reiner Rahmen, <code>page</code> die gewöhnliche Seite</td>
+      <td>#124</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+    <tr>
+      <td>Der Schalter liegt unter dem Baustein (<code>sidebar.toc.enabled</code>)</td>
+      <td>#122</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+    <tr>
+      <td>Werkzeuge und Kommandozeilen-Optionen heißen englisch</td>
+      <td>#122</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+    <tr>
+      <td>Zwei Markup-Namen entfallen (<code>avd-academy-metanav__right</code>, <code>avd-academy-guide-nav</code>)</td>
+      <td>#122, #124</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+    <tr>
+      <td>Simulations-API, Szenen-Attribut und Schalter-Include heißen englisch</td>
+      <td>#136</td>
+      <td><strong>umgesetzt</strong> – siehe unten</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="alle-schlüssel-des-themes-heißen-anders-122">Alle Schlüssel des Themes heißen anders (#122)</h3>
+
+<p><strong>Durchgehend englisch, nach Ort gruppiert, Substantive statt Verben.</strong> Die alten Namen waren
+gemischt deutsch und englisch (<code>einleitung</code> neben <code>duration</code>), trugen Abkürzungen (<code>toc</code>),
+Markup-Sprache (<code>resources_box</code>), Verben (<code>markdown_copy</code>) und Präfixe statt Struktur
+(<code>favicon_16</code>). Vor allem sagten sie nicht, <strong>wo</strong> ein Schalter wirkt – <code>print_contact</code> klang
+wie ein Drucken-Knopf.</p>
+
+<p><strong>Front Matter:</strong> <code>breadcrumb.path</code> → <code>breadcrumb.ancestors</code> (weil <code>page.path</code> in Jekyll die
+Quelldatei ist), die Schalter
+in ihre Gruppen (<code>sidebar.toc.enabled</code>, <code>sidebar.progress.enabled</code>,
+<code>sidebar.resources.enabled</code>, <code>toolbar.copy.enabled</code>, <code>toolbar.print.enabled</code>,
+<code>toolbar.qr.enabled</code>), die Simulationsfelder
+unter <code>simulation.*</code> mit <code>simulation.step.interval</code> in <strong>Millisekunden</strong> – das Seitenfeld
+<code>duration</code> zählt Minuten, und zwei Felder gleichen Namens mit verschiedenen Einheiten waren
+eine Falle. <code>resources[].titel</code> ist entfallen; es gilt <code>title</code>.</p>
+
+<p><strong><code>_config.yml</code>:</strong> <code>brand.*</code> (Logo, Icons, Markentext, Website), <code>code.highlight</code>, <code>styles</code>,
+<code>footer.legal.*</code>, <code>nav.items[]</code> und <code>footer.links.items[]</code> in derselben Form wie <code>resources</code>,
+<code>components</code> statt <code>avd_academy</code> – und <strong>ohne</strong> die
+Zwischenebene <code>defaults</code>, die Jekyll für sich belegt. <code>footer.phone</code> ist entfallen (dieselbe
+Angabe stand unter <code>contact.phone</code>), <code>footer.homepage</code> wurde <code>brand.website</code>, weil auch die
+Druck-Kontaktzeile sie liest.</p>
+
+<p><strong>Ein Nebeneffekt, der die Gruppen rechtfertigt:</strong> Die Zuständigkeit je Layout steht jetzt in
+der Form. Ein Layout ohne Sidebar hat keine <code>sidebar</code>-Gruppe – genau der Streitpunkt aus #68,
+dort noch als Prüfregel im Schema.</p>
+
+<p><strong><code>metanav</code> ist entfallen.</strong> Die Metaleiste über der Kopfzeile hatte eine rechte Seite für
+kurze Verweise, und <strong>kein Projekt hat sie je genutzt</strong> – nicht die Doku-Site, nicht die
+Vorlage, nicht die bestehenden Konzept-Repos. Die Leiste zeigt weiter den Markentext
+(<code>brand.tagline</code>, vormals <code>contact.tagline</code> – eine Kontaktangabe, die keine war). Mit den
+Links entfällt auch die Klasse <code>avd-academy-metanav__right</code>: der einzige Name, den der Markup
+Contract in 2.0 verliert.</p>
+
+<p><strong>Schema-Versionen:</strong> beide auf <strong>2</strong>. Version 1 bleibt erreichbar (archiviert unter
+<code>github-pages/schemas/«name»/1/</code>, bei jedem Deploy mitveröffentlicht) – ein Repo, das noch auf
+<code>/schemas/config/1/</code> zeigt, verliert seine Auflösung nicht.</p>
+
+<h3 id="default-ist-der-reine-rahmen-page-die-gewöhnliche-seite-124"><code>default</code> ist der reine Rahmen, <code>page</code> die gewöhnliche Seite (#124)</h3>
+
+<p>Bis 1.x war <code>default</code> <strong>beides</strong>: Rahmen <strong>und</strong> Seitenlayout. Ein neues Layout begann deshalb
+damit, abzuschalten, was es nicht wollte – <code>chrome: false</code>, <code>sidebar: false</code>,
+<code>breadcrumbs: false</code>. Jetzt ist die Grundstellung leer, und jedes Layout schaltet <strong>an</strong>, was
+es braucht.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Layout</th>
+      <th>Erbt von</th>
+      <th>Was es ist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>default</code></td>
+      <td>–</td>
+      <td>der <strong>reine Rahmen</strong>: <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, Skripte, Footer, Druck-Kontaktzeile</td>
+    </tr>
+    <tr>
+      <td><code>page</code></td>
+      <td><code>default</code></td>
+      <td>die <strong>gewöhnliche Seite</strong> – Kopfzeile, Brotkrumen, Hero, Sidebar, Blätter-Navigation</td>
+    </tr>
+    <tr>
+      <td><code>guide</code></td>
+      <td><strong><code>page</code></strong></td>
+      <td>zusätzlich nummerierte Schritte und Prev/Next aus den Geschwistern</td>
+    </tr>
+    <tr>
+      <td><code>visualization</code></td>
+      <td><code>default</code></td>
+      <td>schmaler Hero mit Werkzeugen, keine Kopfzeile, keine Sidebar</td>
+    </tr>
+    <tr>
+      <td><code>presentation</code></td>
+      <td><strong>–</strong></td>
+      <td>eigenständiges Dokument: Folien aus Markdown</td>
+    </tr>
+    <tr>
+      <td><code>simulation</code></td>
+      <td><strong>–</strong></td>
+      <td>eigenständiges Dokument: ein Ablauf zum Durchklicken</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>presentation</code> und <code>simulation</code> erben von <strong>niemandem</strong>: Sie bringen ihr eigenes
+<code>&lt;!DOCTYPE html&gt;</code> mit und teilen mit dem Rahmen nur CSS, JS und die Schalter. Der Schnitt
+berührt sie deshalb nicht.</p>
+
+<p><strong><code>guide</code> erbt jetzt von <code>page</code></strong>, nicht von <code>default</code> – so steht das, was eine gewöhnliche
+Seite ausmacht, an genau einer Stelle. Am Build geprüft: Die Eigenschaften werden über die
+ganze Kette gemergt, eine Übung behält Kopfzeile, Hero, Brotkrumen, Sidebar und Nummerierung.</p>
+
+<p><strong><code>page</code> ist die Vorgabe.</strong> <code>_config.defaults.yml</code> setzt <code>layout: page</code> für die ganze Site –
+damit ist <code>layout</code> so optional wie jedes andere Feld. Wer den reinen Rahmen will, schreibt
+<code>layout: default</code> hin.</p>
+
+<p><strong>Der Schalter-Auflöser kennt <code>default</code> nicht mehr</strong> – ausser bei <code>print.contact</code>: Ohne
+Kopfzeile, Hero und Sidebar gibt es dort nichts zu schalten. Die Druck-Kontaktzeile bleibt,
+denn auch ein nackt gedrucktes Blatt soll sagen, woher es kommt.</p>
+
+<p><strong>Was Projekte tun müssen:</strong> nichts von Hand – <code>bin/migrate.rb</code> schreibt <code>layout: default</code> auf
+<code>layout: page</code> um. Das ist sicher, weil es den reinen Rahmen vorher nicht gab: Keine
+bestehende Seite kann ihn gemeint haben. Danach <strong>darf</strong> die Zeile auch entfallen.</p>
+
+<p><strong>Ein Fallstrick, der in der Doku steht:</strong> Jekyll <strong>ersetzt</strong> <code>defaults</code>-Arrays, statt sie zu
+mergen. Wer selbst einen <code>defaults:</code>-Block hat, überschreibt den des Themes – dann gehört
+<code>layout: page</code> dort hinein. Konzept-Repos, die mit <code>bin/build.sh</code> bauen, laden die
+Theme-Defaults ohnehin nicht und brauchen den Block in ihrer eigenen <code>_config.yml</code>.</p>
+
+<h3 id="die-zielgruppen-gehören-der-site-nicht-dem-theme-130">Die Zielgruppen gehören der Site, nicht dem Theme (#130)</h3>
+
+<p>Bis Schema 1 schrieb das <strong>Theme</strong> vor, welche Zielgruppen es gibt – ein <code>enum</code> mit den Werten
+eines einzigen Anwendungsfalls, an vier Stellen: Seite, <code>resources</code>-Eintrag, <code>nav</code>-Eintrag und
+<code>audience</code> des Builds. Wer eine dritte Zielgruppe brauchte, hätte das Theme ändern müssen.</p>
+
+<p>Jetzt kennt das Theme den <strong>Mechanismus</strong> und nicht die Liste. Die Site deklariert ihre
+Zielgruppen selbst:</p>
+
+<pre><code class="language-yaml">audiences: [internal, public]     # die Site legt fest, welche es gibt
+</code></pre>
+
+<p><strong>Die Prüfung ist dabei nicht entfallen, sondern umgezogen.</strong> Ein blosses <code>type: string</code> hätte
+sie verloren: <code>audience: publik</code> (Tippfehler) fiele nirgends auf, und die Seite landete
+stillschweigend in <strong>jedem</strong> Build – die schlechteste Fehlerart. <code>validate.rb</code> prüft deshalb
+jede Angabe gegen <code>audiences</code>, an allen vier Stellen. <strong>Und wer <code>audience</code> benutzt, ohne zu
+deklarieren, bekommt einen Fehler</strong>, kein Achselzucken: Eine Angabe ohne prüfbare Menge ist
+eine Vermutung.</p>
+
+<p>Was die IDE verliert: die Vorschläge für die <strong>Werte</strong> von <code>audience</code> – ein JSON Schema kennt
+keine Liste, die aus derselben Datei kommt. Die Feldnamen vervollständigt sie weiter.</p>
+
+<p><strong>Was Projekte tun müssen:</strong> <code>audiences</code> deklarieren, falls sie <code>audience</code> benutzen. Die Werte
+bleiben dieselben; sie gehören jetzt dem Repo.</p>
+
+<h3 id="die-rechte-sidebar-scrollt-für-sich-das-inhaltsverzeichnis-klappt">Die rechte Sidebar scrollt für sich, das Inhaltsverzeichnis klappt</h3>
+
+<p><strong>Zwei Layout-Probleme, ein Umbau.</strong> Eine lange Übung hatte eine Sidebar, die über den
+Bildschirmrand hinausreichte: Wer die Karte „Weiterführende Informationen“ sehen wollte,
+musste die <strong>ganze Seite</strong> scrollen, bis die Sidebar mitwanderte – und das reichte oft nicht.
+Und breite Tabellen rutschten hinter die Sidebar.</p>
+
+<ul>
+  <li><strong>Die Sidebar ist ein eigener Scrollbereich</strong> (<code>max-height</code> bis zum Fensterrand,
+<code>overflow-y: auto</code>, <code>overscroll-behavior: contain</code>). Am Handy bleibt alles, wie es war.</li>
+  <li><strong>Breite Tabellen brechen jetzt um, statt zu überlaufen.</strong> Zellen erhalten
+<code>overflow-wrap: break-word</code>, Code und Links darin <code>anywhere</code> – nur das senkt die
+Mindestbreite einer Tabelle wirklich.</li>
+  <li><strong>Neuer Baustein <code>avd-academy-fold</code></strong> – ein Abschnitt, der sich an seiner Stelle
+auf- und zuklappt (auf <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code>, ohne JavaScript). Er steht auch <strong>Seiten</strong>
+zur Verfügung; im Ausdruck klappt <code>print.css</code> alle Folds auf.</li>
+  <li><strong>Das Inhaltsverzeichnis startet zugeklappt, wenn es lang ist</strong> – aber nur, wenn darunter
+noch eine Karte steht, die es sonst aus dem Bild schiebt. Schwelle site-weit:
+<code>components.sidebar.toc.open_threshold</code> (Vorgabe 12); Anfangszustand je Seite:
+<code>sidebar.toc.open</code>.</li>
+  <li><strong>Die Karte „Weiterführende Informationen“ ist nur klappbar, wenn es konfiguriert ist</strong>
+(<code>components.sidebar.resources.open_threshold</code> oder <code>sidebar.resources.open</code>). Ohne
+Angabe bleibt sie ein gewöhnlicher Kasten: Unter ihr steht nichts, sie verdeckt nichts.</li>
+</ul>
+
+<p><strong>Für Konsumenten:</strong> nichts zu tun. Die Vorgaben wirken ohne Konfiguration, und Markup wie
+Tokens bleiben – dazu kommen <code>avd-academy-fold</code>, <code>avd-academy-fold__body</code>,
+<code>avd-academy-fieldtable</code>, <code>avd-academy-fieldtable__layouts</code> und <code>avd-academy-tablescroll</code>.</p>
+
+<h3 id="der-schalter-heißt-enabled">Der Schalter heißt <code>enabled</code></h3>
+
+<p>Ein Baustein ist ein <strong>Abschnitt</strong>, nicht ein Wahrheitswert: <code>sidebar.toc.enabled</code> statt
+<code>sidebar.toc: true</code>. Erst damit kann derselbe Baustein daneben Weiteres tragen –
+<code>sidebar.toc.open</code> etwa den Anfangszustand. Wäre der Name selbst der Wert, müsste alles
+Weitere in eine Parallelstruktur ausweichen, und dieselbe Sache stünde an zwei Stellen.</p>
+
+<p><strong>Und der Baustein trägt seine Beschriftung mit.</strong> Jeder von ihnen hat ein <code>title</code>: die
+Überschrift der Sidebar-Karte („Auf dieser Seite“, „Fortschritt“, „Weiterführende
+Informationen“) bzw. den Tooltip des Werkzeugs („Markdown kopieren“, „Diese Seite drucken“,
+„Diese Seite auf Deinem Smartphone öffnen“). Einstellbar auf denselben vier Ebenen wie
+<code>enabled</code> – site-weit, je Layout, je Seite. Ein Repo, das seine Übungen anders nennt, kann das
+jetzt in der Sidebar tun, ohne das Theme anzufassen. Aufgelöst wird es im neuen Include
+<code>avd-text.html</code>; die Vorgaben bleiben, wo sie waren, also ändert sich ohne Konfiguration nichts.</p>
+
+<p>Betroffen sind alle sechs Schalter: <code>sidebar.toc</code>, <code>sidebar.progress</code>, <code>sidebar.resources</code>,
+<code>toolbar.copy</code>, <code>toolbar.print</code>, <code>toolbar.qr</code> – auf <strong>allen</strong> Ebenen (Front Matter,
+<code>components.«gruppe»</code>, <code>components.layouts.«layout».«gruppe»</code>). Das Migrationsskript schreibt
+die alten Namen direkt auf die neue Form (<code>qr_code</code> → <code>toolbar.qr.enabled</code>).</p>
+
+<h3 id="die-werkzeuge-und-ihre-optionen-heißen-englisch">Die Werkzeuge und ihre Optionen heißen englisch</h3>
+
+<p><strong>Bruch für Pipelines, nicht für Inhalte.</strong> Skriptnamen und Kommandozeilen-Optionen waren
+gemischt: <code>ruby pruefen.rb --config</code> zwang jeden Aufrufer zur Sprachmischung, und diese Namen
+stehen in <strong>fremden</strong> Repos.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>vorher</th>
+      <th>jetzt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>theme/jekyll/schema/pruefen.rb</code></td>
+      <td><code>theme/jekyll/schema/validate.rb</code></td>
+    </tr>
+    <tr>
+      <td><code>bin/paketinhalt.sh</code> · <code>theme/paketinhalt.txt</code></td>
+      <td><code>bin/package-contents.sh</code> · <code>theme/package-contents.txt</code></td>
+    </tr>
+    <tr>
+      <td><code>bin/vorlagen.sh</code> · <code>github-pages/vorlagenversion.txt</code></td>
+      <td><code>bin/templates.sh</code> · <code>github-pages/template-version.txt</code></td>
+    </tr>
+    <tr>
+      <td><code>bin/schema-veroeffentlichen.sh</code></td>
+      <td><code>bin/publish-schemas.sh</code></td>
+    </tr>
+    <tr>
+      <td><code>--pruefen</code>, <code>--setzen</code>, <code>--selbsttest</code>, <code>--wurzel</code>, <code>--hilfe</code>, <code>--schreiben</code>, <code>--von</code>/<code>--nach</code></td>
+      <td><code>--check</code>, <code>--set</code>, <code>--self-test</code>, <code>--root</code>, <code>--help</code>, <code>--write</code>, <code>--from</code>/<code>--to</code></td>
+    </tr>
+    <tr>
+      <td><code>make pruefen</code></td>
+      <td><code>make check</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Was Projekte tun müssen:</strong> den Prüfschritt ihrer Pipeline anpassen – eine Zeile. Der Weg
+steht in „Migration auf 2.0“. Die Regel selbst steht ab jetzt in <code>AGENTS.md</code>
+(„Namen sind englisch“): Jeder Name, den jemand von außen tippt, ist englisch; deutsch bleiben
+Prosa, Kommentare, Meldungen und repo-interne Bezeichner.</p>
+
+<p>Die Kopiervorlagen unter <code>github-pages/</code> tragen deshalb <strong>Version 8</strong>.</p>
+
+<h3 id="auch-die-simulations-api-heißt-englisch--und-liest-nur-noch-einen-namen-136">Auch die Simulations-API heißt englisch – und liest nur noch <strong>einen</strong> Namen (#136)</h3>
+
+<p><strong>Beim Durchgang der Sammelstelle gefunden.</strong> #122 hat Front Matter und <code>_config.yml</code>
+umbenannt; der Sweep war auf YAML beschränkt. Die <strong>Autorenschnittstelle der Simulation</strong> ist
+JavaScript – und nahm jeden Schlüssel <strong>doppelt</strong>: <code>titel</code> neben <code>title</code>, <code>dauer</code> neben
+<code>duration</code>, dazu <code>kennung</code>, <code>schritte</code>, <code>zustand</code>, <code>zeichne</code>, <code>beschreibung</code>. Im Skriptkopf
+stand als Begründung: „gemischte Bestände sollen nicht an einer Vokabel scheitern.“ Genau das
+war das Problem – zwei Namen für dasselbe Feld sind zwei Wartungsorte, und keiner ist der
+richtige.</p>
+
+<p>Ab 2.0 gilt <strong>ein</strong> Name, englisch: <code>title</code>, <code>duration</code>, <code>id</code>, <code>steps</code>, <code>state</code>, <code>render</code>,
+<code>description</code>. Dazu <code>setup({speed, stepInterval})</code>, die Helfer <code>pulse()</code> und <code>codeLine()</code>, das
+Ereignis <code>"step"</code>, der Kontext <code>ctx.previous</code>/<code>.direction</code>/<code>.animated</code>/<code>.step</code>/<code>.count</code>/
+<code>.scenario</code>/<code>.scenarioIndex</code>, die Zustandsklassen <code>is-new</code>/<code>is-gone</code>/<code>is-active</code>/<code>is-error</code>
+sowie <code>data-avd-academy-sim-scene</code> und <code>data-direction="forward|back|start"</code>.</p>
+
+<p>Zwei Namen außerhalb der Simulation gehören zum selben Bruch: der Include
+<strong><code>avd-switch.html</code></strong> (vorher <code>avd-schalter.html</code>) – relevant für Repos mit eigenen Layouts –
+und das <code>data</code>-Attribut der Szenen-Container, das damit auch im <strong>Markup Contract</strong> neu heißt.</p>
+
+<p><strong>Was Projekte tun müssen:</strong> In jeder Simulation das Inline-Skript umstellen. <code>bin/migrate.rb</code>
+<strong>meldet</strong> die betroffenen Dateien samt Mapping-Tabelle, ändert sie aber nicht – es sind
+JavaScript-Schlüssel, keine YAML-Zeilen; eine Textersetzung von <code>titel:</code> träfe auch Prosa. Der
+Weg steht in „Migration auf 2.0“.</p>
+
+<h3 id="weggefallen-weil-es-keinen-nutzer-hatte">Weggefallen, weil es keinen Nutzer hatte</h3>
+
+<p><strong>Die Blätter-Navigation</strong> (<code>zurueck</code>/<code>weiter</code> samt automatischer Ableitung aus den
+Geschwisterseiten) ist <strong>ersatzlos entfallen</strong>. Wird sie gebraucht, wird sie neu gebaut – bis
+dahin wäre sie Aufwand ohne Nutzer: Pflege im Layout, im Schema, in der Doku und in der
+Prüfung. Mit ihr entfällt die Klasse <code>avd-academy-guide-nav</code>.</p>
+
+<p><strong>Die Druck-Kontaktzeile ist kein Schalter mehr.</strong> Sie erscheint immer. Ein Blatt Papier ohne
+Absender ist wertlos, und niemand hat sie je abgeschaltet – ein Schalter, den keiner umlegt,
+ist nur eine Zeile, die geprüft, dokumentiert und mitgeschleppt werden muss.</p>
+
+<p><strong>Der Footer-Marker <code>homepage: true</code></strong> ist entfallen: Der Verweis auf die Academy-Website ist
+ein gewöhnlicher Eintrag mit <code>url</code>. <code>brand.website</code> bleibt für die Druck-Kontaktzeile.</p>
+
+<h3 id="eine-form-für-alle-verweise">Eine Form für alle Verweise</h3>
+
+<p><code>resources</code> (Front Matter), <code>nav.items</code> und <code>footer.links.items</code> (<code>_config.yml</code>) haben
+<strong>dieselben Felder</strong>: <code>url</code>, <code>title</code>, <code>icon</code>, <code>audiences</code>. <code>nav.items</code> kennt zusätzlich
+<code>children</code>. Wer eine Stelle kennt, kennt alle drei – und im Schema steht die Form einmal.</p>
+
+<p>Dazu ist <code>nav</code> ein <strong>Abschnitt mit <code>items</code></strong> geworden statt einer Liste: konsistent zu
+<code>footer.links</code>, und später kann die Navigation weitere Eigenschaften tragen.</p>
+
+<h3 id="der-umstieg-ist-skriptiert">Der Umstieg ist skriptiert</h3>
+
+<p><strong><code>bin/migrate.rb</code></strong> benennt Front Matter und <code>_config.yml</code> um – zeilenbasiert, damit
+Kommentare erhalten bleiben, und <strong>stufenweise</strong>: <code>--from 1 --to 3</code> führt später beide Stufen
+hintereinander aus. Was es <strong>nicht</strong> tut, meldet es: Fälle, in denen sich die Bedeutung ändert
+und nicht nur der Name. Dazu gibt es das Plugin-Skill <strong><code>theme-migrieren</code></strong>.</p>
+
+<p><strong>Was Projekte tun müssen:</strong> auf <code>^1</code> binden (falls noch <code>latest</code>), Skript laufen lassen, die
+gemeldeten Handarbeitsfälle abarbeiten, prüfen, dann auf <code>^2</code> binden.</p>
+
+<p><strong>Voraussetzung, die bereits erfüllt ist:</strong> Die Konsumenten binden das Theme auf <code>^1</code>
+(training-concept-java-se#66, didaktikon-playground#59, didaktikon#97) – ein Publish von 2.0.0
+fährt damit nirgends ungefragt ein. Der Umstieg auf <code>^2</code> ist eine eigene Entscheidung je
+Projekt, <strong>nach</strong> dem Release.</p>
+
+<hr />
+
+<h2 id="kompatibilitätsschichten--beim-nächsten-major-zu-entfernen">Kompatibilitätsschichten – beim nächsten Major zu entfernen</h2>
+
+<p>Register der Übergangslösungen, die nur existieren, um einen Bruch zu vermeiden.
+<strong>Jeder Eintrag ist technische Schuld mit Verfallsdatum:</strong> Beim nächsten
+Major-Sprung wird die Liste durchgegangen und geleert.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Seit</th>
+      <th>Kompatibilitätsschicht</th>
+      <th>Entfällt mit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.1.0</td>
+      <td><code>brand.website</code> wird gelesen, wenn <code>contact.website</code> fehlt</td>
+      <td><strong>3.0</strong></td>
+    </tr>
+    <tr>
+      <td>2.3.0</td>
+      <td><code>avd-academy-theme-toggle</code> und <code>avd-academy-print-btn</code> bleiben neben <code>avd-academy-tool</code> auf den Knöpfen</td>
+      <td><strong>3.0</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Eintrag 2.1.0 im Klartext.</strong> Die Academy-Website heißt seit 2.1.0 <code>contact.website</code>. Der
+alte Schlüssel <code>brand.website</code> bleibt als Rückfall lesbar, damit der Umzug keine
+Konfiguration bricht. <strong>Beim Sprung auf 3.0 ist zu tun:</strong></p>
+
+<ol>
+  <li>Den Rückfall <code>| default: site.brand.website</code> aus <code>theme/jekyll/_layouts/default.html</code>,
+<code>theme/jekyll/_layouts/presentation.html</code> und <code>theme/jekyll/_includes/footer.html</code>
+entfernen.</li>
+  <li><code>brand.website</code> aus <code>theme/jekyll/schema/config.schema.json</code> streichen (und die
+Schema-Version in <code>config.version.txt</code> hochzählen, weil ein bisher erlaubter Schlüssel
+entfällt).</li>
+  <li>In <code>bin/migrate.rb</code> unter der Stufe <code>3</code> die Regel <code>%w[brand website] =&gt; %w[contact
+website]</code> ergänzen – dann zieht <code>ruby bin/migrate.rb --from 2 --to 3</code> den Schlüssel in
+den Repos um.</li>
+  <li>Die veraltet-Vermerke aus <code>docs/theme/academy.md</code>, <code>docs/theme/schemas.md</code> und
+<code>docs/theme/migration-2.0.md</code> entfernen.</li>
+</ol>
+
+<p><strong>Projekte müssen danach:</strong> <code>brand.website</code> in ihrer <code>_config.yml</code> auf <code>contact.website</code>
+umbenennen (falls überhaupt gesetzt – in den Pipelines schreibt die Vorlage den neuen
+Schlüssel bereits seit Vorlagenversion 9).</p>
+
+<p><strong>Eintrag 2.3.0 im Klartext.</strong> Die Seitenwerkzeuge sind seit 2.3.0 eine Komponente und
+tragen <code>avd-academy-tool</code>. Die beiden alten Namen stehen im Markup-Vertrag – fremde
+Repos selektieren sie in ihrer <code>assets/custom.css</code> – und bleiben deshalb als zweite
+Klasse auf denselben Knöpfen. <strong>Beim Sprung auf 3.0 ist zu tun:</strong></p>
+
+<ol>
+  <li><code>avd-academy-theme-toggle</code> und <code>avd-academy-print-btn</code> aus dem Selektor in
+<code>theme/academy/components.css</code> und aus der Ausblendliste in
+<code>theme/academy/print.css</code> entfernen.</li>
+  <li>Beide Klassen aus den Knöpfen in <code>theme/jekyll/_includes/tools.html</code> streichen.</li>
+  <li><code>bin/markup-contract.sh &gt; theme/markup-contract.txt</code> neu erzeugen.</li>
+</ol>
+
+<p><strong>Projekte müssen danach:</strong> In ihrer <code>assets/custom.css</code> <code>.avd-academy-theme-toggle</code>
+bzw. <code>.avd-academy-print-btn</code> auf <code>.avd-academy-tool--theme</code> bzw.
+<code>.avd-academy-tool--print</code> umschreiben. Wer die Werkzeuge nur über die Variablen
+<code>--avd-academy-tool-*</code> anpasst, ist nicht betroffen.</p>
+
+<p><strong>Für 2.0 durchgegangen und geleert.</strong> Der Durchgang hat eine Schicht gefunden, die nie hier
+stand: <code>simulation.js</code> las jeden Autorenschlüssel deutsch <strong>und</strong> englisch. Sie ist mit 2.0
+entfernt (#136) – nicht stillschweigend, sondern als beschriebener Bruch. Dass die Liste jetzt
+leer ist, heißt: <strong>geprüft</strong>, nicht <strong>angenommen</strong>.</p>
+
+<p>Format für neue Einträge: <em>seit welcher Version, was die Schicht überbrückt, was
+nach ihrer Entfernung von Projekten zu tun ist.</em></p>
+
+<hr />
+
+<h2 id="1162">1.16.2</h2>
+
+<p><strong>Ein hängender Lauf blockiert die Pipeline nicht mehr.</strong></p>
+
+<p>Die Workflow-Vorlagen standen auf <code>concurrency: cancel-in-progress: false</code> mit einem
+<strong>festen</strong> Gruppennamen. Beides zusammen hat einmal zwei Stunden gekostet: Der <code>deploy</code>-Job
+eines Laufs bekam keinen Runner und blieb in der Warteschlange; weil die Gruppe damit belegt
+war, startete danach <strong>kein</strong> Lauf mehr – auch keine PR-Prüfung, und die stand ohne Job und
+ohne Meldung auf „pending“.</p>
+
+<p>Jetzt gilt in <code>theme/jekyll/starter/pages.yml</code>, <code>github-pages/deploy.example.yml</code> und im
+<code>pages</code>-Workflow dieses Repos:</p>
+
+<pre><code class="language-yaml">concurrency:
+  group: pages-$
+  cancel-in-progress: true
+</code></pre>
+
+<p><strong>Beide Hälften sind nötig.</strong> <code>cancel-in-progress: true</code> allein hätte es schlimmer gemacht:
+Bei einem festen Gruppennamen bricht ein PR-Lauf den laufenden <code>main</code>-Deploy ab. Die Gruppe
+ist deshalb nach <strong>Ref</strong> getrennt – dann bricht ein Lauf nur seinen eigenen Vorgänger ab.</p>
+
+<p>Bei einer Pages-Site ist das die richtige Vorgabe: Der veröffentlichte Stand ist immer der
+letzte, ein überholter Deploy hat keinen Wert.</p>
+
+<p><strong>Was Projekte tun sollten:</strong> den <code>concurrency</code>-Block aus der Vorlage übernehmen
+(<strong>Vorlagenversion 4</strong>). Wer es lässt, behält das alte Verhalten – funktioniert, blockiert
+aber beim nächsten hängenden Runner wieder alles.</p>
+
+<hr />
+
+<h2 id="1161">1.16.1</h2>
+
+<p><strong>Der Markup Contract sichert jetzt auch die <code>data</code>-Attribute der Autorenfläche.</strong></p>
+
+<p>Bisher führte <code>theme/markup-contract.txt</code> Klassen und Variablen-Definitionen. Zwei
+<code>data</code>-Attribute stehen aber ebenso in fremden Repos – belegt, nicht vermutet:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Attribut</th>
+      <th>Wo es außerhalb des Themes steht</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>data-avd-academy-sim-szene</code></td>
+      <td>die Simulations-Vorlage lässt Autoren es schreiben; im Java-SE-Repo 9× in handgeschriebenem Markup</td>
+    </tr>
+    <tr>
+      <td><code>data-avd-academy-theme</code></td>
+      <td>Dark-Mode-Selektor in der <code>assets/custom.css</code> beider bestehender Repos (<code>:root[data-avd-academy-theme="dark"]</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Fällt eines weg, bricht es dort still. Jetzt bricht stattdessen der Build: 191 Namen (108
+Klassen, 81 Variablen, 2 Attribute).</p>
+
+<p><strong>Bewusst nicht aufgenommen sind die übrigen ~49 <code>data</code>-Attribute.</strong> Das sind JS-Haken der
+Layouts (<code>…-nav-toggle</code>, <code>…-qr</code>, <code>…-print</code>); sie alle aufzunehmen hieße, Internes als
+Versprechen einzufrieren – jeder Umbau von <code>header.html</code> oder <code>atvantage.js</code> bräuchte dann
+eine Begründung als Bruch. Das Kriterium steht im Kopf von <code>bin/markup-contract.sh</code>: Im
+Contract ist, was <strong>Autoren schreiben</strong> oder was <strong>Repos in ihrem CSS selektieren</strong>.</p>
+
+<hr />
+
+<h2 id="1160">1.16.0</h2>
+
+<p><strong>Die Front-Matter-Doku sagt jetzt, wann man ein Feld weglässt</strong> – und die Schemas liegen
+unter einer Adresse, die je Schema versioniert ist.</p>
+
+<h3 id="jedes-front-matter-feld-ist-optional--als-geprüfte-regel">Jedes Front-Matter-Feld ist optional – als geprüfte Regel</h3>
+
+<p>Zu jedem Feld gibt es einen Standardwert; eine Seite ohne Front Matter baut, und zwar
+richtig. Das steht nicht nur in der Doku: <code>frontmatter.schema.json</code> darf auf oberster Ebene
+<strong>kein <code>required</code></strong> tragen, und der Selbsttest bricht ab, wenn doch. Wer eine <code>.md</code> anlegt,
+soll schreiben können, ohne vorher eine Feldliste zu lesen.</p>
+
+<h3 id="empfehlungen-je-feld-als-info-schaltfläche">Empfehlungen je Feld, als Info-Schaltfläche</h3>
+
+<p>Neue Variante der Reveal-Komponente: <strong><code>avd-academy-reveal--info</code></strong> – ein runder Knopf mit
+Info-Zeichen statt einer Titelzeile, für Tabellenzellen. Der Titel steckt als visuell
+verborgener Text im <code>summary</code>; Screenreader lesen ihn, und er wird zur Überschrift des
+Panels. Im Ausdruck entfällt der Knopf und der Titel erscheint als Zeile.</p>
+
+<p>Damit dokumentiert sind: <code>layout</code> (was ohne Angabe gilt, mit Links zu allen Layout-Seiten),
+<code>title</code> (in Markdown besser weglassen und <code>#</code> schreiben – in HTML umgekehrt, weil ein <code>&lt;h1&gt;</code>
+im Rumpf nicht ausgewertet wird), <code>duration</code> (Bearbeitungszeit bei Übungen, Lesedauer bei
+Seiten, Vortragszeit bei Folien) und <code>audience</code> (warum das Theme es nicht liest).</p>
+
+<h3 id="neue-adresse-schemasnameversionschemajson">Neue Adresse: <code>/schemas/«name»/«version»/schema.json</code></h3>
+
+<p>Vorher: <code>/schema/1/config.schema.json</code> – eine gemeinsame Version für beide Schemas. Jetzt
+trägt <strong>jedes Schema seine eigene Version</strong>, denn sie entwickeln sich unabhängig; eine
+gemeinsame Nummer hätte bei jeder Änderung des einen auch das andere „neu“ gemacht.</p>
+
+<pre><code class="language-yaml"># yaml-language-server: $schema=https://«doku-site»/schemas/config/1/schema.json
+</code></pre>
+
+<p>Der Verweis des Konfigurations-Schemas auf das Front-Matter-Schema wird beim Veröffentlichen
+auf <code>../../frontmatter/«version»/schema.json</code> umgehängt – relativ, damit er ohne bekannte
+Basis-URL trägt und einen Domainwechsel überlebt. <code>validate.rb</code> löst <code>$ref</code> deshalb <strong>relativ
+zur Datei auf, in der er steht</strong> und versteht damit beide Ablagen; für die veröffentlichte
+gibt es <code>--frontmatter-schema</code> und <code>--config-schema</code>.</p>
+
+<p><strong>Alte Versionen bleiben erreichbar:</strong> Beim Erhöhen gehört die bisherige Fassung nach
+<code>github-pages/schemas/«name»/«alt»/schema.json</code>, von wo sie mitveröffentlicht wird. Ein
+Deploy ersetzt die ganze Site – ohne diesen Schritt wäre die alte URL weg.</p>
+
+<p><strong>Was Projekte tun müssen:</strong> nichts. Die alte URL war einen Tag alt und stand in keinem
+Repo; die <code>$schema</code>-Zeile der Kopiervorlage zeigt bereits auf die neue.</p>
+
+<hr />
+
+<h2 id="1150">1.15.0</h2>
+
+<p><strong>Front Matter und <code>_config.yml</code> haben ein Schema</strong> (Issue #120).</p>
+
+<p>Bis hierher waren beide YAML-Quellen ungeprüft. <code>ressources:</code> statt <code>resources:</code> baute
+fehlerfrei und ließ die Sidebar-Karte einfach weg; <code>duration: "45"</code> ergab einen Zeit-Tag,
+der nicht rechnet. Jekylls <code>--strict_front_matter</code> hilft dabei nicht – es prüft die
+YAML-<strong>Syntax</strong>, nicht die Feldnamen.</p>
+
+<p>Neu im Paket, unter <code>jekyll/schema/</code>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Datei</th>
+      <th>Inhalt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>frontmatter.schema.json</code></td>
+      <td>alle Felder, die das Theme (bzw. der Zielgruppen-Build) aus dem Front Matter liest – <strong>geschlossen</strong>, repo-eigene Felder mit Präfix <code>x_</code></td>
+    </tr>
+    <tr>
+      <td><code>config.schema.json</code></td>
+      <td>die <code>_config.yml</code>: Jekyll-Standard <strong>plus</strong> Theme-Schlüssel – <strong>offen</strong>, damit Plugins und eigene Schlüssel durchgehen</td>
+    </tr>
+    <tr>
+      <td><code>validate.rb</code></td>
+      <td>der Prüfer (Ruby-Standardbibliothek, kein Gem, kein Netz)</td>
+    </tr>
+    <tr>
+      <td><code>version.txt</code></td>
+      <td>die <strong>Schema-Version</strong> – eine eigene, kleine Zählung</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Die Schema-Version ist nicht die Theme-Version.</strong> Sie steigt nur bei einer
+inkompatiblen Änderung (Feld entfernt, umbenannt, Typ verengt); neue optionale Felder
+sind additiv. Deshalb darf ein Projekt auf eine Schema-Version zeigen und muss keinen
+Zeiger nachziehen, wenn das Theme ein Patch weiterwandert.</p>
+
+<p><strong>Für die IDE</strong> werden die Schemas unter einer stabilen, versionierten URL veröffentlicht
+(<code>«Theme-Doku»/schema/«Version»/…</code>; Basis aus der Org-Variablen <code>ACADEMY_THEME_DOCS</code>).
+In der <code>_config.yml</code> genügt <strong>eine Zeile</strong> – keine Kopie je Repo:</p>
+
+<pre><code class="language-yaml"># yaml-language-server: $schema=https://«doku-site»/schema/1/config.schema.json
+</code></pre>
+
+<p><strong>Was Projekte tun können</strong> (nichts davon ist Pflicht – der alte Stand baut unverändert):</p>
+
+<ul>
+  <li>Die <code>$schema</code>-Zeile als <strong>erste</strong> Zeile der <code>_config.yml</code> ergänzen; nur dort lesen sie
+VS Code und die JetBrains-IDEs.</li>
+  <li>Den Prüfschritt in die eigene Pipeline übernehmen – die Vorlagen
+(<code>github-pages/deploy.example.yml</code>, <code>theme/jekyll/starter/pages.yml</code>) bringen ihn mit
+(<strong>Vorlagenversion 2</strong>).</li>
+  <li>Repo-eigene Felder auf das Präfix <code>x_</code> umstellen, falls es welche gibt – im Front Matter
+wie in den getippten Abschnitten der <code>_config.yml</code>. Belegter Fall: der Marker
+<code>academy_website: true</code> in <code>footer.more.links</code>, den die Pipeline eines Schulungsrepos
+liest und das Theme nicht; er heißt künftig <code>x_academy_website</code>.</li>
+</ul>
+
+<p>Außerdem geprüft wird jetzt, <strong>dass die <code>avd_academy</code>-Schalter zum Layout passen</strong>:
+<code>layouts.simulation.toc</code> ist ein Fehler, weil die Simulation keine Sidebar hat. Das war
+der offene Rest aus Issue #68.</p>
+
+<p>Vollständige Feldlisten mit Beispielen: <strong>Doku → Design-System → Schemas</strong>.</p>
+
+<h3 id="der-academy-link-im-footer-gehört-jetzt-dem-theme">Der Academy-Link im Footer gehört jetzt dem Theme</h3>
+
+<p>Ein Eintrag in <code>footer.more.links</code> mit <strong><code>homepage: true</code></strong> ist der Verweis auf die
+Academy-Website. Sein Ziel löst das Theme aus <code>footer.homepage</code> auf – dem Wert, den die
+Pipeline aus der Org-Variablen <code>ACADEMY_WEBSITE</code> setzt; ohne ihn greift derselbe Default
+wie in der Druck-Kontaktzeile. Ein eigenes <code>url</code> ist unnötig, ohne <code>title</code> erscheint
+„ATVANTAGE Academy“:</p>
+
+<pre><code class="language-yaml">footer:
+  more:
+    links:
+      - { homepage: true }
+</code></pre>
+
+<p>Aufgefallen ist die Lücke beim Prüfen des ersten echten Repos: Dort trug der Link einen
+repo-eigenen Marker, und der Workflow schrieb seine URL zur Build-Zeit um – dieselbe
+Mechanik in jedem Repo, in Workflow <strong>und</strong> Build-Skript, für eine Angabe, die das Theme
+ohnehin kennt. Nach einem Domain-Wechsel wäre jede Kopie einzeln nachzuziehen.</p>
+
+<p><strong>Was Projekte tun können:</strong> den eigenen Marker samt Umschreib-Schritt entfernen und den
+Link auf <code>homepage: true</code> umstellen. Wer es lässt, behält seinen bisherigen Stand –
+<code>footer.more.links</code> verhält sich unverändert, solange kein <code>homepage</code> daran steht.</p>
+
+<hr />
+
+<h2 id="1141">1.14.1</h2>
+
+<p><strong>Der Markup Contract ist festgehalten und gegen Wegfall gesichert</strong> (Issue #126,
+herausgelöst aus #120).</p>
+
+<p>Projekte schreiben die Klassen des Themes in ihr Markdown (<code>avd-academy-callout</code>,
+<code>avd-academy-grouptable</code>, <code>avd-academy-doclink</code> …) und überschreiben seine Variablen in
+ihrer <code>assets/custom.css</code> (<code>--avd-orange</code> für die Schulungs-Akzentfarbe). <strong>Verschwindet
+ein Name, bricht das in fremden Repos</strong> – und hier fiel es niemandem auf, weil nichts
+danach fragte.</p>
+
+<p>Der Fall ist nicht konstruiert: <code>theme/atvantage/</code> wird bei einem neuen Export
+<strong>ersetzt</strong>, nicht bearbeitet. Fällt dabei eine Variable weg, ist es ein stiller Bruch in
+jedem Schulungs-Repo.</p>
+
+<p><code>theme/markup-contract.txt</code> führt jetzt <strong>188 Namen</strong> – 107 Klassen und 81
+Variablen-<strong>Definitionen</strong>. Nur Definitionen: Was nur benutzt und nirgends gesetzt wird,
+ist kein Versprechen.</p>
+
+<p><strong>Asymmetrisch geprüft, und das ist Absicht:</strong></p>
+
+<ul>
+  <li>Ein Name, der <strong>wegfällt</strong>, lässt die Prüfung scheitern – das ist der Bruch.</li>
+  <li>Ein Name, der <strong>dazukommt</strong>, nicht. Er wird nur gemeldet, samt Befehl zum Nachziehen.
+Sonst rauschte die Prüfung bei jeder Ergänzung und würde weggeklickt.</li>
+</ul>
+
+<p>Der Preis dieser Wahl ist benannt: Das Artefakt veraltet, wenn niemand es nachzieht.
+Deshalb steht die Pflicht in <code>AGENTS.md</code>, und der Hinweis erscheint bei jedem Lauf.</p>
+
+<p><strong>Generiert, nicht gepflegt:</strong> 188 Namen von Hand zu führen wäre eine zweite Wahrheit,
+die driftet.</p>
+
+<p>Geprüft im PR (<code>npm-validate</code>) und lokal über <code>make pruefen</code>.</p>
+
+<p><strong>Eingestuft als Patch:</strong> ein generiertes Artefakt und ein Prüfschritt. Am ausgelieferten
+Paket ändert sich nichts – die Paketprüfung belegt es (56 Dateien, unverändert).</p>
+
+<hr />
+
+<h2 id="1140">1.14.0</h2>
+
+<h3 id="der-rahmen-kennt-seine-kinder-nicht-mehr-issue-119">Der Rahmen kennt seine Kinder nicht mehr (Issue #119)</h3>
+
+<p><code>default.html</code> verzweigte an <strong>16 Stellen</strong> auf <code>page.layout == 'visualization'</code> bzw.
+<code>== 'guide'</code>. Damit erforderte <strong>jedes neue Layout einen Eingriff in diese Datei</strong> – und
+damit einen PR, der Theme, Vorlagen und Plugin gleichzeitig anfasst. Genau diese Reibung
+war der Anlass der Architekturdiskussion (#64).</p>
+
+<p>Jetzt sagt jedes Layout <strong>selbst</strong>, was es anders macht – über sein eigenes Front
+Matter, das Jekyll dem Rahmen als <code>layout.*</code> bereitstellt:</p>
+
+<pre><code class="language-yaml"># _layouts/visualization.html
+layout: default
+body_class: avd-academy-guide--viz
+chrome: false
+breadcrumbs: false
+hero: slim
+hero_tools: true
+sidebar: false
+duration_tag: false
+prev_next: false
+</code></pre>
+
+<p>Zehn Eigenschaften – <code>body_class</code>, <code>chrome</code>, <code>breadcrumbs</code>, <code>hero</code>, <code>hero_tools</code>,
+<code>sidebar</code>, <code>duration_tag</code>, <code>numbered_steps</code>, <code>prev_next</code>, <code>prev_next_siblings</code> – ersetzen
+die Namensprüfungen. Sie gehören zu <strong>Layouts, nicht zu Seiten</strong>: Gelesen wird <code>layout.*</code>,
+nie <code>page.*</code>. Was eine Seite steuern darf, sind die Schalter.</p>
+
+<p><strong>Ein neues Layout braucht <code>default.html</code> nicht mehr anzufassen.</strong></p>
+
+<h3 id="neu-layout-page">Neu: <code>layout: page</code></h3>
+
+<p>Die gewöhnliche Seite, <strong>benannt</strong>. Setzt keine Eigenschaft und ist damit <strong>identisch</strong> zu
+<code>layout: default</code> – sagt aber, was die Seite ist. <code>default</code> sagt nur, dass niemand
+nachgedacht hat, und verdeckt, dass es eigentlich der geteilte Rahmen ist.</p>
+
+<p><code>layout: default</code> bleibt gültig und verhält sich unverändert.</p>
+
+<p><strong>Eingestuft als Minor:</strong> ein neues Layout und ein neues, dokumentiertes
+Erweiterungsmodell für Layouts. Kein bestehendes Markup und kein Front Matter ändert
+seine Wirkung – nachgemessen: 52 gebaute Seiten gegen 1.13.5, <strong>0 inhaltliche
+Unterschiede</strong>, und <code>layout: page</code> liefert Byte-gleiches HTML wie <code>layout: default</code>.</p>
+
+<p><strong>Für 2.0 gesammelt</strong> (siehe das 2.0-Sammelissue): <code>default</code> künftig als <strong>rein</strong>
+neutraler Rahmen, <code>page</code> verbindlich – und der Schalter-Auflöser
+(<code>_includes/avd-schalter.html</code>) auf Eigenschaften statt Layout-Namen. Beides bricht
+bestehende Repos und ist hier bewusst nicht enthalten.</p>
+
+<hr />
+
+<h2 id="1135">1.13.5</h2>
+
+<p><strong>Zwei Prüfungen, die bisher Handarbeit oder gar nichts waren</strong> (Issue #118, Teil 1 von
+#106).</p>
+
+<h3 id="der-paketinhalt-ist-prüfbar">Der Paketinhalt ist prüfbar</h3>
+
+<p><code>theme/package.json</code> führt eine bewusst enge <code>files</code>-Liste – und forderte im
+<code>_filesComment</code> eine <strong>Handprüfung</strong> mit <code>npm pack --dry-run</code>. Die macht niemand
+zuverlässig; <strong>#67 belegt, was dann passiert</strong>: 24 Werkstattseiten in jedem Bundle, im
+Playground sogar im öffentlich gepushten Lernenden-Bundle.</p>
+
+<p>Neu: <code>theme/package-contents.txt</code> listet die <strong>55 Dateien</strong>, die tatsächlich im Paket landen.
+Der PR-Check <code>npm-validate</code> vergleicht dagegen (<code>bin/package-contents.sh --check</code>) und sagt
+im Fehlerfall, was zu tun ist – Liste absichtlich erweitert oder <code>files</code> falsch. Lokal
+über <code>make pruefen</code>.</p>
+
+<p>Die Liste trägt <strong>nur Pfade</strong>, keine Größen oder Hashes: Sie soll sich ändern, wenn
+Dateien <strong>hinzukommen oder wegfallen</strong> – nicht bei jeder Textänderung. Sonst rauscht die
+Prüfung und wird weggeklickt. Grundlage ist <code>npm pack --dry-run</code> selbst, keine
+Nachbildung der <code>files</code>-Logik.</p>
+
+<h3 id="kopiervorlagen-tragen-eine-vorlagenversion">Kopiervorlagen tragen eine Vorlagenversion</h3>
+
+<p><code>github-pages/_config.example.yml</code> und <code>deploy.example.yml</code> werden in Ziel-Repos
+<strong>kopiert</strong> und trugen danach keinen Bezug zur Quelle. Der Schaden ist belegt: Der
+<code>Makefile</code> von <code>training-concept-java-se</code> war von seiner Vorlage abgedriftet – <strong>deshalb</strong>
+überlebte dort eine Fehlerfalle, die in der Vorlage längst behoben war. Aufgefallen ist
+das nur, weil jemand zufällig beide Dateien nebeneinander gelegt hat.</p>
+
+<p>Jede Vorlage trägt jetzt im Kopf <code># Vorlagenversion: N · Quelle: … · Aktualisieren: …</code>.
+Die kanonische Nummer steht <strong>an einer Stelle</strong>
+(<code>github-pages/template-version.txt</code>) und gilt für alle Vorlagen zusammen – sie werden
+gemeinsam kopiert. Es ist eine <strong>eigene, kleine Zählung</strong>, nicht die Theme-Version: Die
+ändert sich bei jedem Patch und sagt über die Vorlagen nichts.</p>
+
+<p>Der <strong>Aktualisierungsweg</strong> steht in <code>github-pages/README.md</code>, für beide Seiten: Wie ein
+Verbraucher erkennt, dass seine Kopie alt ist (und warum er sie <strong>nicht blind
+überschreibt</strong> – sie trägt eigene Anpassungen), und wann ein Maintainer die Nummer
+erhöht. Maßstab dafür: <strong>Müsste ein bestehendes Repo etwas tun?</strong> Reine Formulierungen
+zählen nicht – eine Zahl, die bei jeder Kommaänderung steigt, wird ignoriert.</p>
+
+<p>Beide Regeln stehen als Pflicht in <code>AGENTS.md</code>, damit auch eine KI sie einhält. Der
+PR-Check <code>pages</code> prüft die Kopfzeilen.</p>
+
+<p><strong>Eingestuft als Patch:</strong> zwei Prüfungen und Kopfzeilen in Vorlagen – am ausgelieferten
+Paket ändert sich nichts (die Prüfung belegt es: 55 Dateien, unverändert).</p>
+
+<hr />
+
+<h2 id="1134">1.13.4</h2>
+
+<p><strong>Der Druck-Knopf der Präsentation hängt jetzt auch am Schalter.</strong> <code>print_button</code> deckt
+damit <strong>beide</strong> Knöpfe ab, die dieselbe Absicht haben: den im Hero der Visualisierung
+(<code>data-avd-academy-print</code>) und den in der Werkzeugleiste der Präsentation
+(<code>data-avd-academy-present-print</code>, druckt alle Folien).</p>
+
+<p><strong>Ein Schalter statt zwei Namen</strong>, weil die Frage dieselbe ist: „Darf man diese Ansicht
+über einen Knopf drucken?“ Wer ihn abschaltet, meint nicht den einen von beiden.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Schalter</th>
+      <th><code>default</code></th>
+      <th><code>guide</code></th>
+      <th><code>visualization</code></th>
+      <th><code>presentation</code></th>
+      <th><code>simulation</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>print_button</code></td>
+      <td>–</td>
+      <td>–</td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td>–</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Unberührt bleiben</strong> die übrigen Werkzeuge der Präsentation – Farbschema-Umschalter,
+Vollbild, Zurück. Sie gehören zur Bedienung des Ablaufs, nicht zur Ausgabe.</p>
+
+<p><strong>Eingestuft als Patch:</strong> eine weitere Auslesestelle für einen bestehenden Schalter,
+Vorgabe unverändert <strong>an</strong> (52 Seiten gegen 1.13.3, 0 inhaltliche Unterschiede).</p>
+
+<p>Damit ist der Mechanismus aus <strong>#68</strong> vollständig: Sieben Schalter, jeder mit
+ausgeschriebener Zuständigkeit, vier Ebenen von der harten Vorgabe bis zum Front Matter.</p>
+
+<hr />
+
+<h2 id="1133">1.13.3</h2>
+
+<h3 id="schalter-werden-nur-dort-gelesen-wo-es-den-baustein-gibt">Schalter werden nur dort gelesen, wo es den Baustein gibt</h3>
+
+<p>Die Doku sagte für <code>toc</code> und <code>resources_box</code> „überall außer <code>visualization</code>“ – und
+verschwieg, dass <strong>Präsentation und Simulation überhaupt keine Sidebar rendern</strong>. Der
+Auflöser antwortete dort brav mit <code>false</code>, obwohl die richtige Antwort „gibt es hier
+nicht“ ist. Folge: <code>layouts.presentation.toc: false</code> sah aus wie eine Einstellung und
+war keine.</p>
+
+<p>Jeder Schalter trägt jetzt eine <strong>Zuständigkeit</strong> – die Liste der Layouts, in denen er
+tatsächlich ausgelesen wird. Außerhalb davon ist die Antwort <code>false</code>, und die
+<strong>Konfiguration wird nicht gelesen</strong>. Ein YAML-Eintrag, der aussieht, als täte er etwas,
+ist schlimmer als keiner.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Schalter</th>
+      <th><code>default</code></th>
+      <th><code>guide</code></th>
+      <th><code>visualization</code></th>
+      <th><code>presentation</code></th>
+      <th><code>simulation</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>markdown_copy</code></td>
+      <td>aus</td>
+      <td><strong>an</strong></td>
+      <td>aus</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td><code>toc</code></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td>–</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td><code>progress</code></td>
+      <td>aus</td>
+      <td><strong>an</strong></td>
+      <td>–</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td><code>resources_box</code></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td>–</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td><code>print_contact</code></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td><code>print_button</code></td>
+      <td>–</td>
+      <td>–</td>
+      <td><strong>an</strong></td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td><code>qr_code</code></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+      <td><strong>an</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>–</code> heißt: Der Bereich wird dort nicht gerendert. <code>toc</code>, <code>progress</code> und <code>resources_box</code>
+verlieren damit auch die Visualisierung – deren Sidebar steht unter <code>unless isViz</code> und
+existiert gar nicht.</p>
+
+<h3 id="neu-print_button">Neu: <code>print_button</code></h3>
+
+<p>Der <strong>Drucken-Knopf</strong> im Hero der Visualisierungs-Ansicht ist schaltbar – zuständig nur
+dort, denn auf gewöhnlichen Seiten wäre er eine Dopplung des Browser-Befehls. <strong>Nicht zu
+verwechseln mit <code>print_contact</code></strong>, der Kontaktzeile im Ausdruck. Der Druck-Knopf der
+Präsentation ist ein anderes Element (<code>data-avd-academy-present-print</code>) und gehört zu
+ihrer Werkzeugleiste – wie der Farbschema-Umschalter nicht schaltbar.</p>
+
+<h3 id="print_contact-wirkt-jetzt-auch-in-der-präsentation"><code>print_contact</code> wirkt jetzt auch in der Präsentation</h3>
+
+<p>Die Zeile stand in <code>presentation.html</code>, der Schalter wurde dort aber nicht gelesen – die
+Doku versprach mehr, als das Layout tat. Jetzt ist er verdrahtet.</p>
+
+<p><strong>Eingestuft als Patch</strong> – auf ausdrückliche Ansage, obwohl es streng genommen eine
+Inkompatibilität ist: Konfigurationseinträge für unzuständige Kombinationen werden nicht
+mehr gelesen. Sie hatten aber ohnehin keine Wirkung, also ändert sich für jedes Projekt
+nichts – nachgemessen: 52 Seiten gegen 1.13.2, <strong>0 inhaltliche Unterschiede</strong>.</p>
+
+<hr />
+
+<h2 id="1132">1.13.2</h2>
+
+<p><strong>„Markdown kopieren“ bietet keine Kopie mehr an, die falsch wäre</strong> (Issue #113).</p>
+
+<p>Das Kopierfeld wird mit <code>page.content</code> gefüllt – der <strong>rohen Quelle</strong>: Jekyll baut die
+<code>page</code>-Variable, bevor es den Inhalt rendert. Liquid ist darin nicht ausgeführt, und die
+Kopie war deshalb die <strong>Anweisung statt ihres Ergebnisses</strong> – eine <code>for</code>-Schleife statt
+der Kacheln, oder die wörtlichen raw-Marker statt des Textes, den sie schützen. Still
+falsch: Sie sieht wie Markdown aus und tut beim Einfügen nichts.</p>
+
+<p>Enthält die Quelle Liquid, <strong>entfällt der Knopf</strong> – samt <code>&lt;textarea&gt;</code>. Im HTML steht an
+der Stelle ein Kommentar mit der Begründung, damit niemand sucht. <strong>Erzwingen</strong> geht mit
+<code>markdown_copy: force</code> im Front Matter, für Seiten, deren Liquid im Ergebnis nicht ins
+Gewicht fällt.</p>
+
+<p><strong>Nachrendern wäre der offensichtliche Wunsch und ist keine Option:</strong> Es bräuchte einen
+Filter wie <code>liquify</code> aus einem Plugin, und das Theme bleibt abhängigkeitsfrei; <code>content</code>
+ist HTML und widerspricht dem Zweck.</p>
+
+<p><strong>Eingestuft als Patch:</strong> Eine Kopie, die nachweislich falsch war, wird nicht mehr
+angeboten – kein neues Verhalten, sondern der Wegfall eines stillen Fehlers. Guides ohne
+Liquid bleiben unverändert (52 Seiten gegen 1.13.1 verglichen, 0 inhaltliche
+Unterschiede).</p>
+
+<hr />
+
+<h2 id="1131">1.13.1</h2>
+
+<p><strong><code>qr_code</code> ist schaltbar, und die harten Vorgaben stehen je Layout ausgeschrieben</strong>
+(Issue #112).</p>
+
+<p>Der QR-Code war der letzte Baustein, der fest verdrahtet blieb – er erscheint an <strong>vier</strong>
+Stellen: Kopfzeile (<code>header.html</code>), Hero der Visualisierungs-Ansicht, Kopfleiste der
+Präsentation und der Simulation. Alle vier hängen jetzt am Schalter, Vorgabe <strong>an</strong>; ohne
+Konfiguration ändert sich nichts.</p>
+
+<p>Dazu die Vorgaben <strong>je Layout explizit</strong> statt „überall außer …“: <code>presentation</code> und
+<code>simulation</code> sind eigenständige Layouts ohne Sidebar – die alte Formulierung lieferte für
+sie <code>toc: true</code>, obwohl es dort keine ToC gibt. Heute harmlos (das Layout fragt nicht),
+aber falsch dokumentiert und bei jedem weiteren Schalter eine Falle. Die Matrix steht
+jetzt in der Doku, mit <code>–</code> für „gibt es dort nicht“.</p>
+
+<p>Nebenbei festgehalten, weil verwechselbar: Die Fortschrittsleisten von Präsentation und
+Simulation sind <strong>nicht</strong> der Schalter <code>progress</code> – der meint die Sidebar-Karte mit den
+Definition-of-Done-Haken.</p>
+
+<p><strong>Eingestuft als Patch:</strong> ein weiterer Schalter im bestehenden Mechanismus, kein
+geändertes Verhalten (52 Seiten gegen 1.13.0 verglichen, 0 inhaltliche Unterschiede).</p>
+
+<hr />
+
+<h2 id="1130">1.13.0</h2>
+
+<h3 id="bausteine-sind-schaltbar--mehrstufig-issue-68">Bausteine sind schaltbar – mehrstufig (Issue #68)</h3>
+
+<p>Was auf einer Übung richtig ist, steht auf einer Katalogseite im Weg: „Markdown
+kopieren“, das Inhaltsverzeichnis, der Fortschritt. Bisher entschied das Layout allein,
+und zwar fest verdrahtet. Neu ist <strong>ein</strong> Mechanismus mit <strong>vier Ebenen</strong> – die spätere
+gewinnt:</p>
+
+<ol>
+  <li><strong>harte Vorgabe je Layout</strong> (im Theme, <code>_includes/avd-schalter.html</code>)</li>
+  <li><code>avd_academy.defaults</code> in <code>_config.yml</code> – site-weit</li>
+  <li><code>avd_academy.layouts.«layout»</code> – site-weit je Layout</li>
+  <li><strong>Front Matter der Seite</strong></li>
+</ol>
+
+<pre><code class="language-yaml">avd_academy:
+  defaults:
+    print_contact: false
+  layouts:
+    default:
+      toc: false
+</code></pre>
+
+<p>Fünf Schalter zum Start: <code>markdown_copy</code>, <code>toc</code>, <code>progress</code>, <code>resources_box</code>,
+<code>print_contact</code>. Die harten Vorgaben entsprechen <strong>genau</strong> dem bisherigen Verhalten –
+ohne Konfiguration ändert sich nichts (nachgemessen: 52 gebaute Seiten,
+<strong>0 inhaltliche Unterschiede</strong> gegenüber 1.12.x).</p>
+
+<ul>
+  <li><strong><code>markdown_copy</code> schaltet Knopf und <code>&lt;textarea&gt;</code> gemeinsam</strong> – sonst reiste die
+vollständige Seitenquelle unsichtbar im HTML mit; auch die Berechnung des Kopiertexts
+entfällt. Harte Vorgabe: <strong>nur <code>layout: guide</code></strong>, wie es <code>atvantage.js</code> seit je
+behauptet („auf Übungsseiten“).</li>
+  <li><strong><code>resources_box</code>, nicht <code>resources</code>:</strong> Der Schlüssel <code>resources</code> trägt im Front
+Matter die Linkliste selbst; ein gleichnamiger Schalter würde sie als Ja/Nein-Wert
+lesen.</li>
+  <li><strong>Geprüft wird auf „nicht gesetzt“, nicht auf „wahr“.</strong> Nur so kann eine Seite einen
+Schalter auf <code>false</code> ziehen, den die Ebene darunter auf <code>true</code> gesetzt hat.</li>
+  <li><strong>Die harte Vorgabe steht im Include, nicht in <code>_config.defaults.yml</code></strong> – zwei der
+drei Consumer laden diese Datei nicht. Eine Vorgabe nur dort hätte für sie nicht
+gegolten.</li>
+  <li><strong>Ein Schalter auf oberster Ebene von <code>_config.yml</code> wirkt nicht</strong> und ist ein stiller
+Irrtum; er gehört unter <code>avd_academy</code>.</li>
+</ul>
+
+<p>Die Struktur ist nach Schlüsseln <strong>offen</strong>: Ein neuer Schalter braucht einen
+<code>when</code>-Zweig im Include, eine <code>capture</code>-Abfrage im Layout und eine Zeile in der Doku –
+kein neues YAML-Schema. <code>qr_code</code> ist der nächste Kandidat; er erscheint an vier
+Stellen (Hero der Visualisierung, Kopfzeile, Präsentation, Simulation) und bekommt
+deshalb einen eigenen Durchgang.</p>
+
+<p><strong>Eingestuft als Minor:</strong> neue Konfiguration, kein geändertes Verhalten.</p>
+
+<hr />
+
+<h2 id="1120">1.12.0</h2>
+
+<h3 id="aktionsspalte-am-zeilenende-der-gruppierten-tabelle">Aktionsspalte am Zeilenende der gruppierten Tabelle</h3>
+
+<p>Hat <strong>jede Zeile ein Ziel</strong>, das man ansteuern soll, dann gehört der Verweis nicht in
+die Inhaltszelle: Dort beginnt er in jeder Zeile an einer anderen Stelle und sieht aus
+wie ein Teil des Textes – beim Überfliegen geht er unter. Neu ist
+<code>avd-academy-grouptable__action</code>: eine <strong>eigene, letzte Spalte</strong> mit getönter Fläche
+über die <strong>volle Zeilenhöhe</strong> – immer an derselben Stelle, groß genug, um sie zu
+treffen, ohne zu zielen.</p>
+
+<pre><code class="language-html">&lt;td class="avd-academy-grouptable__action" markdown="span"&gt;[&lt;span class="avd-academy-visually-hidden"&gt;«Ziel» öffnen&lt;/span&gt;](«ziel».md)&lt;/td&gt;
+&lt;td class="avd-academy-grouptable__action"&gt;&lt;/td&gt;   &lt;!-- Zeile ohne Ziel: leer --&gt;
+</code></pre>
+
+<ul>
+  <li><strong>Getönt wird nur, wo ein Ziel dahintersteht</strong> (<code>:has(a)</code>) – so ist auf einen Blick
+zu sehen, welche Zeilen eines haben.</li>
+  <li><strong>Das Play-Zeichen kommt aus dem Theme</strong>, als CSS-Maske in der Akzentfarbe. <strong>Kein
+<code>▶️</code> ins Markup</strong>: Ein Emoji sieht je Plattform anders aus (auf manchen blau), lässt
+sich nicht einfärben und folgt der Schriftgröße nicht. Ins Markup gehört nur eine
+Beschriftung für Screenreader – ein Link ohne Text ist für sie stumm.</li>
+  <li><strong>Zeilen über die volle Breite</strong> (<code>…__gap</code>, <code>…__alert</code>) zählen die Spalte mit:
+<code>colspan</code> um eins erhöhen.</li>
+  <li><strong>Im Ausdruck entfällt die Spalte</strong> – eine Fläche zum Anklicken ist auf Papier
+sinnlos.</li>
+</ul>
+
+<p><code>…__link</code> bleibt unverändert für den anderen Fall: ein Verweis, der zum Satz gehört.</p>
+
+<p>Die Änderung kommt als Rückmeldung aus <code>training-concept-java-se</code> (Register-Eintrag
+A-004): Dort war die Spalte in der <code>assets/custom.css</code> des Repos nachgebaut – vier
+Regeln, die in jedem Schulungs-Repo erneut entstehen würden.</p>
+
+<p><strong>Eingestuft als Minor:</strong> eine neue Klasse in einer bestehenden Komponente; kein
+vorhandenes Markup ändert seine Wirkung.</p>
+
+<hr />
+
+<h2 id="1110">1.11.0</h2>
+
+<h3 id="aufdeckbarer-inhalt-avd-academy-reveal">Aufdeckbarer Inhalt: <code>avd-academy-reveal</code></h3>
+
+<p>Ein <strong>Titel, der wie ein Link aussieht</strong> – der Inhalt erscheint erst auf Klick,
+<strong>mittig</strong> über der Seite; Klick daneben, ESC oder das Kreuz schließen. Der Inhalt ist
+<strong>gewöhnliches Markdown</strong> und steht an seiner Stelle im Dokument.</p>
+
+<pre><code class="language-markdown">&lt;details class="avd-academy-reveal" markdown="1"&gt;
+&lt;summary&gt;Was dieser Kurs bewusst nicht behandelt&lt;/summary&gt;
+
+| Bewusst nicht hier | Warum |
+| --- | --- |
+| … | … |
+
+&lt;/details&gt;
+</code></pre>
+
+<p><strong>Wofür:</strong> Material, das den Lesefluss unterbrechen würde, aber greifbar bleiben soll –
+Musterlösungen neben einer Aufgabe, Legenden, Abgrenzungstabellen. Es ersetzt keinen
+Callout: Ein Callout will gelesen werden, ein Reveal will verfügbar sein.</p>
+
+<p><strong>Auf <code>&lt;details&gt;</code> aufgebaut, nicht auf einem Klick-Handler.</strong> Ohne JavaScript bleibt es
+ein gewöhnlicher Aufklapper, und der Inhalt ist erreichbar – ein Popup, das nur mit JS
+existiert, verliert im Fehlerfall Schulungsinhalt. Die mittige Darstellung macht CSS
+allein (am Attribut <code>[open]</code>).</p>
+
+<p><strong>Im Ausdruck steht der Inhalt eingebettet</strong> an seiner Stelle in der Seite, auch wenn er
+am Bildschirm zu war: Wer eine Unterlage auf Papier durcharbeitet, kann nichts
+anklicken. Das Aufklappen dafür übernimmt <code>atvantage.js</code> (<code>beforeprint</code>) – und das ist
+kein Umweg, sondern nötig: Ein geschlossenes <code>&lt;details&gt;</code> verbirgt seinen Inhalt über
+einen Slot im <strong>Shadow DOM</strong>, was von außen per CSS nicht aufzuheben ist.</p>
+
+<p>Für Inhalte, die auf Papier <strong>nicht</strong> erscheinen dürfen, gibt es
+<code>avd-academy-reveal--screen-only</code>. Der wichtige Fall sind <strong>Musterlösungen neben der
+Übung</strong>: Ein Ausdruck, der die Lösung mitbringt, nimmt der Übung den Sinn.</p>
+
+<h3 id="audience-wirkt-jetzt-auch-im-untermenü-der-topnav"><code>audience</code> wirkt jetzt auch im Untermenü der TopNav</h3>
+
+<p>Die Doku sagte es bereits („Ein Eintrag <strong>oder Kind</strong> kann per <code>audience:</code> …“), die
+Umsetzung tat es nicht: Der Filter griff nur für <strong>Haupteinträge</strong>. Ein Kind mit
+<code>audience: trainer</code> erschien damit auch in der Lernenden-Unterlage – im schlechtesten
+Fall ein Link auf eine Seite, die es dort nicht gibt (404).</p>
+
+<p>Jetzt gilt <code>audience</code> je Kind. Bleibt in einer Gruppe <strong>kein</strong> Kind übrig, entfällt die
+Gruppe mit – ein Aufklappmenü ohne Einträge wäre eine Schaltfläche, die nichts tut.</p>
+
+<p><strong>Ebenfalls dokumentiert, aber bisher nirgends beschrieben:</strong> <code>resources</code>-Einträge im
+Front Matter kennen <code>audience</code> schon lange. Damit kann <strong>dieselbe</strong> Seite beide
+Zielgruppen bedienen und dem Trainer zusätzlich Regie-Material anbieten; bleibt kein
+Eintrag übrig, entfällt der ganze Kasten.</p>
+
+<p><strong>Eingestuft als Minor:</strong> eine neue Komponente und neue CSS-Klassen. Der
+<code>audience</code>-Anteil allein wäre ein Patch – dokumentiertes Verhalten, das nicht wirkte –,
+zusammen entscheidet die neue Funktion.</p>
+
+<hr />
+
+<h2 id="1100">1.10.0</h2>
+
+<h3 id="die-materialübersicht-für-lernende-kommt-aus-dem-theme">Die Materialübersicht für Lernende kommt aus dem Theme</h3>
+
+<p>Die Aufstellung der Unterlagen auf der Lernenden-Startseite – <strong>je Themenblock
+zwei Spalten: links die Übungen, rechts das Material zum Nachschlagen</strong> – ist jetzt
+eine Theme-Komponente. Bisher hat jedes Schulungs-Repo sie in seiner
+<code>assets/custom.css</code> nachgebaut und <strong>eigene Kopien der Format-Icons</strong> mitgeschleppt;
+dieselben Formate sahen von Repo zu Repo unterschiedlich aus.</p>
+
+<p>Neue Klassen: <code>avd-academy-topic</code> (Themenblock mit Akzentlinie),
+<code>avd-academy-materials</code> + <code>…__col</code> + <code>…__head</code> (das Zwei-Spalten-Raster).</p>
+
+<h3 id="typisierte-dokumentlinks-avd-academy-doclink">Typisierte Dokumentlinks: <code>avd-academy-doclink</code></h3>
+
+<p>Ein Link sagt über eine <strong>Klasse</strong>, auf welches Format er zeigt – das Icon liefert
+das Theme:</p>
+
+<pre><code class="language-markdown">- [Die Java-Plattform erkunden](einfuehrung-java/issue.md){: .avd-academy-doclink .avd-academy-doclink--guide}
+- [Entstehung von Java](einfuehrung-java/praesentation.md){: .avd-academy-doclink .avd-academy-doclink--slides}
+</code></pre>
+
+<p>Modifier: <code>--guide</code>, <code>--slides</code>, <code>--visualization</code>, <code>--simulation</code>, <code>--overview</code>.
+Die Klassen gelten überall, nicht nur in der Materialübersicht.</p>
+
+<p>Dazu liefert das Paket die Icons neu mit (<code>academy/icons/*.svg</code>); die CSS verweist
+<strong>relativ</strong> darauf, damit derselbe Verweis mit und ohne <code>baseurl</code> trägt.</p>
+
+<blockquote>
+  <p><strong>Migration (optional, empfohlen):</strong> Wer <code>&lt;img src="…/icon-guide.svg"&gt;</code> vor
+seinen Links stehen hat, ersetzt das durch die Klassen, löscht die lokalen
+<code>assets/icons/</code> und die nachgebauten Regeln aus <code>assets/custom.css</code>. Nichts
+bricht, wenn es stehen bleibt – es bleibt nur eine zweite Quelle derselben
+Gestaltung.</p>
+</blockquote>
+
+<p><strong>Eingestuft als Minor:</strong> nur neue Klassen und neue Paketdateien; kein bestehendes
+Markup ändert seine Wirkung.</p>
+
+<hr />
+
+<h2 id="190">1.9.0</h2>
+
+<h3 id="der-zurück-link-weicht-einem-zurück-knopf">Der Zurück-Link weicht einem Zurück-Knopf</h3>
+
+<p><strong>Die Layouts <code>presentation</code> und <code>simulation</code> verlinken nicht mehr auf eine im
+Front Matter (<code>zurueck</code>) angegebene „übergeordnete“ Seite.</strong> Das war geraten: Aufgerufen wird
+eine Präsentation über das Modul, aus der Suche, per QR-Code vom Beamer oder aus
+einem Chat – ein fester Link führt dann in vier von fünf Fällen woandershin, als
+man gekommen ist.</p>
+
+<p>An seiner Stelle steht ein <strong>Zurück-Knopf</strong>, der <code>history.back()</code> ruft und damit
+dahin führt, wo jemand <strong>tatsächlich</strong> herkam. Er bleibt verborgen, wenn es keinen
+Verlauf gibt (frischer Tab). Verdrahtet über <code>[data-avd-academy-back]</code> in
+<code>theme/academy/atvantage.js</code> – damit steht er jedem Layout offen.</p>
+
+<blockquote>
+  <p><strong>Migration:</strong> <code>zurueck</code> aus dem Front Matter von Seiten mit
+<code>layout: presentation</code> und <code>layout: simulation</code> entfernen. Das Feld erzeugt
+keinen Fehler, wirkt dort aber nicht mehr – stehen bleiben würde es nur als
+Irrtum für den nächsten Leser. <strong>In Guides bleibt <code>zurueck</code> unverändert</strong>: Dort
+bezeichnet es den Vorgänger einer Kette (Prev/Next), nicht eine übergeordnete
+Seite.</p>
+</blockquote>
+
+<p><strong>Eingestuft als Minor.</strong> Nach der Kriterienliste wäre es ein Major – ein
+dokumentiertes Front-Matter-Feld schaltet seine Funktion nicht mehr frei. Nichts
+bricht jedoch hörbar: Kein Build schlägt fehl, keine Adresse ändert sich, und an
+die Stelle des Links tritt sofort ein besserer Rückweg. Eine Übergangslösung –
+den Link weiter zeigen, wenn <code>zurueck</code> gesetzt ist – wurde erwogen und verworfen:
+Sie hätte genau das Verhalten konserviert, das entfallen soll, und zwei Rückwege
+nebeneinandergestellt.</p>
+
+<h3 id="eine-simulation-kann-mehrere-szenarien-tragen">Eine Simulation kann mehrere Szenarien tragen</h3>
+
+<p>Bisher war sie genau ein Ablauf. Manche Themen zerfallen aber in mehrere in sich geschlossene Abläufe, die
+zusammengehören und jeder von vorn beginnen – dafür musste man bislang zur
+eigenständigen HTML-Vorlage greifen, weil nur die Tabs kannte.</p>
+
+<pre><code class="language-js">AvdSimulation.registerScenario({
+  id: "abgrenzung", titel: "…", beschreibung: "…", state, render, steps: [ … ]
+});
+</code></pre>
+
+<p>Ab dem <strong>zweiten</strong> Szenario erscheinen von selbst:</p>
+
+<ul>
+  <li>eine <strong>Reiterleiste</strong> unter der Kopfleiste (Tasten <code>1</code>–<code>9</code>),</li>
+  <li>eine <strong>Übersicht</strong> als Startbild (Taste <code>0</code>) mit Beschreibung und Schrittzahl je
+Szenario; der Satz darüber kommt aus dem neuen Front-Matter-Feld <code>einleitung</code>.</li>
+</ul>
+
+<p>Je Szenario liefert die Seite ein eigenes Bühnenbild in einem Container mit
+<code>data-avd-academy-sim-szene="«id»"</code>; sichtbar ist immer genau eines. Die Adresse
+trägt dann Szenario <strong>und</strong> Schritt: <code>#/abgrenzung/3</code> – mit der Kennung statt der
+Nummer, damit ein Verweis das Umsortieren der Szenarien überlebt.</p>
+
+<p><strong>Mit einem Szenario ändert sich nichts</strong> – weder erscheint eine Leiste, noch
+ändert sich die Adresse (<code>#/3</code>). <code>registerStep</code>/<code>registerSteps</code> wirken unverändert
+und legen ein unbenanntes Szenario an.</p>
+
+<p>Neu in der Schnittstelle: <code>registerScenario</code>, <code>registerScenarios</code>,
+<code>szenario(kennungOderNummer)</code>, <code>uebersicht()</code>, dazu die Leser <code>szenarien</code>,
+<code>aktuellesSzenario</code>, <code>istUebersicht</code>. <code>ctx</code> in <code>render</code> trägt jetzt zusätzlich
+<code>szenario</code> und <code>szenarioIndex</code>.</p>
+
+<p><strong>Vorlage und Beispiel zeigen beide die neue Form.</strong> Das Beispiel
+<code>EXAMPLE-java-speicher.md</code> ist in „Primitive Typen“ und „Referenztypen“ geteilt –
+zwei Abläufe zu einer Frage, jeder beginnt auf leerer Bühne. Genau daran erkennt
+man ein eigenes Szenario, und genau das ist die Stelle, an der der Merksatz zum
+ersten Teil steht, bevor der zweite ihn umdreht.</p>
+
+<p><strong>Tafeln lassen sich einfärben</strong> – <code>avd-academy-sim-panel--ton-1</code> / <code>-3</code> / <code>-4</code> /
+<code>-alert</code> setzen Rahmen, Überschrift und einen Anflug Fläche aus der kategorialen
+Füllpalette. Gedacht für Tafeln, die über mehrere Szenarien hinweg dieselbe Sache
+bezeichnen: Dann findet man sich beim Wechsel sofort zurecht. Ton 2 fehlt
+absichtlich – das ist die Akzentfarbe.</p>
+
+<p><strong>Quelltext auf der Bühne sieht jetzt wie Quelltext aus.</strong> Die empfohlene Form ist
+ein echter Codeblock mit der gewohnten Syntax-Hervorhebung durch highlight.js:</p>
+
+<pre><code class="language-html">&lt;pre class="avd-academy-sim-code"&gt;&lt;code class="language-java"&gt;int kontostand;&lt;/code&gt;&lt;/pre&gt;
+</code></pre>
+
+<p>Die laufende Zeile markiert der neue Helfer <strong><code>AvdSimulation.codeZeile(block, n)</code></strong>
+mit einem Balken <strong>hinter</strong> dem Text. Anders geht es nicht: Die Ausgabe von
+highlight.js besteht aus verschachtelten Spans, die sich nicht zeilenweise
+zerlegen lassen, ohne die Farben zu zerreißen.</p>
+
+<p>Die ältere Form mit einzelnen <code>avd-academy-sim-code__line</code>-Elementen (seit 1.8.0)
+<strong>bleibt gültig</strong> – sie hat nur keine Syntaxfarben. Neu daneben:
+<code>avd-academy-sim-code__label</code> für eine Beschriftung über einer Zeilengruppe.</p>
+
+<h2 id="180">1.8.0</h2>
+
+<p><strong>Neues Layout „simulation“ – bewegte Abläufe statt Folienwechsel.</strong> Eine Präsentation
+wechselt Folien; eine Simulation verändert <strong>einen</strong> Schauplatz: Kästen entstehen, Werte
+wandern, Pfeile werden gezogen. Dafür gab es bisher nur die eigenständige HTML-Vorlage
+(<code>templates/simulations/simulation-template.html</code>) – ohne Kopfleiste, ohne QR-Code, ohne
+Abspielen. Jetzt gibt es den Weg über die Site:</p>
+
+<pre><code class="language-yaml">---
+layout: simulation
+title: "Java: Stack und Heap"
+---
+</code></pre>
+
+<p>Optisch ist die Seite an <code>presentation</code> angelehnt (dieselbe schmale Kopfleiste mit Logo,
+Titel, QR-Code und Farbschema-Umschalter), darunter Bühne und Erklärspalte, unten eine
+Steuerleiste: Reset, Schritt zurück, Abspielen, Schritt vor.</p>
+
+<p><strong>Abspielen und Tempo sind EIN geteilter Knopf</strong> – gemeinsamer Hintergrund, gemeinsamer
+Rahmen. Der breite Teil spielt ab (voreingestellt 1×), der schmale Teil daneben klappt
+ein Menü <strong>nach oben</strong> auf: 0,5× · 1× · 2× · 5×. Nach oben, weil die Leiste am unteren
+Rand sitzt; als eigener Knopf daneben hätte das Tempo dieselbe Größe getragen wie
+„vor“/„zurück“ und damit eine Wichtigkeit vorgetäuscht, die es nicht hat – man stellt es
+einmal ein, nicht bei jedem Schritt. Ein Tempo zu wählen startet das Abspielen. Mit der
+Tastatur: <code>T</code> öffnet, <code>↑</code>/<code>↓</code> wählen, <code>Esc</code> schließt.</p>
+
+<p><strong>Das Miniframework <code>AvdSimulation</code></strong> (neu: <code>theme/jekyll/simulation.js</code>) trägt den
+Ablauf. Schritte sind <strong>deklarativ</strong>: <code>apply</code> beschreibt nicht, was passiert, sondern was
+danach gilt. Das Framework baut den Zustand bei jedem Wechsel von vorn auf und ruft
+<strong>eine</strong> <code>render</code>-Funktion – Vor, Zurück, Springen und Reset funktionieren damit ohne
+Rückwärts-Logik.</p>
+
+<pre><code class="language-js">AvdSimulation.setup({ state: () =&gt; ({ variablen: [] }), render: (s, ctx) =&gt; { … } });
+AvdSimulation.registerStep({ titel: "…", text: "…", apply: s =&gt; { … } });
+</code></pre>
+
+<p><code>AvdSimulation.list(container, items, {key, create, update})</code> gleicht Listen über
+Schlüssel mit dem DOM ab – die Voraussetzung dafür, dass überhaupt etwas animiert:
+Bestehendes bleibt stehen, Neues kommt mit <code>is-neu</code>, Verschwundenes geht mit <code>is-weg</code>.</p>
+
+<p><strong>Neu im Paket:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Datei</th>
+      <th>Zweck</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>jekyll/_layouts/simulation.html</code></td>
+      <td>das Layout</td>
+    </tr>
+    <tr>
+      <td><code>jekyll/simulation.css</code></td>
+      <td>Apparatur + Bühnen-Bausteine</td>
+    </tr>
+    <tr>
+      <td><code>jekyll/simulation.js</code></td>
+      <td>Miniframework <code>AvdSimulation</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Neue Klassen</strong> (alle additiv): <code>avd-academy-sim*</code> für die Apparatur sowie die
+Bühnen-Bausteine <code>avd-academy-sim-panels</code>, <code>-panel</code>, <code>-cell</code>, <code>-code</code> mit den
+Zustandsklassen <code>is-neu</code>, <code>is-weg</code>, <code>is-aktiv</code>, <code>is-puls</code>, <code>is-fehler</code>.</p>
+
+<p><strong>Neue Front-Matter-Felder</strong> (nur bei <code>layout: simulation</code>): <code>erklaerspalte</code>,
+<code>tempo</code> (0.5/1/2/5), <code>schrittdauer</code>. <code>title</code>, <code>description</code> und <code>zurueck</code> wirken wie in
+<code>presentation</code>.</p>
+
+<p><strong>Capture-Modus für Beamer und Aufzeichnung.</strong> Taste <code>C</code> oder <code>?capture</code> in der
+Adresse räumt alles weg, was nicht zur Sache gehört – Kopfleiste, Erklärspalte,
+Fortschritt, Steuerleiste – und blendet den Mauszeiger aus; die Bühne füllt das
+Fenster. Taste <code>T</code> holt den Erklärtext als Einblendung (OST) an den unteren
+Bühnenrand zurück; die Bühne hält dafür gemessenen Platz frei, damit die
+Einblendung nicht verdeckt, worüber sie spricht. <code>?capture</code> bleibt in der Adresse
+stehen (Neuladen-fest, verlinkbar an die Aufnahme-Maschine); der Weg über die
+Taste blendet kurz einen Hinweis auf den Ausgang ein. Neu in der Schnittstelle:
+<code>AvdSimulation.capture(an)</code> und <code>.ost(an)</code>.</p>
+
+<p><strong>Kein Drucklayout – mit Absicht.</strong> Eine Simulation lebt von der Bewegung; ein Ausdruck
+wäre ein willkürliches Standbild. Es gibt weder Druck-Knopf noch Seitenaufbereitung; wer
+trotzdem druckt, bekommt den sichtbaren Schritt, einen Hinweis und den QR-Code als
+Rückweg.</p>
+
+<p><strong>Bestehendes bleibt unberührt.</strong> Die eigenständige HTML-Vorlage besteht weiter; die
+Anleitung unter <code>/templates/simulations/</code> beschreibt jetzt beide Wege.</p>
+
+<h2 id="171">1.7.1</h2>
+
+<p><strong>Die Werkzeuge stehen jetzt überall in derselben Reihenfolge: QR-Code links,
+Umschalter bzw. Drucken rechts.</strong> Bisher lag der QR-Code je Layout an einer anderen
+Stelle und der Farbschema-Umschalter war doppelt so groß wie seine Nachbarn.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Layout</th>
+      <th>Wo der QR-Code steht</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>default</code>, <code>guide</code></td>
+      <td><strong>in der Kopfzeile</strong>, links vom Farbschema-Umschalter (vorher: rechts im Hero)</td>
+    </tr>
+    <tr>
+      <td><code>visualization</code></td>
+      <td>rechts im Hero, <strong>links vom</strong> Drucken-Knopf (vorher: rechts davon)</td>
+    </tr>
+    <tr>
+      <td><code>presentation</code></td>
+      <td>in der Kopfleiste, <strong>links vom</strong> Farbschema-Umschalter (vorher: zwischen Drucken und Vollbild)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Der Farbschema-Umschalter ist kompakt.</strong> Er trug das Button-Grundmaß (11 px/26 px
+Polster) und stand damit als breiter Block neben einer 34-px-Kachel; jetzt ist er ein
+Icon-Button mit derselben Kantenlänge wie der QR-Code daneben. Neue Klasse:
+<code>avd-academy-theme-toggle</code> (das <code>data</code>-Attribut ist unverändert).</p>
+
+<p><strong>Neue Gruppe <code>avd-academy-header__tools</code></strong> trägt beide in der Kopfzeile – bewusst
+<strong>außerhalb</strong> von <code>avd-academy-header__nav</code>:</p>
+
+<ul>
+  <li>Das Nav klappt unter 900 px in den Burger. Der Umschalter war dort nur nach einem
+Tipp auf ☰ erreichbar; jetzt steht er auf dem Handy so offen wie am Schreibtisch.</li>
+  <li>Das Nav entfällt im Ausdruck. Läge der QR-Code darin, wäre er auf Papier weg –
+gerade dort ist er der Rückweg zur Online-Fassung.</li>
+</ul>
+
+<p>Im Ausdruck ist der QR-Code in der Kopfzeile <strong>20 mm</strong> groß (statt 25 mm im Hero), damit
+er den Briefkopf nicht aufbläht; der Umschalter entfällt dort wie alles andere Chrome.</p>
+
+<p><strong>Für bestehende Projekte ist nichts zu tun</strong> – keine Klasse entfällt, kein Front
+Matter, keine Funktion. Nur wer per <code>site.custom_css</code> <strong>gezielt</strong> auf die alte
+Anordnung gestylt hat, zieht nach: ein Selektor auf <code>.avd-academy-header__nav button</code>
+trifft den Umschalter nicht mehr (jetzt <code>.avd-academy-theme-toggle</code> in
+<code>.avd-academy-header__tools</code>), und ein Selektor auf den QR-Code im Hero greift auf
+Doku-Seiten und Guides nicht mehr (dort steht er in der Kopfzeile).</p>
+
+<h2 id="170">1.7.0</h2>
+
+<p><strong>Neu: gruppierte Tabelle (<code>avd-academy-grouptable</code>).</strong> Eine Tabelle, deren Zeilen
+zu <strong>Gruppen</strong> zusammengefasst sind, mit <strong>Zwischenräumen</strong> dazwischen: Jede Gruppe
+trägt links einen farbigen Streifen, die Zwischenräume sind schraffiert. Damit ist
+auf einen Blick zu sehen, wie voll eine Gruppe ist, wo Raum frei bleibt und wo etwas
+über die letzte Gruppe hinausläuft – was eine gewöhnliche Tabelle nicht zeigt, weil
+sie Zeilen nur aufreiht.</p>
+
+<p>Die Komponente ist <strong>bewusst neutral</strong>: „Gruppe“ und „Zwischenraum“, nicht
+„Schulungstag“ und „Pause“. Sie rechnet nicht, summiert nicht und kennt keine
+Reihenfolge – alles steht im Markup. Gedacht für Ablauf- und Belegungspläne,
+Kapazitätsübersichten, Etappen mit Puffer.</p>
+
+<p>Bausteine: <code>…__group</code> (Gruppenkopf mit <code>rowspan</code>, Töne <code>--tone-1</code> … <code>--tone-4</code> und
+<code>--tone-alert</code>), <code>…__num</code> (schmale Zahlenspalte), <code>…__link</code> (rechtsbündige
+Schlusszeile einer Zelle), an <code>&lt;tr&gt;</code>: <code>…__gap</code> (Zwischenraum zwischen Gruppen),
+<code>…__free</code> (freier Raum innerhalb einer Gruppe), <code>…__alert</code> (Ankündigung, dass das
+Raster verlassen wird). Dazu <code>avd-academy-grouptable-legend</code> mit
+<code>…__key--tone-*</code> / <code>…__key--gap</code>. Markup, Beispiel und Grenzen:
+<a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/docs/theme/academy.md">Doku, Abschnitt „Gruppierte Tabelle“</a>.</p>
+
+<p><strong>Neue Tokens: <code>--avd-academy-tone-1..4</code> und <code>--avd-academy-tone-alert.</code></strong> Sie leiten
+sich aus der kategorialen Füllpalette (<code>--avd-academy-fill-*</code>) bzw. der Danger-Farbe
+ab und bringen <strong>keine eigenen Farbwerte</strong> mit. Im Dark-Theme werden sie per
+<code>color-mix</code> aufgehellt – die Füllpalette ist auf helle Flächen gerechnet, Ton 1
+(Slate) wäre auf dunklem Grund nicht zu sehen. Im <strong>Drucklayout</strong> werden sie auf die
+Light-Werte zurückgesetzt, damit ein Ausdruck aus dem Dark-Mode nicht blass wird.</p>
+
+<p><strong>Geändert: Lernziele in Guides stehen in der Du-Form.</strong> Bisher galt „durchgängig
+Du – <strong>Ausnahme:</strong> Lernziele in der 3. Person“. Diese Ausnahme fällt weg: Lernziele
+beginnen mit <strong>„Du …“</strong>, die Verben stehen in der <strong>2. Person Singular</strong>
+(„benennst“, „implementierst“). Ein Guide spricht die Lernenden direkt an; eine
+Aufzählung in der 3. Person fiel mitten im Dokument aus der Anrede. Betrifft
+<code>templates/guides/guide-template.md</code>, <code>EXAMPLE-postgresql-backend.md</code> und die
+Anweisungen in <code>templates/guides/index.md</code>.</p>
+
+<p><strong>Für bestehende Projekte ist nichts zu tun.</strong> Die neue Komponente ist rein
+ergänzend. Bestehende Guides mit „Die Lernenden …“ bleiben lesbar und funktionsfähig
+und werden <strong>nicht unaufgefordert</strong> umgeschrieben – die neue Regel gilt für neue und
+ohnehin bearbeitete Übungen.</p>
+
+<h2 id="160">1.6.0</h2>
+
+<p><strong>Neu: Drucken-Knopf im Hero der Visualisierungs-Ansicht.</strong> <code>layout: visualization</code>
+hat weder Kopfzeile noch Sidebar – darin steckte bisher kein Weg zum Ausdruck außer
+dem Browser-Menü. Jetzt steht rechts im Hero ein Drucken-Knopf, gleiche Bauform und
+Größe wie die Kopier-Buttons (Icon als CSS-Maske in <code>currentColor</code>, kein Emoji), und
+<strong>links neben dem QR-Code</strong> – wie in der Präsentation.</p>
+
+<p>Damit ist auch ein Nebeneffekt von <code>1.5.0</code> behoben: Wo eine Visualisierung ihren
+<strong>eigenen</strong> Drucken-Knopf im Inhalt mitbrachte, stand der QR-Code <strong>über</strong> ihm statt
+neben ihm. Das Layout kann eine Schaltfläche im Inhalt nicht finden – mit dem Knopf
+im Hero gibt es nun eine Stelle, an der beide zusammenstehen.</p>
+
+<ul>
+  <li><strong>Nur in dieser Ansicht.</strong> Auf Doku-Seiten und Guides ist der Hero mit Tags und
+„Markdown kopieren“ belegt; dort bleibt es bei <code>Strg/Cmd+P</code>.</li>
+  <li>Neue Klasse <code>avd-academy-print-btn</code>, neuer Haken <code>[data-avd-academy-print]</code>
+(verdrahtet von <code>academy/atvantage.js</code>, löst <code>window.print()</code> aus). Braucht
+JavaScript – wie die Kopier-Buttons.</li>
+  <li>Im Ausdruck ausgeblendet: ein Drucken-Knopf auf Papier ist sinnlos.</li>
+</ul>
+
+<p><strong>Für bestehende Projekte ist nichts zu tun.</strong> Wer in einer Visualisierung einen
+eigenen Drucken-Knopf im Inhalt hat, kann ihn jetzt entfernen – sonst stehen zwei da.</p>
+
+<h2 id="150">1.5.0</h2>
+
+<p><strong>Neu: QR-Code der Seitenadresse in allen Layouts.</strong> Neben dem Drucken- bzw.
+Kopieren-Button steht jetzt ein QR-Code auf die Adresse der aktuellen Seite –
+Tooltip „Diese Seite auf Deinem Smartphone öffnen“. Er ist die Brücke von der Wand
+in die Hand: Was am Beamer hängt, liegt einen Scan später auf dem Gerät der
+Teilnehmenden, ohne dass jemand eine URL abtippt.</p>
+
+<ul>
+  <li><strong>Überall, gleich groß:</strong> in <code>default</code>, <code>guide</code> und <code>visualization</code> rechts im
+Hero, in <code>presentation</code> in der Kopfleiste neben dem Drucken-Knopf – jeweils in
+der Größe des Knopfs daneben. Kein Schalter im Front Matter: Es gibt keine Seite,
+auf der der Weg aufs eigene Smartphone schaden würde.</li>
+  <li><strong>Vergrößert sich zum Scannen</strong> (ca. 168 px) bei Überfahren, Tastaturfokus oder
+Antippen. In Knopfgröße wäre ein Modul rund ein Pixel breit und der Code
+unlesbar.</li>
+  <li><strong>Entsteht im Browser</strong> und wird per DOM eingehängt. Zur Build-Zeit ginge es
+nicht: Dieselbe Unterlage läuft unter github.io, im lokalen Server und in Forks
+(verschiedene <code>baseurl</code>), und in der Präsentation steht die aktuelle Folie im
+Fragment (<code>#/3</code>) – dort zeigt der Code auf <strong>genau die Folie an der Wand</strong> und
+wird beim Blättern neu berechnet. Ohne JavaScript und bei <code>file://</code> erscheint er
+nicht.</li>
+  <li><strong>Immer dunkel auf hell</strong>, auch im Dark-Mode: Ein invertierter QR-Code wird von
+vielen Scannern nicht gelesen.</li>
+  <li><strong>Bleibt im Ausdruck</strong> – als einziger Bedienbaustein, weil er auf Papier kein
+Chrome ist, sondern der Rückweg zur Online-Fassung. 25 mm auf Doku-/Guide-Seiten,
+20 mm in der Kopfleiste der Präsentation.</li>
+</ul>
+
+<p><strong>Neu im Paket:</strong> die Bibliothek <strong>qrcode-generator 2.0.4</strong> (MIT, unverändert
+übernommen) unter <code>academy/qrcode/</code> – wie highlight.js <strong>mitgeliefert statt per
+CDN</strong> und per <code>import()</code> nachgeladen, damit sie das Rendern nicht aufhält. Das SVG
+baut das Theme selbst.</p>
+
+<p><strong>Neue Klassen:</strong> <code>avd-academy-qr</code> (mit <code>__box</code>, <code>is-zoom</code>) und
+<code>avd-academy-guide-hero__actions</code> (fasst die Werkzeuge der Hero-Meta-Zeile
+zusammen). <strong>Neues Ereignis:</strong> <code>presentation.js</code> sendet bei jedem Folienwechsel
+<code>avd-academy-urlchange</code> am <code>window</code> – nötig, weil das Fragment per
+<code>history.replaceState</code> gesetzt wird und das kein <code>hashchange</code> auslöst.</p>
+
+<p><strong>Was sich für bestehende Projekte sichtbar ändert:</strong> der Ausdruck. Die
+Hero-Meta-Zeile (<code>avd-academy-guide-hero__meta</code>) wird beim Drucken nicht mehr als
+Ganzes ausgeblendet, weil sie den QR-Code trägt; stattdessen entfallen dort jetzt
+die Hero-Tags (<code>avd-academy-guide-hero__tags</code>) einzeln. In der Präsentation gilt
+das Gleiche für <code>avd-academy-present__tools</code> und die Knöpfe darin. Nichts wurde
+entfernt oder umbenannt – wer den QR-Code im Ausdruck nicht will, blendet
+<code>.avd-academy-qr</code> per <code>site.custom_css</code> in einem eigenen <code>@media print</code> aus.</p>
+
+<h2 id="143">1.4.3</h2>
+
+<p><strong>Fix: Ein Wisch blätterte mehrere Folien weiter.</strong> Die in <code>1.4.2</code> eingeführte
+Erkennung eines neuen Wischs war zu großzügig und zündete schon <strong>innerhalb</strong>
+einer Geste: Beim Wischen schwanken die Beträge ständig (beschleunigen,
+abbremsen, wieder beschleunigen), und jeder Anstieg galt als neuer Wisch.</p>
+
+<p>Jetzt gilt wieder streng: <strong>Ein Wisch = ein Folienwechsel.</strong> Danach muss
+losgelassen werden – anschließend darf sofort weitergewischt werden, ohne Pause
+und ohne Mausbewegung. Als neuer Wisch zählt nur noch:</p>
+
+<ul>
+  <li>ein <strong>deutlicher Anstieg nach sichtbarem Abklingen</strong> (mindestens vier
+aufeinanderfolgende nicht steigende Ereignisse, danach mehr als der doppelte
+Betrag) – das ist die Signatur „Nachlauf zu Ende, Finger wieder aufgelegt“,</li>
+  <li>oder eine <strong>klare Richtungsumkehr</strong> (der Nachlauf läuft nie rückwärts).</li>
+</ul>
+
+<p>Zwei Feinheiten, die im Trace sichtbar wurden und den Ausschlag gaben:</p>
+
+<ul>
+  <li>Das <strong>letzte Ein-Pixel-Ereignis</strong> des Nachlaufs beendete zwar die alte Geste,
+begann aber zugleich eine neue – mit seiner zufälligen Richtung. Die
+Umkehr-Regel zündete daraufhin mitten im nächsten Wisch. Solche Ausläufer
+beginnen jetzt gar keine Geste mehr (alles unter 2 px zählt als Rauschen).</li>
+  <li>Die gemerkte Wischrichtung stammt jetzt aus der <strong>tatsächlich gewischten
+Summe</strong> statt aus dem ersten Ereignis der Geste.</li>
+</ul>
+
+<h2 id="142">1.4.2</h2>
+
+<p><strong>Fix: Zweimal hintereinander wischen ging nur mit Mausbewegung dazwischen.</strong> Der
+erste Wisch blätterte, der zweite tat nichts – bis man den Zeiger kurz bewegte.</p>
+
+<p>Ursache war der <strong>Nachlauf</strong> (Momentum): Nach einem Wisch liefert das Trackpad
+noch für einige Zehntelsekunden abklingende Ereignisse. Die Geste galt erst als
+beendet, wenn 150 ms lang gar nichts mehr kam – der Nachlauf hielt sie also am
+Leben, und der zweite Wisch wurde als dessen Rest verworfen. Eine Mausbewegung
+beendet den Nachlauf, deshalb half sie.</p>
+
+<p>Jetzt wird ein <strong>neuer Wisch mitten im Nachlauf erkannt</strong>: Momentum klingt ab,
+seine Beträge werden monoton kleiner – steigt der Betrag wieder spürbar an oder
+dreht die Richtung, liegen die Finger wieder auf dem Trackpad. Die alte Geste wird
+dann beendet und die neue beginnt, ohne Pause dazwischen.</p>
+
+<p>Dazu ist die Auslöseschwelle für <strong>Trackpad-Gesten</strong> von 80 px auf <strong>50 px</strong>
+(bzw. 6 % der Bühnenbreite) gesenkt. Der Finger auf dem Touchscreen schiebt die
+Folie 1:1 und darf einen längeren Weg brauchen; die Trackpad-Geste ist indirekt
+und liefert je Wisch deutlich weniger „Pixel“ – mit demselben Wert fühlte sie sich
+zäh an. Die Touch-Schwelle bleibt unverändert.</p>
+
+<h2 id="141">1.4.1</h2>
+
+<p><strong>Fix: Wischen wirkte nur, wenn der Zeiger über der Folie stand.</strong> Nach einem
+Folienwechsel – besonders nach einem Klick auf „weiter“ – tat die Zwei-Finger-Geste
+nichts; erst ein kurzes Bewegen der Maus half.</p>
+
+<p>Ursache: <code>wheel</code>-Ereignisse gehen an das Element <strong>unter dem Zeiger</strong>, die
+Gesten-Erkennung hing aber an der Folien-Bühne. Kopfleiste, Fortschrittsbalken und
+die fixierten Blätter-Knöpfe liegen <strong>außerhalb</strong> der Bühne – und genau über dem
+Knopf steht der Zeiger, nachdem man damit weitergeblättert hat. Die Ereignisse
+erreichten die Erkennung also gar nicht, bis der Zeiger wieder über einer Folie
+lag.</p>
+
+<p>Zuständig ist jetzt das <strong>Dokument</strong>: Gewischt werden kann überall auf der Seite.
+Für Touch gilt dasselbe – eine Geste darf auf der Leiste beginnen. Die Prüfung auf
+waagerecht scrollbare Inhalte läuft entsprechend über die volle Vorfahrenkette;
+breite Codeblöcke und Tabellen behalten ihren Vorrang.</p>
+
+<h2 id="140">1.4.0</h2>
+
+<p><strong>Trackpad-Wischen: Die Folie geht jetzt sofort mit.</strong> Das Blättern mit zwei
+Fingern fühlte sich schwerfällig an und ging manchmal ins Leere – zu Recht: Bis
+zum Überschreiten der Schwelle passierte <strong>nichts Sichtbares</strong>, und ein zu kurzer
+Wisch verpuffte spurlos. Man wischte gegen ein totes Bild und wusste nicht, ob die
+Geste überhaupt ankommt.</p>
+
+<p>Jetzt gilt auf Trackpad und Touchscreen dasselbe Modell:</p>
+
+<ul>
+  <li><strong>Sofortige Rückmeldung</strong> – die Schiene folgt der Geste von der ersten Bewegung
+an (an den Enden gedämpft).</li>
+  <li><strong>Gewechselt wird erst über der Schwelle</strong> – 12 % der Bühnenbreite, höchstens
+80 px; darunter rastet die Folie animiert zurück.</li>
+  <li><strong>Ein Wisch = eine Folie</strong>, der Nachlauf (Momentum) blättert nicht weiter.</li>
+</ul>
+
+<p>Dazu zwei Korrekturen, die das „teilweise gar nicht“ erklären:</p>
+
+<ul>
+  <li><strong>Achse einmal festlegen.</strong> Bisher wurde bei <em>jedem</em> Ereignis geprüft, ob
+waagerecht oder senkrecht überwiegt – bei einem leicht schrägen Wisch fiel ein
+Teil der Ereignisse heraus, die Geste zerfiel. Jetzt steht die Achse nach dem
+ersten Ereignis fest und gilt bis zum Ende der Geste.</li>
+  <li><strong>Am Rand rastet die Schiene zurück.</strong> <code>go()</code> rendert auch dann, wenn sich der
+Index nicht ändert (erste/letzte Folie) – sonst blieb die Schiene nach einer
+Geste verschoben stehen.</li>
+</ul>
+
+<h2 id="130">1.3.0</h2>
+
+<p><strong>Touch-Wischen: Die Folie folgt dem Finger.</strong> Das Wischen auf dem Touchscreen war
+schwerfällig und ging manchmal ins Leere. Drei Ursachen, alle behoben:</p>
+
+<ul>
+  <li><strong>Nur Strecke, kein Tempo.</strong> Ausgelöst wurde erst ab 60 px Wischweite, gemessen
+beim Loslassen. Ein kurzer, schneller Flick blieb darunter und verpuffte. Jetzt
+zählt <strong>Strecke oder Tempo</strong>: langes Ziehen (über 12 % der Bühnenbreite, höchstens
+80 px) <strong>oder</strong> ein Flick unter 300 ms.</li>
+  <li><strong>Keine Rückmeldung während der Geste.</strong> Es passierte bis zum Loslassen nichts –
+man wischte gegen ein totes Bild. Jetzt folgt die Schiene dem Finger und rastet
+beim Loslassen animiert ein (an den Enden nur gedämpft, damit sichtbar ist, dass
+dort Schluss ist).</li>
+  <li><strong>Abgebrochene Gesten hingen.</strong> Wurde die Berührung vom System abgebrochen
+(eingehender Anruf, Systemgeste, zweiter Finger), kam kein <code>touchend</code> – der
+Zustand blieb stehen. <code>touchcancel</code> und Mehrfinger-Berührung setzen jetzt sauber
+zurück.</li>
+</ul>
+
+<p>Dazu die <strong>Achsen-Entscheidung</strong>: Nach den ersten Pixeln steht fest, ob die Geste
+blättert oder scrollt, und sie wechselt bis zum Loslassen nicht mehr. Waagerecht
+scrollbare Inhalte (breiter Codeblock, breite Tabelle) haben dabei jetzt auch beim
+Touch Vorrang – dieselbe Prüfung wie beim Trackpad, die es im Touch-Pfad bisher gar
+nicht gab. <code>touch-action: pan-y pinch-zoom</code> überlässt senkrechtes Scrollen und
+Zoomen weiterhin dem Browser.</p>
+
+<h2 id="121">1.2.1</h2>
+
+<p><strong>Fix: Vorwärtswischen auf dem Trackpad blätterte nicht.</strong> Rückwärts (nach rechts)
+funktionierte, vorwärts (nach links) nicht.</p>
+
+<p>Ursache war der Vorrang-Check für waagerecht scrollbare Inhalte: Er prüfte nur
+<code>scrollWidth &gt; clientWidth</code> und lief dabei über die <strong>Folien-Schiene</strong>
+(<code>.avd-academy-deck__track</code>). Die ist naturgemäß so breit wie alle Folien zusammen
+(bei sieben Folien 10080 px gegenüber 1440 px Bühne) und stand auf <code>scrollLeft: 0</code>
+– also „links ist noch Weg“: Jede Vorwärtsgeste galt als Scrollen im Inhalt und
+wurde verschluckt, während Rückwärts (<code>scrollLeft &gt; 1</code> ist bei 0 falsch)
+durchkam.</p>
+
+<p>Jetzt zählen nur <strong>echte</strong> Scroll-Container: <code>overflow-x: auto|scroll</code> <strong>und</strong>
+noch Weg in der Wischrichtung; die Schiene ist zusätzlich ausdrücklich
+ausgenommen. Breite Codeblöcke und Tabellen behalten damit ihren Vorrang – geprüft
+ist beides: Wischen im breiten Block scrollt dort, am Anschlag blättert die Folie
+weiter.</p>
+
+<h2 id="120">1.2.0</h2>
+
+<p><strong>Blättern per Wischgeste auf dem Trackpad.</strong> Bisher reagierte das Layout
+<code>presentation</code> auf Tastatur, Schaltflächen und Touch-Wischen; die
+Zwei-Finger-Geste auf dem Trackpad blätterte nicht. Jetzt gilt überall dasselbe:
+<strong>nach links wischen = nächste Folie, nach rechts = zurück.</strong></p>
+
+<p>Umgesetzt über <code>wheel</code>-Events mit waagerechtem <code>deltaX</code>, mit den drei nötigen
+Feinheiten:</p>
+
+<ul>
+  <li><strong>Ein Wisch = eine Folie.</strong> Die Ereignisse eines Wischs samt Nachlauf
+(Momentum) werden zu einer Geste zusammengefasst und erst nach 220 ms Ruhe
+wieder freigegeben.</li>
+  <li><strong>Senkrechtes Scrollen bleibt der Folie</strong>, ebenso Pinch-Zoom.</li>
+  <li><strong>Waagerecht scrollbare Inhalte haben Vorrang</strong> – wer in einem breiten
+Codeblock oder einer breiten Tabelle wischt, scrollt dort; erst am Anschlag
+blättert die Folie.</li>
+</ul>
+
+<p>Die Geste löst zudem <strong>nicht mehr die Zurück-Navigation des Browsers</strong> aus
+(<code>preventDefault</code> plus <code>overscroll-behavior-x: contain</code> auf der Bühne).</p>
+
+<p><strong>Für Konsumenten:</strong> nichts zu tun – rein ergänzend; Tastatur, Schaltflächen und
+Touch bleiben unverändert.</p>
+
+<h2 id="112">1.1.2</h2>
+
+<p><strong>Doku:</strong> Eine Präsentation darf statt einer Datei auch ein <strong>Ordner mit
+<code>index.md</code></strong> sein – der Weg, sobald sie eigene Dateien mitbringt (Bilder,
+Diagramme, Skripte, Stylesheets): <code>«modul»/praesentation/index.md</code> +
+<code>«modul»/praesentation/diagramm.svg</code>, Referenzen relativ, Verweis dann
+<code>praesentation/index.md</code> bzw. Folien-Anker <code>praesentation/#/9</code>. Ein <strong>inline
+eingebettetes SVG</strong> braucht gar keine Zusatzdatei und erbt über <code>currentColor</code>
+die Textfarbe. Nachgezogen in Vorlage, Referenz und Skill
+<code>praesentation-erstellen</code>; die Struktur-Regeln für Schulungs-Repos bleiben beim
+<code>didaktikon</code>-Plugin. Kein Code, kein Verhalten geändert.</p>
+
+<h2 id="111">1.1.1</h2>
+
+<p><strong>Farbschema-Umschalter in der Präsentation.</strong> Die Kopfleiste des Layouts
+<code>presentation</code> trägt jetzt den Schalter <code>◐</code> – dieselbe Mechanik wie in der TopNav
+(<code>[data-avd-academy-theme-toggle]</code>), die es in dieser Ansicht nicht gibt. Auf einer
+Präsentation wechselt die Wahl regelmäßig: heller Schulungsraum am Beamer gegen
+Aufzeichnung am Abend.</p>
+
+<p>Dazu zwei Präzisierungen in Doku und Vorlage (kein Code): Der Verweis auf einen
+Foliensatz gehört <strong>ins Kapitel</strong> des Modul-<code>index.md</code>, das er stützt – an
+dieselbe Stelle wie <code>[Zur Übung](issue.md)</code>, bei mehreren Kapiteln mit Folien-Anker
+(<code>praesentation.md#/9</code>). Und ein Foliensatz im Schulungs-Repo <strong>steht für sich</strong>:
+keine Verortung im Ablauf („Tag 1“, „Vormittag“, festes Datum) – die lebt im
+Regiebuch und wäre auf der Folie nach dem ersten Verschieben falsch.</p>
+
+<h2 id="110">1.1.0</h2>
+
+<p><strong>Neues Layout <code>presentation</code> – Folien aus Markdown.</strong> Eine Seite mit
+<code>layout: presentation</code> wird zum folienbasierten Vortrag im Vollbild: Das Theme
+tritt zurück (keine Meta-Leiste, TopNav, Brotkrumen, Sidebar, Footer), es bleiben
+eine schmale Kopfleiste mit dem Präsentationstitel und die Folienfläche.</p>
+
+<p>Die Übersetzung ist die ganze Syntax – es gibt <strong>keine</strong> Folien-Auszeichnung:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Markdown</th>
+      <th>Ergebnis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>#</code> (oder <code>title</code>)</td>
+      <td>Titel der Präsentation: klein in der Kopfleiste, groß auf der Titelfolie</td>
+    </tr>
+    <tr>
+      <td>alles vor dem ersten <code>##</code></td>
+      <td>Titelfolie</td>
+    </tr>
+    <tr>
+      <td><code>##</code></td>
+      <td>Titel einer Folie – <strong>jedes <code>##</code> beginnt eine neue Folie</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Geblättert wird mit <code>←</code>/<code>→</code> (auch Leertaste, <code>Bild ↑/↓</code>, <code>Pos1</code>/<code>Ende</code>), über die
+Schaltflächen oder per Wischgeste; die Folie schiebt sich dabei nach links aus dem
+Bild. <code>F</code> schaltet Vollbild, der Hash (<code>#/3</code>) hält die Folie fest. <strong>Jede
+Präsentation hat ein Drucklayout:</strong> im Ausdruck eine Folie je Seite – das Handout
+entsteht aus demselben Markdown.</p>
+
+<p>Neu im Paket: <code>jekyll/_layouts/presentation.html</code>, <code>jekyll/presentation.css</code>,
+<code>jekyll/presentation.js</code>. Neues optionales Front-Matter-Feld <code>zurueck: {title,
+url}</code> wirkt in diesem Layout als „Zurück“-Link in der Kopfleiste (<code>url</code> relativ
+oder ab Site-Wurzel).</p>
+
+<p><strong>Für Konsumenten:</strong> nichts zu tun – rein ergänzend. Bestehende Seiten und
+Layouts (<code>default</code>, <code>guide</code>, <code>visualization</code>) sind unverändert. Ohne JavaScript
+bleibt eine Präsentation als scrollbares Dokument lesbar.</p>
+
+<p>Das <strong>eigenständige Deck</strong> (<code>templates/presentations/presentation-template.html</code>
+mit Fragmenten und Speaker-Notes) bleibt daneben bestehen; wann welcher Weg
+passt, steht unter <code>/templates/presentations/</code>.</p>
+
+<h2 id="100">1.0.0</h2>
+
+<p><strong>Beginn der semantischen Versionierung.</strong> Inhaltlich identisch mit <code>0.1.59</code> – der
+Sprung markiert das Ende der Pre-Release-Phase, nicht einen Bruch. Alles unter
+<code>0.1.x</code> war Vorabversion: Die Nummer zählte hoch, ohne eine Aussage über
+Kompatibilität zu tragen.</p>
+
+<p><strong>Für Konsumenten:</strong> Bindung von <code>latest</code> bzw. <code>^0.1.x</code> auf <strong><code>^1</code></strong> umstellen. Wer
+auf <code>^0.1.x</code> stehen bleibt, bekommt <strong>keine</strong> Updates mehr – die Spanne endet bei
+<code>&lt;0.2.0</code>.</p>
+
+<h3 id="was-in-der-pre-release-phase-still-gebrochen-ist">Was in der Pre-Release-Phase still gebrochen ist</h3>
+
+<p>Nachträglich dokumentiert, ohne die alten Nummern neu zu bewerten. Diese drei
+Releases wären nach der neuen Regel <strong>Major</strong> gewesen; sie sind als Patch
+ausgeliefert worden, weil die Pipeline nur die Patch-Stelle erhöhen konnte:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Version</th>
+      <th>Bruch</th>
+      <th>Umstellung</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0.1.56</code></td>
+      <td>Ein <strong>Guide</strong> ist ausschließlich durch <code>layout: guide</code> gekennzeichnet. Zuvor genügte ein gesetztes <code>duration</code>.</td>
+      <td>Übungen von <code>layout: default</code> auf <code>layout: guide</code> umstellen – sonst fehlen Kopier-Button, Fortschritt, nummerierte Arbeitsschritte und Prev/Next.</td>
+    </tr>
+    <tr>
+      <td><code>0.1.58</code></td>
+      <td>Der Default <code>favicon</code> in <code>_config.defaults.yml</code> zeigt auf die quadratische Bildmarke statt auf die Wortmarke.</td>
+      <td>Nichts, wenn der Default gewünscht ist. Projekte mit eigenem <code>favicon:</code> überschreiben ihn weiterhin.</td>
+    </tr>
+    <tr>
+      <td><code>0.1.59</code></td>
+      <td>Die Werkstatt des Design-Fundaments ist nicht mehr Teil des Pakets: <code>atvantage/components/</code>, <code>guidelines/</code>, <code>ui_kits/</code>, <code>uploads/</code>, <code>SKILL.md</code>, <code>thumbnail.html</code>, <code>ATVANTAGE Homepage.html</code>, die <code>_ds_*</code>-Dateien sowie <code>academy/page-template.html</code> und <code>academy/partials/</code>.</td>
+      <td>Wer eine dieser Dateien referenziert, muss den Verweis auflösen. Sie liegen weiterhin im Repo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ebenfalls in <code>0.1.5x</code> enthalten, verträglich: Untermenü im Burger-Menü, Versatz für
+Sprungmarken, Kopier-Button nur auf Guides, Visualisierungen ohne rechten Bereich,
+<code>&lt;title&gt;</code> aus der ersten Überschrift, quadratisches Favicon.</p>
+
+
+    </main><aside class="avd-academy-guide-sidebar"><details class="avd-academy-guide-side avd-academy-guide-side--toc avd-academy-fold" data-avd-academy-toc-box
+               data-avd-academy-toc-grenze="12" open hidden>
+        <summary class="avd-academy-guide-side__label">Auf dieser Seite</summary>
+        <nav class="avd-academy-toc avd-academy-fold__body" data-avd-academy-toc aria-label="Inhaltsverzeichnis"></nav>
+      </details>
+    </aside>
+  </div><div class="avd-academy-print-contact" aria-hidden="true">
+    <span>Kontakt: https://academy.atvantage-academy.workers.dev/</span>
+    <span>academy@atvantage.com</span>
+  </div>
+
+  <footer class="avd-academy-footer">
+  <div class="avd-academy-footer__grid">
+    <div><strong>ATVANTAGE Academy</strong>
+      <p>Schulungsunterlagen der ATVANTAGE Academy.</p>
+    </div><div>
+      <strong>Kontakt</strong>
+      <p><a href="https://academy.atvantage-academy.workers.dev/" target="_blank" rel="noopener">Website</a><br><a href="mailto:academy@atvantage.com">academy@atvantage.com</a><br>
+      </p>
+    </div></div>
+  <div class="avd-academy-footer__legal">
+    © <span data-avd-academy-year>2026</span> ATVANTAGE
+  </div>
+</footer>
+
+</body>
+</html>
