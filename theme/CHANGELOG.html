@@ -61,28 +61,42 @@
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>Änderungen am ATVANTAGE Academy Theme · ATVANTAGE Academy</title><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789644347"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789644347">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789644347">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789644347">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789644347"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789644347">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789644347" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789644347" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789644347">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789663196"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789663196">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789663196">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789663196">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789663196"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789663196">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789663196" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789663196" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789663196">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
-  Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
-    .then(([core, java]) => {
+  const _hlsprachen = ["java", "http", "json", "xml"];
+  Promise.all([import(_hlbase + "core.min.js"), ..._hlsprachen.map((s) => import(_hlbase + s + ".min.js"))])
+    .then(([core, ...grammatiken]) => {
       const hljs = core.default;
-      hljs.registerLanguage("java", java.default);
-      document.querySelectorAll("pre code.language-java").forEach((el) => hljs.highlightElement(el));
+      _hlsprachen.forEach((s, i) => hljs.registerLanguage(s, grammatiken[i].default));
+      document.querySelectorAll(_hlsprachen.map((s) => "pre code.language-" + s).join(","))
+        .forEach((el) => hljs.highlightElement(el));
+
+      /* Statuszeile nach Klasse einfaerben. highlight.js gibt jedem dreistelligen
+         Code dieselbe Klasse `hljs-number` - in einem Mitschnitt ist aber genau das
+         die Stelle, auf die man zuerst sieht: 2xx ist etwas anderes als 4xx.
+         Deshalb hier die einzige eigene Zutat, und bewusst nur diese: Die
+         Statusklassen von HTTP aendern sich nicht, das bleibt stabil. */
+      document.querySelectorAll("pre code.language-http .hljs-number").forEach((el) => {
+        const code = parseInt(el.textContent, 10);
+        if (code >= 100 && code <= 599) {
+          el.classList.add("avd-academy-http-status--" + Math.floor(code / 100) + "xx");
+        }
+      });
     });
 </script>
 <link rel="apple-touch-icon" sizes="180x180" href="/training-material-kitrainings/theme/atvantage/assets/icon-180.png">
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789644347">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789644347"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789663196">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789663196"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
@@ -146,6 +160,166 @@ Abschnitt „Theme-Version“.</p>
 
 <hr />
 
+<h2 id="2170">2.17.0</h2>
+
+<h3 id="die-sprache-steht-im-front-matter-nicht-nur-im-ordnernamen">Die Sprache steht im Front Matter, nicht nur im Ordnernamen</h3>
+
+<p>Bisher entschied <strong>allein der Ordner</strong>, welche Sprache eine Seite spricht: Was unter
+<code>/en/</code> lag, war englisch. Das trägt ganze Bäume gut – aber nur ganze Bäume. Ein einzelnes
+übersetztes Kapitel tief in einer deutschen Unterlage oder eine Sammlung, deren Dokumente
+ohnehin flach nebeneinanderliegen, ließen sich so nicht paaren.</p>
+
+<p><strong>Neu:</strong> <code>lang</code> im Front Matter bestimmt die Seitensprache <strong>vorrangig</strong>.</p>
+
+<pre><code class="language-yaml">page_id: modul-tcp-ip
+lang: en          # gilt, egal in welchem Ordner die Datei liegt
+</code></pre>
+
+<p>Damit ändert sich, wie der Umschalter das Gegenstück sucht – in zwei Schritten:</p>
+
+<ol>
+  <li><strong>Über die ganze Site</strong>: Gibt es irgendwo eine Seite mit derselben <code>page_id</code> und der
+gesuchten Sprache, ist das die Übersetzung. Der Pfad spielt keine Rolle.</li>
+  <li><strong>Erst wenn dort nichts liegt</strong>, wird wie bisher im Sprachbaum (<code>/en/…</code>) gesucht.</li>
+</ol>
+
+<p>Zwei Dateien im <strong>selben</strong> Ordner, gleiche <code>page_id</code>, verschiedenes <code>lang</code> – der
+Umschalter findet sie jetzt in beide Richtungen, mit richtigem <code>&lt;html lang&gt;</code> und
+gegenseitigem <code>hreflang</code>.</p>
+
+<p><strong>Für bestehende Sites ändert sich nichts.</strong> Seiten ohne <code>lang</code> werden weiter über ihren
+Ordner eingeordnet; Schritt 2 ist genau das bisherige Verhalten. Die Prüfung zählt auf
+mehrsprachigen Sites die Seiten ohne <code>lang</code> und nennt sie als <strong>Hinweis</strong> – in einer
+Zeile, nicht je Seite – ohne den Lauf abzubrechen. Gemahnt werden nur Dateien <strong>mit</strong>
+Front Matter: Eine <code>.html</code> ohne Front Matter rendert Jekyll nicht, sondern kopiert sie
+durch; für sie löst das Theme nie eine Sprache auf, und ein <code>lang:</code> bliebe wirkungslos.</p>
+
+<p>Die Regel „wie bestimmt sich die Sprache einer Seite“ steckt jetzt an <strong>einer</strong> Stelle
+(<code>avd-seitensprache.html</code>) statt verstreut; sie gilt für die gerenderte Seite ebenso wie
+für jedes Verweisziel. In <code>avd-page-url.html</code> ist sie aus gemessenen Gründen eingesetzt
+statt eingebunden – der Include verdoppelte dort die Bauzeit (4,7 s → 9,5 s); der
+Kommentar an beiden Stellen hält das fest.</p>
+
+<p>Doku: <a href="https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/mehrsprachigkeit.html#seitensprache">Mehrsprachigkeit → Die Sprache einer Seite</a>.</p>
+
+<hr />
+
+<h2 id="2160">2.16.0</h2>
+
+<h3 id="rohe-nachrichten-werden-hervorgehoben-http-json-xml">Rohe Nachrichten werden hervorgehoben: <code>http</code>, <code>json</code>, <code>xml</code></h3>
+
+<p>Gemeldet aus einem Schulungs-Repo (dort A-013). Eine Akademie mit API- und
+Web-Schulungen zeigt <strong>rohe Nachrichten</strong> in jeder zweiten Unterlage; ohne
+Hervorhebung blieb nur die Wahl zwischen unleserlich und <em>je Repo neu gebaut</em>. Genau
+Letzteres war dort passiert: rund 60 Zeilen eigenes JavaScript und 13 Farbregeln.</p>
+
+<p>Das Grammatik-Set des Themes umfasst jetzt <strong>vier</strong> Sprachen statt einer – gemessen
+<strong>3 604 Bytes</strong> zusätzlich auf 20 KB Core:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Grammatik</th>
+      <th>minifiziert</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>http</code></td>
+      <td>909 B</td>
+    </tr>
+    <tr>
+      <td><code>json</code></td>
+      <td>689 B</td>
+    </tr>
+    <tr>
+      <td><code>xml</code></td>
+      <td>1 992 B</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ein Codeblock mit der Sprache <code>http</code> trägt jetzt Farben – Startzeile, Kopfzeilen und
+Rumpf.</p>
+
+<p><strong>Der Rumpf wird automatisch mitgefärbt.</strong> <code>http</code> erkennt JSON und XML selbst, sobald
+die beiden registriert sind – im gebauten Beispiel trägt der Rumpf die
+<code>language-json</code>-Klasse, ohne dass irgendwo etwas angegeben wurde.</p>
+
+<h3 id="die-eine-eigene-zutat-statuscode-nach-klasse">Die eine eigene Zutat: Statuscode nach Klasse</h3>
+
+<p>highlight.js gibt <strong>jedem</strong> dreistelligen Code dieselbe Klasse <code>hljs-number</code>. In einem
+Mitschnitt ist das aber die Stelle, auf die man zuerst sieht: 201 ist etwas anderes als</p>
+<ol>
+  <li>Ein kurzes Skript hängt darum <code>avd-academy-http-status--2xx</code> … <code>--5xx</code> an, und
+<code>highlight.css</code> färbt danach.</li>
+</ol>
+
+<p>Die Farben kommen aus den <strong>Vordergrundfassungen</strong> und nicht als feste Hexwerte: Die
+Codeblock-Fläche kippt mit dem Farbschema (<code>#EDEDED</code> hell, <code>#24332F</code> dunkel), ein fester
+Wert könnte also nicht beides tragen. Gemessen auf der Codeblock-Fläche <strong>4,56–9,38:1</strong>
+in beiden Schemata.</p>
+
+<p>Dafür wurde die <code>-ink</code>-Kategorie vervollständigt: <strong><code>--avd-academy-color-success-ink</code></strong>
+und <strong><code>--avd-academy-color-warning-ink</code></strong> fehlten noch. 4xx und 5xx teilen sich die
+Farbe – beide sind „Fehler“, welcher, sagt die Zahl selbst.</p>
+
+<h3 id="was-http-nicht-kann--gemessen-nicht-vermutet">Was <code>http</code> nicht kann – gemessen, nicht vermutet</h3>
+
+<p>Die Grammatik ist streng (<code>illegal: /\S/</code>). Gegen die vier realen Formen des meldenden
+Repos geprüft:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fall</th>
+      <th>Ergebnis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>HTTP/1.1 201</code> mit JSON-Rumpf</td>
+      <td>vollständig gefärbt, Rumpf automatisch mit</td>
+    </tr>
+    <tr>
+      <td>Anfrage (<code>GET … HTTP/1.1</code>)</td>
+      <td>vollständig gefärbt</td>
+    </tr>
+    <tr>
+      <td>HTTP/2 (<code>:status = 200</code>)</td>
+      <td><strong>gar keine Hervorhebung</strong></td>
+    </tr>
+    <tr>
+      <td>gRPC-Mitschnitt (DATA/TRAILERS)</td>
+      <td><strong>gar keine Hervorhebung</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Diese beiden bleiben beim Repo. Ein Format, das sich nicht normieren lässt – gRPC-Frames
+mit Bytelegende –, gehört nicht ins Theme; die Doku hält ausdrücklich fest, dass ein
+eigener Hervorheber <strong>in einer Visualisierung</strong> zulässig ist.</p>
+
+<h3 id="nebenbefund-verschachtelte-code-umzäunungen-zerreissen-die-verweise">Nebenbefund: verschachtelte Code-Umzäunungen zerreissen die Verweise</h3>
+
+<p>Der erste Entwurf dieser Doku zeigte das Markdown-Beispiel in einer <strong>vierfachen</strong>
+Umzäunung mit einer dreifachen darin – die naheliegende Art, einen Codeblock zu zeigen.
+kramdown verarbeitet das fehlerhaft: Der gebauten <strong>englischen</strong> Seite fehlten danach
+18 KB, und <code>links.rb</code> meldete <strong>14</strong> Sprachbaum-Befunde, ausgelöst von einer Änderung an
+der <strong>deutschen</strong> Datei.</p>
+
+<p>Gefunden wurde es durch Halbierung gegen einen sauber gebauten <code>main</code> – <code>make check</code> baut
+<strong>nicht</strong> neu, und ein Lauf gegen ein altes <code>_site</code> hätte die Ursache verdeckt. Wer ein
+Markdown-Beispiel zeigen will, nimmt eine andere Form als die verschachtelte Umzäunung.</p>
+
+<h3 id="einstufung">Einstufung</h3>
+
+<p><strong>Minor.</strong> Drei neue Dateien im Paket, zwei neue Tokens, vier neue Klassen – alles rein
+ergänzend. Wer <code>syntax_highlight</code> nicht setzt, lädt weiterhin nichts; wer es setzt,
+bekommt drei Sprachen mehr und für <code>java</code> unverändertes Verhalten.</p>
+
+<hr />
+
 <h2 id="2152">2.15.2</h2>
 
 <h3 id="die-kontrastprüfung-übersprang-seiten-still-die-body-im-text-führen">Die Kontrastprüfung übersprang Seiten still, die <code>&lt;/body&gt;</code> im Text führen</h3>
@@ -171,7 +345,7 @@ tatsächlich nutzen <strong>zwei</strong> der drei Repos dieselbe Farbe <code>#0
 <p>Die Aussage darüber bleibt richtig – jedes der drei Repos lag in einem der beiden Modi
 unter AA –, aber es sind zwei Farben und nicht drei. Die Tabelle ist korrigiert.</p>
 
-<h3 id="einstufung">Einstufung</h3>
+<h3 id="einstufung-1">Einstufung</h3>
 
 <p><strong>Patch.</strong> Eine Korrektur an einer Prüfung, die Seiten still übersprang, plus eine
 Richtigstellung im CHANGELOG. Kein Token, keine Klasse, kein Pfad, kein Verhalten der
@@ -215,7 +389,7 @@ Entscheidung fällt: in die Customization des Repos.</p>
 <p>Nach der Korrektur meldet die Kontrastprüfung im betroffenen Repo über beide Schemata
 <strong>keine Paarung unter der Schwelle</strong> – vorher lag dessen Akzent auf Weiß bei 3,03:1.</p>
 
-<h3 id="einstufung-1">Einstufung</h3>
+<h3 id="einstufung-2">Einstufung</h3>
 
 <p><strong>Patch.</strong> Nur Doku und CHANGELOG; kein Token, keine Klasse, kein Verhalten ändert sich.
 Die Korrektur beschreibt, was seit 2.13.0 gilt.</p>
@@ -297,7 +471,7 @@ ist genau das passiert: Die Abschnittsabstände waren gemessen <strong>0 px</str
 speist <strong>jeden</strong> Absatz der Site, nicht nur die Guide-Spalte – eine eigene Entscheidung,
 die nicht in diese gehört.</p>
 
-<h3 id="einstufung-2">Einstufung</h3>
+<h3 id="einstufung-3">Einstufung</h3>
 
 <p><strong>Minor.</strong> Drei neue Tokens; kein Token entfernt oder umbenannt, keine Klasse, kein Pfad.
 Es ändern sich Werte mit sichtbarer Wirkung auf bestehende Seiten – dieselbe Einstufung
@@ -346,7 +520,7 @@ muss das Verhältnis von aussen kommen. Es steht jetzt als Datum neben dem Logo-
 als Zahlenpaar in einer Style-Datei – aber <strong>ändert sich die <code>viewBox</code>, muss <code>logo_ratio</code>
 mit</strong>, sonst wird die Marke verzerrt.</p>
 
-<h3 id="einstufung-3">Einstufung</h3>
+<h3 id="einstufung-4">Einstufung</h3>
 
 <p><strong>Minor.</strong> Ein neues, optionales Feld und eine neue Klasse
 (<code>avd-academy-header__logo-mask</code>). Ohne <code>brand.logo_ratio</code> ändert sich nichts: Die
@@ -435,7 +609,7 @@ Mischung auch den Farbwinkel interpoliert und die Farbe Richtung Textfarbe zieht
 einer Engine die relative Farbsyntax, bleibt es per <code>@supports</code> bei der rohen Basisfarbe –
 dem Zustand, den die Repos heute ohnehin haben.</p>
 
-<h3 id="einstufung-4">Einstufung</h3>
+<h3 id="einstufung-5">Einstufung</h3>
 
 <p><strong>Minor.</strong> Zwei neue Tokens, rein ergänzend; kein bestehendes Repo ändert sein Aussehen,
 solange es <code>--avd-academy-accent-base</code> nicht setzt.</p>
@@ -478,7 +652,7 @@ mehr. Wer sie vorher schon in der Pipeline hatte, konnte sie nur mit <code>--ign
 umgehen – was weiterhin sinnvoll ist, denn die Seiten des Themes gehören nicht dem Repo,
 das sie ausliefert.</p>
 
-<h3 id="einstufung-5">Einstufung</h3>
+<h3 id="einstufung-6">Einstufung</h3>
 
 <p><strong>Patch.</strong> Drei Verweise in einer Doku-Datei. Kein Token, keine Klasse, kein Pfad, kein
 Verhalten ändert sich.</p>
@@ -557,7 +731,7 @@ fester weißer Schrift, in beiden Schemata richtig.</p>
 <p>Danach meldet der Prüfer im eigenen Repo wieder <strong>19 Gruppen</strong>, und alle 19 sind die
 offene Markenfrage.</p>
 
-<h3 id="einstufung-6">Einstufung</h3>
+<h3 id="einstufung-7">Einstufung</h3>
 
 <p><strong>Patch.</strong> Eine Korrektur an einer Prüfung, die Fehlalarme lieferte, plus zwei
 Korrekturen an einer Vorlage, die nicht im npm-Paket liegt. Kein Token, keine Klasse,
@@ -629,7 +803,7 @@ danach suchte.</p>
 <p>Nach der Korrektur meldet es 19 statt 22 Gruppen. Die verbleibenden 19 sind ausnahmslos
 die offene Markenfrage – der Akzent des Fundaments als Schrift auf hellen Flächen.</p>
 
-<h3 id="einstufung-7">Einstufung</h3>
+<h3 id="einstufung-8">Einstufung</h3>
 
 <p><strong>Minor.</strong> Kein Token entfernt oder umbenannt, keine Klasse, kein Pfad; ein Farbwert mit
 sichtbarer Wirkung auf bestehende Seiten – dieselbe Einstufung wie 2.6.0, 2.7.0 und 2.9.0.</p>
@@ -728,7 +902,7 @@ Gegenproben, die ein vertauschtes oder verschlucktes Farbschema auffliegen lasse
 <p><strong>Laufzeit</strong> rund anderthalb Minuten für 70 Seiten × 2 Schemata mit acht parallelen
 Browsern (<code>--jobs</code>).</p>
 
-<h3 id="einstufung-8">Einstufung</h3>
+<h3 id="einstufung-9">Einstufung</h3>
 
 <p><strong>Minor.</strong> Eine neue Datei im Paket, rein ergänzend. Kein Token, keine Klasse, kein
 Pfad, kein Front-Matter-Feld ändert sich; nichts Bestehendes verhält sich anders, und
@@ -819,7 +993,7 @@ liegt – in der Kopiervorlage <code>github-pages/deploy.example.yml</code>, die
 <p>Der Selbsttest deckt die neuen Fälle ab: vier gültige Laufzeit-Anker, die <strong>kein</strong>
 Befund sein dürfen, und zwei ungültige, die einer sein müssen.</p>
 
-<h3 id="einstufung-9">Einstufung</h3>
+<h3 id="einstufung-10">Einstufung</h3>
 
 <p><strong>Patch.</strong> Eine Korrektur an einer Prüfung, die Fehlalarme lieferte. Kein Token, keine
 Klasse, kein Pfad, kein Front-Matter-Feld ändert sich; für Autoren gibt es nichts Neues
@@ -977,7 +1151,7 @@ Dark-Wert war nie betroffen (6,88:1) und bleibt.</p>
 <p>Anders als die beiden anderen Befunde kann ein Projekt diesen weder auslösen noch
 vermeiden.</p>
 
-<h3 id="einstufung-10">Einstufung</h3>
+<h3 id="einstufung-11">Einstufung</h3>
 
 <p><strong>Minor.</strong> Kein Token entfernt oder umbenannt, keine Klasse, kein Pfad; die neuen
 <code>-ink</code>-Tokens sind rein ergänzend, die geänderten Werte sind sichtbar, verlangen aber
@@ -1065,7 +1239,7 @@ hängt an ihm, nicht an der Überschrift – die Zuordnung bleibt also sichtbar.
 gedämpfter als bisher. Das ist eine sichtbare Änderung am Ergebnis bestehender Simulationen –
 deshalb <strong>Minor</strong>, nicht Patch. Ungetönte Tafeln bleiben unverändert.</p>
 
-<h3 id="einstufung-11">Einstufung</h3>
+<h3 id="einstufung-12">Einstufung</h3>
 
 <p><strong>Minor.</strong> Kein Token entfernt oder umbenannt, keine Klasse, kein Pfad; es ändert sich ein
 Farbwert mit sichtbarer Wirkung auf bestehende Seiten – dieselbe Einstufung wie 2.6.0 und
@@ -1138,7 +1312,7 @@ color: color-mix(in srgb, var(--ci-accent) 12%, #fff);
 <code>simulation-erstellen</code>, ab Plugin 2.5.2) – aber auch das erneuert nur die Vorlage, nicht
 eine bereits abgeleitete Datei im Schulungs-Repo.</p>
 
-<h3 id="einstufung-12">Einstufung</h3>
+<h3 id="einstufung-13">Einstufung</h3>
 
 <p><strong>Minor.</strong> Kein Token entfernt oder umbenannt; es ändert sich ein Wert, und zwar nur für
 Projekte, die den Akzent überschreiben. Im Auslieferungszustand ist das Ergebnis identisch.</p>
@@ -1256,7 +1430,7 @@ das Skript <strong>eine Variable je Zeile</strong> liest und <code>--avd-academy
 Dark-Block werden sie jetzt gefunden. Das Artefakt ist nachgezogen; damit sind diese
 Namen ab sofort auch gegen stilles Wegfallen geschützt.</p>
 
-<h3 id="einstufung-13">Einstufung</h3>
+<h3 id="einstufung-14">Einstufung</h3>
 
 <p><strong>Minor.</strong> Keines der Major-Kriterien greift: kein Token entfernt, keines umbenannt, kein
 Pfad und kein Front-Matter-Feld geändert. Es ändern sich <strong>Werte</strong> – sichtbar, aber ohne

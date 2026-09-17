@@ -684,6 +684,7 @@ seiten = 0
 sammlungsseiten = 0
 uebersetzungen = {}
 dateinamen = {}
+ohne_sprachangabe = []
 Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
   rel = pfad.sub(/\A#{Regexp.escape(wurzel)}\/?/, '')
   next if uebersprungen?(rel, ausschluss, sammlungen)
@@ -710,7 +711,23 @@ Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
   # sind der Normalfall (jeder Ordner hat eine `index.md`) und erst dann ein Problem, wenn
   # jemand darauf verweist.
   seitensprache = sprache_von_pfad(rel, sprachen, standardsprache)
-  seitensprache = daten['lang'] if daten.is_a?(Hash) && daten['lang'].is_a?(String)
+  if daten.is_a?(Hash) && daten['lang'].is_a?(String)
+    seitensprache = daten['lang']
+  elsif daten.is_a?(Hash)
+    # OHNE `lang` entscheidet der Ordner. Das bleibt gültig und ist der bequeme
+    # Normalfall – aber es bindet die Seite an ihren Platz im Baum. Wer eine
+    # Übersetzung woanders ablegen will, braucht die Angabe. Gesammelt wird sie
+    # als HINWEIS, nicht als Verstoß: Ein Abbruch würde jede bestehende
+    # mehrsprachige Site auf einen Schlag rot machen.
+    #
+    # NUR fuer Dateien MIT Front Matter (`daten` ist ein Hash). Eine .html ohne
+    # Front Matter rendert Jekyll nicht, es kopiert sie durch – das Theme loest
+    # fuer sie nie eine Sprache auf, und ein `lang:` haette dort keine Wirkung.
+    # Die Vorlagen-Decks unter templates/ sind genau dieser Fall: Sie tragen ihr
+    # `<html lang>` selbst. Sie zu mahnen hiesse, eine Angabe zu verlangen, die
+    # nichts bewirkt.
+    ohne_sprachangabe << rel
+  end
   if daten.is_a?(Hash) && daten['page_id'].is_a?(String)
     vergebene_ids << daten['page_id']
     (uebersetzungen[[seitensprache, daten['page_id']]] ||= []) << rel
@@ -795,6 +812,19 @@ if seiten.zero?
   warn '       Damit hat die Prüfung nichts geprüft – das ist ein Befund, kein Erfolg.'
   warn '       Stimmt --root? Schließt `exclude` versehentlich alles aus?'
   exit 2
+end
+
+# EIN Hinweis, nicht siebzig. Eine Warnung, die je Seite erscheint, scrollt die
+# eigentliche Meldung weg und wird beim zweiten Mal überlesen – dann schützt sie nichts
+# mehr. Genannt werden drei Dateien als Einstieg, gezählt wird der Rest.
+if sprachcodes.size > 1 && !ohne_sprachangabe.empty?
+  beispiele = ohne_sprachangabe.first(3).join(', ')
+  rest = ohne_sprachangabe.size - [ohne_sprachangabe.size, 3].min
+  warn "HINWEIS: #{ohne_sprachangabe.size} Seite(n) ohne `lang` im Front Matter – dort " \
+       'entscheidet der Ordner über die Sprache. Das ist gültig, bindet die Seite aber an ' \
+       'ihren Platz im Baum; eine Übersetzung lässt sich so nicht woanders ablegen.'
+  warn "         z. B. #{beispiele}#{rest.positive? ? " (und #{rest} weitere)" : ''}"
+  warn ''
 end
 
 if meldungen.empty?

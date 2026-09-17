@@ -33,7 +33,7 @@
     },
     "lang": {
       "type": "string",
-      "description": "Sprache dieser Seite (BCP-47). GILT IN: allen. STANDARD: `lang` der Site.",
+      "description": "Sprache dieser Seite (BCP-47). BESTIMMT DIE SEITENSPRACHE VORRANGIG – vor dem Ordner: Steht die Angabe hier, gilt sie unabhängig davon, wo die Datei liegt; eine Übersetzung darf damit NEBEN dem Original im selben Ordner liegen. Regionale Kennungen werden auf den Sprachteil gekürzt (`en-GB` zählt als `en`). GILT IN: allen. STANDARD: ohne Angabe entscheidet der Sprachbaum (`base` der Sprache, z. B. `/en/…`), sonst `lang` der Site. Auf mehrsprachigen Sites meldet die Prüfung fehlende Angaben als Hinweis, nicht als Fehler.",
       "examples": [
         "de",
         "en"
@@ -41,7 +41,7 @@
     },
     "page_id": {
       "type": "string",
-      "description": "Stabile ID DIESER Seite – ihre Identität, unabhängig vom Pfad. Zwei Verwendungen: (1) Ein Verweis in `nav.items`, `footer.links.items`, `resources` oder `breadcrumb.ancestors` zeigt mit `page: «id»` hierher, statt eine Adresse zu führen. (2) Dieselbe ID in einem anderen Sprachbaum macht zwei Dateien zu Fassungen derselben Seite; der Sprachumschalter findet das Gegenstück darüber. GILT IN: allen. STANDARD: keine – dann ist der DATEINAME ohne Endung die Identität. Eine ausdrückliche ID lohnt für sprechende, dateinamen-unabhängige Namen, für Ordner-Indizes (die alle `index` heißen) und für die Paarung über Sprachbäume hinweg.",
+      "description": "Stabile ID DIESER Seite – ihre Identität, unabhängig vom Pfad. Zwei Verwendungen: (1) Ein Verweis in `nav.items`, `footer.links.items`, `resources` oder `breadcrumb.ancestors` zeigt mit `page: «id»` hierher, statt eine Adresse zu führen. (2) Dieselbe ID macht zwei Dateien zu Fassungen derselben Seite, sofern sie sich in `lang` unterscheiden; der Sprachumschalter findet das Gegenstück darüber. Gesucht wird ZUERST in der ganzen Site (gleiche `page_id`, gesuchte Sprache – der Pfad ist gleichgültig), erst danach im Sprachbaum. GILT IN: allen. STANDARD: keine – dann ist der DATEINAME ohne Endung die Identität. Eine ausdrückliche ID lohnt für sprechende, dateinamen-unabhängige Namen, für Ordner-Indizes (die alle `index` heißen) und für die Paarung von Übersetzungen.",
       "examples": [
         "theme-academy",
         "modul-tcp-ip"

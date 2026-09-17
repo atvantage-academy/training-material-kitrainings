@@ -150,7 +150,9 @@
      Die getönten Tafeln (`simulation.css`) mischen mit 35 % stärker. Das ist kein
      Widerspruch, sondern ein anderer Fall: Dort ist die Fläche mit DERSELBEN Farbe
      getönt, Schrift und Grund wandern also miteinander. */
-  --avd-academy-color-danger-ink: color-mix(in srgb, var(--avd-academy-color-danger) 45%, var(--avd-academy-color-ink));
+  --avd-academy-color-danger-ink:  color-mix(in srgb, var(--avd-academy-color-danger) 45%, var(--avd-academy-color-ink));
+  --avd-academy-color-success-ink: color-mix(in srgb, var(--avd-academy-color-success) 45%, var(--avd-academy-color-ink));
+  --avd-academy-color-warning-ink: color-mix(in srgb, var(--avd-academy-color-warning) 45%, var(--avd-academy-color-ink));
   --avd-academy-color-accent-ink: color-mix(in srgb, var(--avd-academy-color-accent) 45%, var(--avd-academy-color-ink));
   --avd-academy-tone-1-ink:       color-mix(in srgb, var(--avd-academy-tone-1) 45%, var(--avd-academy-color-ink));
   --avd-academy-tone-2-ink:       color-mix(in srgb, var(--avd-academy-tone-2) 45%, var(--avd-academy-color-ink));

@@ -15,6 +15,126 @@ Abschnitt „Theme-Version“.
 
 ---
 
+## 2.17.0
+
+### Die Sprache steht im Front Matter, nicht nur im Ordnernamen
+
+Bisher entschied **allein der Ordner**, welche Sprache eine Seite spricht: Was unter
+`/en/` lag, war englisch. Das trägt ganze Bäume gut – aber nur ganze Bäume. Ein einzelnes
+übersetztes Kapitel tief in einer deutschen Unterlage oder eine Sammlung, deren Dokumente
+ohnehin flach nebeneinanderliegen, ließen sich so nicht paaren.
+
+**Neu:** `lang` im Front Matter bestimmt die Seitensprache **vorrangig**.
+
+```yaml
+page_id: modul-tcp-ip
+lang: en          # gilt, egal in welchem Ordner die Datei liegt
+```
+
+Damit ändert sich, wie der Umschalter das Gegenstück sucht – in zwei Schritten:
+
+1. **Über die ganze Site**: Gibt es irgendwo eine Seite mit derselben `page_id` und der
+   gesuchten Sprache, ist das die Übersetzung. Der Pfad spielt keine Rolle.
+2. **Erst wenn dort nichts liegt**, wird wie bisher im Sprachbaum (`/en/…`) gesucht.
+
+Zwei Dateien im **selben** Ordner, gleiche `page_id`, verschiedenes `lang` – der
+Umschalter findet sie jetzt in beide Richtungen, mit richtigem `<html lang>` und
+gegenseitigem `hreflang`.
+
+**Für bestehende Sites ändert sich nichts.** Seiten ohne `lang` werden weiter über ihren
+Ordner eingeordnet; Schritt 2 ist genau das bisherige Verhalten. Die Prüfung zählt auf
+mehrsprachigen Sites die Seiten ohne `lang` und nennt sie als **Hinweis** – in einer
+Zeile, nicht je Seite – ohne den Lauf abzubrechen. Gemahnt werden nur Dateien **mit**
+Front Matter: Eine `.html` ohne Front Matter rendert Jekyll nicht, sondern kopiert sie
+durch; für sie löst das Theme nie eine Sprache auf, und ein `lang:` bliebe wirkungslos.
+
+Die Regel „wie bestimmt sich die Sprache einer Seite“ steckt jetzt an **einer** Stelle
+(`avd-seitensprache.html`) statt verstreut; sie gilt für die gerenderte Seite ebenso wie
+für jedes Verweisziel. In `avd-page-url.html` ist sie aus gemessenen Gründen eingesetzt
+statt eingebunden – der Include verdoppelte dort die Bauzeit (4,7 s → 9,5 s); der
+Kommentar an beiden Stellen hält das fest.
+
+Doku: [Mehrsprachigkeit → Die Sprache einer Seite](https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/mehrsprachigkeit.html#seitensprache).
+
+---
+
+## 2.16.0
+
+### Rohe Nachrichten werden hervorgehoben: `http`, `json`, `xml`
+
+Gemeldet aus einem Schulungs-Repo (dort A-013). Eine Akademie mit API- und
+Web-Schulungen zeigt **rohe Nachrichten** in jeder zweiten Unterlage; ohne
+Hervorhebung blieb nur die Wahl zwischen unleserlich und *je Repo neu gebaut*. Genau
+Letzteres war dort passiert: rund 60 Zeilen eigenes JavaScript und 13 Farbregeln.
+
+Das Grammatik-Set des Themes umfasst jetzt **vier** Sprachen statt einer – gemessen
+**3 604 Bytes** zusätzlich auf 20 KB Core:
+
+| Grammatik | minifiziert |
+| --------- | ----------- |
+| `http` | 909 B |
+| `json` | 689 B |
+| `xml` | 1 992 B |
+
+Ein Codeblock mit der Sprache `http` trägt jetzt Farben – Startzeile, Kopfzeilen und
+Rumpf.
+
+**Der Rumpf wird automatisch mitgefärbt.** `http` erkennt JSON und XML selbst, sobald
+die beiden registriert sind – im gebauten Beispiel trägt der Rumpf die
+`language-json`-Klasse, ohne dass irgendwo etwas angegeben wurde.
+
+### Die eine eigene Zutat: Statuscode nach Klasse
+
+highlight.js gibt **jedem** dreistelligen Code dieselbe Klasse `hljs-number`. In einem
+Mitschnitt ist das aber die Stelle, auf die man zuerst sieht: 201 ist etwas anderes als
+404. Ein kurzes Skript hängt darum `avd-academy-http-status--2xx` … `--5xx` an, und
+`highlight.css` färbt danach.
+
+Die Farben kommen aus den **Vordergrundfassungen** und nicht als feste Hexwerte: Die
+Codeblock-Fläche kippt mit dem Farbschema (`#EDEDED` hell, `#24332F` dunkel), ein fester
+Wert könnte also nicht beides tragen. Gemessen auf der Codeblock-Fläche **4,56–9,38:1**
+in beiden Schemata.
+
+Dafür wurde die `-ink`-Kategorie vervollständigt: **`--avd-academy-color-success-ink`**
+und **`--avd-academy-color-warning-ink`** fehlten noch. 4xx und 5xx teilen sich die
+Farbe – beide sind „Fehler“, welcher, sagt die Zahl selbst.
+
+### Was `http` nicht kann – gemessen, nicht vermutet
+
+Die Grammatik ist streng (`illegal: /\S/`). Gegen die vier realen Formen des meldenden
+Repos geprüft:
+
+| Fall | Ergebnis |
+| ---- | -------- |
+| `HTTP/1.1 201` mit JSON-Rumpf | vollständig gefärbt, Rumpf automatisch mit |
+| Anfrage (`GET … HTTP/1.1`) | vollständig gefärbt |
+| HTTP/2 (`:status = 200`) | **gar keine Hervorhebung** |
+| gRPC-Mitschnitt (DATA/TRAILERS) | **gar keine Hervorhebung** |
+
+Diese beiden bleiben beim Repo. Ein Format, das sich nicht normieren lässt – gRPC-Frames
+mit Bytelegende –, gehört nicht ins Theme; die Doku hält ausdrücklich fest, dass ein
+eigener Hervorheber **in einer Visualisierung** zulässig ist.
+
+### Nebenbefund: verschachtelte Code-Umzäunungen zerreissen die Verweise
+
+Der erste Entwurf dieser Doku zeigte das Markdown-Beispiel in einer **vierfachen**
+Umzäunung mit einer dreifachen darin – die naheliegende Art, einen Codeblock zu zeigen.
+kramdown verarbeitet das fehlerhaft: Der gebauten **englischen** Seite fehlten danach
+18 KB, und `links.rb` meldete **14** Sprachbaum-Befunde, ausgelöst von einer Änderung an
+der **deutschen** Datei.
+
+Gefunden wurde es durch Halbierung gegen einen sauber gebauten `main` – `make check` baut
+**nicht** neu, und ein Lauf gegen ein altes `_site` hätte die Ursache verdeckt. Wer ein
+Markdown-Beispiel zeigen will, nimmt eine andere Form als die verschachtelte Umzäunung.
+
+### Einstufung
+
+**Minor.** Drei neue Dateien im Paket, zwei neue Tokens, vier neue Klassen – alles rein
+ergänzend. Wer `syntax_highlight` nicht setzt, lädt weiterhin nichts; wer es setzt,
+bekommt drei Sprachen mehr und für `java` unverändertes Verhalten.
+
+---
+
 ## 2.15.2
 
 ### Die Kontrastprüfung übersprang Seiten still, die `</body>` im Text führen
