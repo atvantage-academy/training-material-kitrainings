@@ -132,10 +132,10 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 }
 .avd-academy-doc-main { min-width: 0; }
 .avd-academy-doc-main > h1:first-child { display: none; }   /* Titel steht im Hero */
-.avd-academy-doc-main > * + * { margin-top: 1.1rem; }
-.avd-academy-doc-main > h2 { margin-top: 2.75rem; margin-bottom: .25rem; }
-.avd-academy-doc-main > h3 { margin-top: 1.75rem; margin-bottom: .25rem; }
-.avd-academy-doc-main > h4 { margin-top: 1.25rem; margin-bottom: .25rem; }
+.avd-academy-doc-main > * + * { margin-top: var(--avd-academy-rhythm-block); }
+.avd-academy-doc-main > h2 { margin-top: var(--avd-academy-rhythm-section); margin-bottom: var(--avd-academy-rhythm-heading); }
+.avd-academy-doc-main > h3 { margin-top: 1.75rem; margin-bottom: var(--avd-academy-rhythm-heading); }
+.avd-academy-doc-main > h4 { margin-top: 1.25rem; margin-bottom: var(--avd-academy-rhythm-heading); }
 
 .avd-academy-doc-sidebar {
   position: sticky; top: calc(var(--topnav-height, 80px) + 1.5rem);

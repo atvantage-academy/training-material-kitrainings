@@ -145,7 +145,45 @@ end
 # ---------------------------------------------------------------------------
 # Eine gebaute Seite
 # ---------------------------------------------------------------------------
-Seite = Struct.new(:datei, :pfad, :lang, :fassungen, :anker, :verweise)
+Seite = Struct.new(:datei, :pfad, :lang, :fassungen, :anker, :verweise, :routing)
+
+# Zwei Layouts nummerieren ihre Abschnitte ZUR LAUFZEIT und führen den Stand im
+# Fragment: `presentation.js` liest `#/5` und springt zur fünften Folie,
+# `simulation.js` zusätzlich `#/«szenario»/5` und `#/uebersicht`. Eine passende
+# `id` steht dafür NICHT im HTML und soll dort auch nicht stehen – die Folien
+# entstehen erst im Browser. Ohne dieses Wissen meldet die Prüfung jeden
+# Folienanker als tot, und zwar in jedem Repo mit einer Präsentation.
+#
+# Geprüft wird trotzdem, nur gegen etwas anderes: gegen die FORM, die das
+# jeweilige Skript zusichert, und gegen das Layout der ZIELSEITE. `#/5` auf einer
+# gewöhnlichen Seite bleibt damit ein Befund, ebenso `#/kapitel` auf einer
+# Präsentation.
+#
+# NICHT geprüft wird, ob es die fünfte Folie gibt. Dafür müsste dieses Skript die
+# Aufteilungsregeln aus `presentation.js` nachbauen (h2 beginnt eine Folie, Inhalt
+# davor wird zur Titelfolie, fehlt sie, wird eine erzeugt) – und dann bei jeder
+# Änderung dort mitwandern. Genau diese Art von stiller Drift hat #152 verursacht.
+# Ein Anker auf eine Folie, die es nicht gibt, landet auf der letzten; das ist
+# sichtbar, ein toter Verweis ist es nicht.
+#
+# Die Quelle dieser Formen sind die `ausHash()`-Funktionen der beiden Skripte.
+# Wer sie dort ändert, ändert sie hier mit.
+LAUFZEIT_ANKER = {
+  present: [%r{\A/\d+\z}],
+  sim: [%r{\A/\d+\z}, %r{\A/[A-Za-z0-9_-]+/\d+\z}, %r{\A/uebersicht/?\z}]
+}.freeze
+
+LAUFZEIT_NAME = { present: 'Präsentation', sim: 'Simulation' }.freeze
+
+# Der Wurzel-Haken des Layouts steht am `<body>` – dieselbe Kennung, an der auch
+# `bin/js-hooks.sh` die Seiten eines Layouts auswählt.
+def routing_lesen(roh)
+  koerper = roh[/<body\b[^>]*>/mi].to_s
+  return :present if koerper.match?(/\sdata-avd-academy-present[\s=>]/mi)
+  return :sim if koerper.match?(/\sdata-avd-academy-sim[\s=>]/mi)
+
+  nil
+end
 
 # `<a …>`-Tags einer Seite: [href, hat_hreflang].
 def verweise_lesen(rumpf)
@@ -210,7 +248,8 @@ def seiten_einlesen(site, baseurl, ignorieren)
 
     rumpf = ohne_programmtext(roh)
     Seite.new(datei, pfad, roh[/<html\b[^>]*\slang\s*=\s*"([^"]*)"/i, 1],
-              fassungen_lesen(roh, baseurl), anker_lesen(rumpf), verweise_lesen(rumpf))
+              fassungen_lesen(roh, baseurl), anker_lesen(rumpf), verweise_lesen(rumpf),
+              routing_lesen(roh))
   end.compact
 end
 
@@ -300,6 +339,21 @@ def anker_befund(seite, href, fragment, zielseite, ziel, site)
   roh = prozent_aufloesen(fragment)
   return nil if zielseite.anker.include?(roh) || zielseite.anker.include?(fragment)
 
+  # Laufzeit-Anker (`#/5`) – siehe LAUFZEIT_ANKER.
+  if roh.start_with?('/')
+    formen = LAUFZEIT_ANKER[zielseite.routing]
+    if formen.nil?
+      return Befund.new(seite, href, 'Anker fehlt',
+                        "#{ziel[site.size..]} ist weder Präsentation noch Simulation – " \
+                        'dort schaltet nichts auf `#/…`')
+    end
+    return nil if formen.any? { |f| roh.match?(f) }
+
+    return Befund.new(seite, href, 'Anker fehlt',
+                      "#{LAUFZEIT_NAME[zielseite.routing]}: `##{roh}` ist keine Form, " \
+                      'die das Layout kennt')
+  end
+
   Befund.new(seite, href, 'Anker fehlt',
              "#{ziel[site.size..]} hat keine id=\"#{roh}\"")
 end
@@ -357,6 +411,12 @@ SELBSTTEST_DATEIEN = {
     <a href="/BASE/nicht-html.json">keine Seite, keine Anker</a>
     <a href="/BASE/nicht-html.json#egal">Fragment an einer Nicht-Seite</a>
     <a href="«ZIEL-URL»">Platzhalter einer Vorlage</a>
+    <a href="praesentation.html#/3">Folie, gueltig</a>
+    <a href="simulation.html#/uebersicht">Simulation, Uebersicht</a>
+    <a href="simulation.html#/schritte/2">Simulation, Szenario und Schritt</a>
+    <a href="simulation.html#/2">Simulation, nur Schritt</a>
+    <a href="praesentation.html#/kapitel">Folie, Form kennt das Layout nicht</a>
+    <a href="gibt-es.html#/3">Laufzeit-Anker auf gewoehnlicher Seite</a>
     <script>var t = '<a href="/BASE/aus-javascript.html">nur Programmtext</a>';</script>
     </body></html>
   HTML
@@ -364,6 +424,18 @@ SELBSTTEST_DATEIEN = {
     <html lang="de"><head>
     <link rel="alternate" hreflang="de" href="/BASE/gibt-es.html"><link rel="alternate" hreflang="en" href="/BASE/en/exists.html">
     </head><body><h2 id="löschen">Löschen</h2><h2 id="c++">C++</h2></body></html>
+  HTML
+  # Die beiden Layouts mit Laufzeit-Nummerierung. Entscheidend ist allein der
+  # Wurzel-Haken am `<body>`; die Folien entstehen erst im Browser, im HTML steht
+  # deshalb bewusst KEINE passende `id`.
+  'praesentation.html' => <<~HTML,
+    <html lang="de"><head></head>
+    <body class="avd-academy-present" data-avd-academy-present data-avd-academy-present-title="Titel">
+    <div data-avd-academy-deck><h2>Erste</h2><h2>Zweite</h2></div></body></html>
+  HTML
+  'simulation.html' => <<~HTML,
+    <html lang="de"><head></head>
+    <body class="avd-academy-sim" data-avd-academy-sim><div data-avd-academy-sim-stage></div></body></html>
   HTML
   'nur-deutsch.html' => <<~HTML,
     <html lang="de"><head></head><body><p>ohne englische Fassung</p></body></html>
@@ -413,6 +485,9 @@ SELBSTTEST_ERWARTET = [
   ['/', 'Ziel fehlt'],          # /leerer-ordner/ – Ordner ohne index.html
   ['/', 'Ziel fehlt'],          # /gibt-es-nicht.html
   ['/', 'Anker fehlt'],         # #gibt-es-nicht
+  # Laufzeit-Anker: geprueft wird die FORM und das Layout der Zielseite.
+  ['/', 'Anker fehlt'],         # praesentation.html#/kapitel – Form unbekannt
+  ['/', 'Anker fehlt'],         # gibt-es.html#/3 – Ziel schaltet gar nicht
   ['/en/', 'Sprachbaum gewechselt']
 ].freeze
 

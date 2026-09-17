@@ -339,6 +339,10 @@
           "default": "/theme/atvantage/assets/logo-orange.svg",
           "description": "Logo (Wortmarke) in der Kopfzeile, site-relativer Pfad."
         },
+        "logo_ratio": {
+          "type": "string",
+          "description": "Seitenverhältnis des Logos als «Breite / Höhe», exakt die viewBox der SVG-Datei (z. B. \"260 / 24\"). NUR setzen, wenn das Logo die Akzentfarbe tragen soll: Dann rendert das Theme es als Maske statt als Bild, und dabei geht die Eigengröße der Datei verloren – das Verhältnis ersetzt sie. Ohne dieses Feld bleibt das Logo ein gewöhnliches <img> in seinen eigenen Farben."
+        },
         "tagline": {
           "$ref": "frontmatter.schema.json#/definitions/sprachtext",
           "description": "Eine Zeile Markentext in der Metaleiste über der Kopfzeile. MEHRSPRACHIG: auch als Sprachkarte."

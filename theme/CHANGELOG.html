@@ -61,13 +61,13 @@
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>Änderungen am ATVANTAGE Academy Theme · ATVANTAGE Academy</title><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789382767"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789382767">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789382767">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789382767">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789382767"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789382767">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789382767" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789382767" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789382767">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789644347"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789644347">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789644347">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789644347">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789644347"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789644347">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789644347" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789644347" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789644347">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   Promise.all([import(_hlbase + "core.min.js"), import(_hlbase + "java.min.js")])
@@ -81,16 +81,13 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789382767">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789382767"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789644347">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789644347"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
-  <header class="avd-academy-header"><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite">
-    <img class="avd-academy-header__logo"
-         src="/training-material-kitrainings/assets/logo-schulung.svg"
-         alt="ATVANTAGE Academy">
-  </a>
+  <header class="avd-academy-header"><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite"><img class="avd-academy-header__logo" src="/training-material-kitrainings/assets/logo-schulung.svg" alt="ATVANTAGE Academy"><span class="avd-academy-header__logo-mask" role="img" aria-label="ATVANTAGE Academy"
+          style="--avd-academy-logo-src: url('/training-material-kitrainings/assets/logo-schulung.svg'); --avd-academy-logo-ratio: 260 / 24;"></span></a>
   <button class="avd-academy-btn avd-academy-btn--ghost avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
           aria-label="Navigation umschalten" aria-expanded="false">☰</button>
   <nav class="avd-academy-header__nav" id="avd-academy-main-nav">
@@ -146,6 +143,1137 @@
 inkompatibel gilt und wie eingestuft wird, steht in
 <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/AGENTS.md"><code>AGENTS.md</code></a>,
 Abschnitt „Theme-Version“.</p>
+
+<hr />
+
+<h2 id="2152">2.15.2</h2>
+
+<h3 id="die-kontrastprüfung-übersprang-seiten-still-die-body-im-text-führen">Die Kontrastprüfung übersprang Seiten still, die <code>&lt;/body&gt;</code> im Text führen</h3>
+
+<p>Die Sonde wurde vor das <strong>erste</strong> <code>&lt;/body&gt;</code> gesetzt. Eine Seite darf das aber im Text
+führen – etwa ein HTML-Codebeispiel in einem JavaScript-String. Dort eingefügt landet die
+Sonde <strong>innerhalb</strong> des Strings, läuft nie, und die Seite wird <strong>still</strong> übergangen.</p>
+
+<p>Gefunden an einer echten Visualisierung eines Schulungs-Repos: zwei Seiten ohne Antwort
+bei sonst sauberem Lauf. Gemeldet hat es die eigene „Sonde ohne Antwort“-Warnung – ohne
+sie wäre die Seite als geprüft durchgegangen.</p>
+
+<p>Die Sonde steht jetzt vor dem <strong>letzten</strong> <code>&lt;/body&gt;</code>. Der Selbsttest führt dafür eine Seite,
+die <code>&lt;/body&gt;</code> in einem Skript-String enthält.</p>
+
+<h3 id="richtigstellung-zur-tabelle-in-2130">Richtigstellung zur Tabelle in 2.13.0</h3>
+
+<p>Dort stand eine dritte Zeile <code>#7A3FB0</code> mit 2,52:1 im Dark-Theme, als wäre sie die Farbe
+eines dritten Schulungs-Repos. <strong>Das war falsch.</strong> Der Wert stammte aus einem
+Streuungstest über erfundene Farben und ist nie in einem Repo verwendet worden;
+tatsächlich nutzen <strong>zwei</strong> der drei Repos dieselbe Farbe <code>#0E7C66</code>.</p>
+
+<p>Die Aussage darüber bleibt richtig – jedes der drei Repos lag in einem der beiden Modi
+unter AA –, aber es sind zwei Farben und nicht drei. Die Tabelle ist korrigiert.</p>
+
+<h3 id="einstufung">Einstufung</h3>
+
+<p><strong>Patch.</strong> Eine Korrektur an einer Prüfung, die Seiten still übersprang, plus eine
+Richtigstellung im CHANGELOG. Kein Token, keine Klasse, kein Pfad, kein Verhalten der
+ausgelieferten Seiten ändert sich.</p>
+
+<hr />
+
+<h2 id="2151">2.15.1</h2>
+
+<h3 id="klarstellung-fließtext-links-brauchen-eine-zweite-zeile">Klarstellung: Fließtext-Links brauchen eine zweite Zeile</h3>
+
+<p>Die Doku zu <code>--avd-academy-accent-base</code> (2.13.0) war <strong>falsch</strong>. Dort stand, eine Zeile
+genüge und „Akzent (Links, Hover, Icons, aktive Zustände)“ folge daraus.</p>
+
+<p><strong>Links folgen nicht.</strong> Sie hängen nicht am Academy-Akzent, sondern am <strong>Fundament</strong>:
+<code>a { color: var(--color-link) }</code> in <code>theme/atvantage/tokens/base.css</code>, und das löst über
+<code>--color-orange</code> auf <code>--avd-orange</code> auf. Ein Repo, das nur <code>--avd-academy-accent-base</code>
+setzt, bekommt also <strong>orange Links bei sonst durchgängiger Schulungsfarbe</strong> – und weil
+beide Farben für sich stimmig aussehen, fällt das beim Durchblättern nicht auf.</p>
+
+<p>Aufgefallen beim Übernehmen in ein Schulungs-Repo: Die Kontrastprüfung meldete dort
+weiterhin <code>#FF5401</code> auf Kartenflächen, obwohl der Akzent nachweislich abgeleitet war.</p>
+
+<p>Richtig ist:</p>
+
+<pre><code class="language-css">:root {
+  --avd-academy-accent-base: #0198FF;
+  --avd-orange: var(--avd-academy-color-accent);
+}
+</code></pre>
+
+<p>Die zweite Zeile trägt <strong>keine</strong> eigene Farbe – sie hängt das Fundament an den bereits
+abgeleiteten Akzent. Von Hand gepflegt wird weiterhin genau ein Wert.</p>
+
+<p><strong>Warum das Theme es nicht selbst tut:</strong> <code>--avd-orange</code> innerhalb der Academy-Schicht auf
+einen Ausdruck zu setzen, der wieder <code>--avd-orange</code> als Rückfall liest, wäre ein Zyklus –
+CSS erklärt dann beide Eigenschaften für ungültig. Ein Schnappschuss in ein Zwischentoken
+hilft nicht, er erzeugt denselben Zyklus. Die Zeile gehört deshalb dorthin, wo die
+Entscheidung fällt: in die Customization des Repos.</p>
+
+<p>Nach der Korrektur meldet die Kontrastprüfung im betroffenen Repo über beide Schemata
+<strong>keine Paarung unter der Schwelle</strong> – vorher lag dessen Akzent auf Weiß bei 3,03:1.</p>
+
+<h3 id="einstufung-1">Einstufung</h3>
+
+<p><strong>Patch.</strong> Nur Doku und CHANGELOG; kein Token, keine Klasse, kein Verhalten ändert sich.
+Die Korrektur beschreibt, was seit 2.13.0 gilt.</p>
+
+<hr />
+
+<h2 id="2150">2.15.0</h2>
+
+<h3 id="beide-inhaltsspalten-haben-jetzt-denselben-rhythmus">Beide Inhaltsspalten haben jetzt denselben Rhythmus</h3>
+
+<p>Gemeldet aus einem Schulungs-Repo (dort A-002). Das Theme führte für seine beiden
+Inhaltsspalten zwei verschiedene Systeme:</p>
+
+<ul>
+  <li>Die <strong>gewöhnliche Seite</strong> hat eine Hierarchie – Abstand vor einem Abschnitt, kleiner
+Abstand zwischen Blöcken, und fast keiner <strong>nach</strong> einer Überschrift.</li>
+  <li>Die <strong>Guide-Spalte</strong> war ein Flex-Container mit <code>gap: 3.5rem</code>. Ein <code>gap</code> behandelt alle
+Blöcke gleich; eine Überschrift bekommt nach oben denselben Abstand wie nach unten und
+lässt sich nicht an ihren Abschnitt binden.</li>
+</ul>
+
+<p><strong>An einer echten Guide-Seite gemessen</strong> – der Seiteninhalt läuft unverändert in die
+Spalte, die direkten Kinder sind also die einzelnen Markdown-Blöcke:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Übergang</th>
+      <th>vorher</th>
+      <th>nachher</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Absatz → Überschrift</td>
+      <td>56 px</td>
+      <td><strong>44 px</strong></td>
+    </tr>
+    <tr>
+      <td>Überschrift → ihr erster Absatz</td>
+      <td><strong>60 px</strong></td>
+      <td><strong>18 px</strong></td>
+    </tr>
+    <tr>
+      <td>Überschrift → Überschrift</td>
+      <td><strong>84 px</strong></td>
+      <td><strong>28 px</strong></td>
+    </tr>
+    <tr>
+      <td>Absatz → Liste</td>
+      <td>76 px</td>
+      <td><strong>20 px</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>60 px zwischen einer Überschrift und ihrem eigenen Text – sie gehörte optisch zu nichts.</p>
+
+<p><strong>Neu sind drei Tokens, die beide Spalten lesen:</strong></p>
+
+<pre><code class="language-css">--avd-academy-rhythm-block:   1.1rem;   /* zwischen zwei Blöcken */
+--avd-academy-rhythm-section: 2.75rem;  /* vor einer Abschnitts-Überschrift */
+--avd-academy-rhythm-heading: 0.25rem;  /* NACH einer Überschrift */
+</code></pre>
+
+<p>Die Guide-Spalte steht dafür auf <code>display: block</code> statt <code>flex</code>. Ausdrücklich <code>block</code> und
+nicht <code>unset</code>: <code>display</code> erbt nicht, <code>unset</code> wäre <code>initial</code> und damit <code>inline</code>.</p>
+
+<p>Listen trugen <code>margin: 0</code>, weil den Abstand vorher der <code>gap</code> machte; ohne ihn bringen sie
+ihn selbst mit. Die Maße stehen in den <strong>bestehenden</strong> <code>h2</code>/<code>h3</code>-Regeln statt in neuen
+<code>&gt; h2</code>-Regeln daneben – gleiche Spezifität, und die späteren gewinnen. Beim ersten Anlauf
+ist genau das passiert: Die Abschnittsabstände waren gemessen <strong>0 px</strong>.</p>
+
+<p><strong>Was sich sichtbar ändert:</strong> Jede Unterlage in jedem Repo wird kompakter, und
+Überschriften stehen bei ihrem Text. Das ist die deutlichste Änderung dieser Reihe.</p>
+
+<p><strong>Nicht übernommen</strong> wurde aus der Meldung die dortige Überschreibung von
+<code>--paragraph-spacing</code> (20px → 1.5rem). Das ist ein Token des ATVANTAGE-Fundaments und
+speist <strong>jeden</strong> Absatz der Site, nicht nur die Guide-Spalte – eine eigene Entscheidung,
+die nicht in diese gehört.</p>
+
+<h3 id="einstufung-2">Einstufung</h3>
+
+<p><strong>Minor.</strong> Drei neue Tokens; kein Token entfernt oder umbenannt, keine Klasse, kein Pfad.
+Es ändern sich Werte mit sichtbarer Wirkung auf bestehende Seiten – dieselbe Einstufung
+wie 2.6.0, 2.7.0, 2.9.0 und 2.12.0.</p>
+
+<hr />
+
+<h2 id="2140">2.14.0</h2>
+
+<h3 id="die-wortmarke-kann-die-schulungsfarbe-tragen">Die Wortmarke kann die Schulungsfarbe tragen</h3>
+
+<p>Gemeldet aus einem Schulungs-Repo (dort A-003). Die Vorgabe verlangt von jedem Repo ein
+eigenes Logo <strong>und</strong> eine eigene Akzentfarbe – zusammenbringen liessen sie sich nicht:
+Ein <code>&lt;img&gt;</code> lädt sein SVG als <strong>eigenes Dokument</strong>, und dort sind weder die Tokens der
+Seite noch <code>currentColor</code> noch <code>data-avd-academy-theme</code> sichtbar.</p>
+
+<p>Neu: <code>brand.logo_ratio</code> in der <code>_config.yml</code>. Ist es gesetzt, färbt das Theme die
+Wortmarke in <code>--avd-academy-color-accent</code> – und folgt damit auch der Ableitung aus
+2.13.0, ohne dass die Farbe ein zweites Mal gepflegt wird.</p>
+
+<pre><code class="language-yaml">brand:
+  logo: /assets/logo-schulung.svg
+  logo_ratio: 260 / 24        # exakt die viewBox der SVG-Datei
+</code></pre>
+
+<p><strong>Warum nicht inline.</strong> Der naheliegende Weg – das SVG inline rendern, dann genügt
+<code>fill: currentColor</code> – ist in diesem Aufbau verbaut: <code>includes_dir</code> zeigt bei jedem Repo
+in das Theme-Verzeichnis, ein Repo kann also keinen eigenen Include beisteuern, und eine
+beliebige Datei zur Bauzeit einzulesen bräuchte ein Jekyll-Plugin. Das Paket bleibt
+abhängigkeitsfrei.</p>
+
+<p><strong>Warum ein eigenes Element und nicht das Bild.</strong> Der gemeldete Workaround setzt
+<code>content: ""</code> auf das <code>&lt;img&gt;</code> und legt eine Maske darüber. <strong>Gemessen trägt das nicht</strong> –
+weder <code>content: ""</code> noch <code>content: none</code> noch <code>-webkit-mask</code> entfernen den Bildinhalt in
+aktuellem Chrome; das Original malt über die eingefärbte Fläche. Auf einem nicht
+ersetzten Element trägt die Maske. Das Theme gibt die eingefärbte Fassung deshalb als
+<code>&lt;span&gt;</code> <strong>neben</strong> dem Bild aus.</p>
+
+<p><strong>Der Rückfall ist der Normalfall.</strong> Der <code>&lt;span&gt;</code> ist voreingestellt unsichtbar und das
+<code>&lt;img&gt;</code> sichtbar; erst innerhalb von <code>@supports</code> tauschen sie. Kann eine Engine keine
+Masken, bleibt es beim unveränderten Bild – ein fehlendes Logo sieht man nicht im Build,
+sondern beim Kunden.</p>
+
+<p><strong>Der Preis, ausdrücklich benannt:</strong> Ein maskiertes Element hat keine Eigengröße, deshalb
+muss das Verhältnis von aussen kommen. Es steht jetzt als Datum neben dem Logo-Pfad statt
+als Zahlenpaar in einer Style-Datei – aber <strong>ändert sich die <code>viewBox</code>, muss <code>logo_ratio</code>
+mit</strong>, sonst wird die Marke verzerrt.</p>
+
+<h3 id="einstufung-3">Einstufung</h3>
+
+<p><strong>Minor.</strong> Ein neues, optionales Feld und eine neue Klasse
+(<code>avd-academy-header__logo-mask</code>). Ohne <code>brand.logo_ratio</code> ändert sich nichts: Die
+Kopfzeile rendert unverändert ein <code>&lt;img&gt;</code>.</p>
+
+<hr />
+
+<h2 id="2130">2.13.0</h2>
+
+<h3 id="die-schulungsfarbe-kommt-jetzt-aus-einem-wert">Die Schulungsfarbe kommt jetzt aus <strong>einem</strong> Wert</h3>
+
+<p>Gemeldet aus einem Schulungs-Repo (Register A-001 dort). Die Vorgabe liess jedes Repo
+<strong>vier</strong> Farbwerte von Hand pflegen – Akzent und Hero-Band, je für Light und Dark, den
+Dark-Wert doppelt (Attribut- und <code>prefers-color-scheme</code>-Block). Dort ist genau das
+passiert, was dabei passieren muss: Ein Wert wurde geändert und drei nicht, und die
+Unterlage trug <strong>Blau im Light- und Grün im Dark-Modus</strong>. Der Build zeigt immer nur einen
+Modus, also meldet ihn nichts.</p>
+
+<p><strong>Beim Nachmessen kam Schlimmeres heraus.</strong> Von den drei frei gewählten Schulungsfarben
+lag <strong>jede</strong> in einem der beiden Modi unter AA, ohne dass es irgendjemand wusste:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Basis</th>
+      <th>roh, Light</th>
+      <th>roh, Dark</th>
+      <th>abgeleitet, Light</th>
+      <th>abgeleitet, Dark</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>#0198FF</code></td>
+      <td><strong>3,03:1</strong></td>
+      <td>5,52:1</td>
+      <td><strong>5,38:1</strong></td>
+      <td><strong>7,54:1</strong></td>
+    </tr>
+    <tr>
+      <td><code>#0E7C66</code></td>
+      <td>5,13:1</td>
+      <td><strong>3,26:1</strong></td>
+      <td><strong>6,10:1</strong></td>
+      <td><strong>7,33:1</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Korrektur (2.15.2): Hier stand ursprünglich eine dritte Zeile `#7A3FB0` mit
+     2,52:1 im Dark-Theme, als wäre sie die Farbe eines dritten Repos. Das war
+     falsch: Der Wert stammte aus einem Streuungstest über erfundene Farben und
+     ist nie in einem Repo verwendet worden. Tatsächlich nutzen zwei der drei
+     Repos dieselbe Farbe `#0E7C66`. Die Aussage darüber bleibt richtig – jedes
+     der drei Repos lag in einem der beiden Modi unter AA –, aber es sind zwei
+     Farben und nicht drei. -->
+
+<p>Neu: <code>--avd-academy-accent-base</code>. Ein Repo setzt <strong>eine Zeile</strong> –</p>
+
+<pre><code class="language-css">:root { --avd-academy-accent-base: #0198FF; }
+</code></pre>
+
+<p>– und Akzent wie Hero-Band folgen in <strong>beiden</strong> Schemata. Angegeben wird der <strong>Farbton</strong>,
+die <strong>Helligkeit</strong> kommt aus <code>--avd-academy-color-ink</code> bzw. <code>-bg</code>; weil die mit dem
+Farbschema kippen, fallen Light und Dark aus derselben Formel und der Kontrast hängt an
+der Konstruktion statt am Zufall.</p>
+
+<p><strong>Ohne das Token ändert sich nichts.</strong> Akzent und Hero-Band stehen auf
+<code>var(--…-from-base, «bisher»)</code>: Der Rückfall greift, solange keine Basis gesetzt ist.
+Repos, die heute <code>--avd-orange</code> überschreiben, bleiben ebenfalls unberührt.</p>
+
+<p><strong>Die ATVANTAGE-Marke wird ausdrücklich nicht abgeleitet.</strong> Auf das Orange angewandt macht
+die Formel es <em>schlechter</em> (5,19 → 4,18:1 im Dark) und zu reinem Rot – der Farbwinkel
+verträgt den Buntheits-Anschlag nicht.</p>
+
+<p><strong>Die Regel, die man nicht sieht,</strong> steht in der Doku und damit auch im Plugin: Wer neben
+der Basis einen <code>[data-avd-academy-theme="dark"]</code>- oder <code>prefers-color-scheme</code>-Block für
+diese Farben schreibt, <strong>hebelt die Ableitung aus</strong> – ein solcher Block gewinnt gegen die
+Formel und friert einen Modus auf einen Handwert ein.</p>
+
+<p>Technisch zwei Schritte, weil eine relative Farbe nur <strong>eine</strong> Ursprungsfarbe hat, hier
+aber zwei Quellen gebraucht werden: <code>color-mix(in oklab, …)</code> setzt die modusrichtige
+Helligkeit und nimmt dabei Buntheit (die Textfarbe ist fast neutral), <code>oklch(from …)
+calc(c * 3)</code> dreht sie wieder auf. <code>in oklab</code> und nicht <code>in oklch</code>, weil die polare
+Mischung auch den Farbwinkel interpoliert und die Farbe Richtung Textfarbe zieht. Fehlt
+einer Engine die relative Farbsyntax, bleibt es per <code>@supports</code> bei der rohen Basisfarbe –
+dem Zustand, den die Repos heute ohnehin haben.</p>
+
+<h3 id="einstufung-4">Einstufung</h3>
+
+<p><strong>Minor.</strong> Zwei neue Tokens, rein ergänzend; kein bestehendes Repo ändert sein Aussehen,
+solange es <code>--avd-academy-accent-base</code> nicht setzt.</p>
+
+<hr />
+
+<h2 id="2122">2.12.2</h2>
+
+<h3 id="drei-tote-verweise--in-jedem-schulungs-repo-nicht-hier">Drei tote Verweise – in jedem Schulungs-Repo, nicht hier</h3>
+
+<p>Gefunden beim Aufnehmen der Verweisprüfung in die Pipeline eines Schulungs-Repos. Dort
+meldete <code>links.rb</code> drei Befunde, alle auf <strong>einer</strong> Seite: <code>/theme/CHANGELOG.html</code>.</p>
+
+<p><code>theme/CHANGELOG.md</code> liegt im npm-Paket (bewusst – es wird mit ausgeliefert und dem
+Release beigelegt). Projekte laden das Paket <strong>unterhalb ihrer Jekyll-Source</strong> nach
+<code>theme/</code>, und Jekyll rendert jede <code>.md</code> darunter zu einer Seite. Drei Einträge in diesem
+CHANGELOG verwiesen relativ auf die Doku <strong>dieses</strong> Repos:</p>
+
+<pre><code>../docs/verwendung/einbindung.md#mehr-host
+../github-pages/#verweise-pruefen
+../docs/theme/mehrsprachigkeit.md
+</code></pre>
+
+<p>Im eigenen Repo zeigen die ins Ziel. In einem Schulungs-Repo gibt es weder <code>docs/</code> noch
+<code>github-pages/</code> – dort waren es drei tote Verweise, und zwar <strong>in jedem</strong> Repo, das das
+Paket bezieht.</p>
+
+<p><strong>Genau der blinde Fleck, vor dem der Kopf von <code>links.rb</code> selbst warnt:</strong> Im eigenen
+Repo ist jeder Verweis heil, also entsteht der interessante Fall dort nicht. Diesmal war
+es kein fehlender Selbsttest – der Fall lässt sich im eigenen Repo gar nicht erzeugen,
+weil er erst durch das <strong>Ausliefern</strong> entsteht.</p>
+
+<p><strong>Behoben:</strong> Die drei Verweise sind absolut auf dieses Repo umgestellt, wie es die
+übrigen Verweise im CHANGELOG ohnehin halten. <code>theme/README.md</code> ist gegengeprüft: Sein
+einziger relativer Verweis (<code>jekyll/starter/</code>) ist <strong>paket</strong>relativ und löst in einer
+Consumer-Site richtig auf.</p>
+
+<p><strong>Für Projekte:</strong> Nach dem Update meldet die Verweisprüfung diese drei Befunde nicht
+mehr. Wer sie vorher schon in der Pipeline hatte, konnte sie nur mit <code>--ignore /theme/</code>
+umgehen – was weiterhin sinnvoll ist, denn die Seiten des Themes gehören nicht dem Repo,
+das sie ausliefert.</p>
+
+<h3 id="einstufung-5">Einstufung</h3>
+
+<p><strong>Patch.</strong> Drei Verweise in einer Doku-Datei. Kein Token, keine Klasse, kein Pfad, kein
+Verhalten ändert sich.</p>
+
+<hr />
+
+<h2 id="2121">2.12.1</h2>
+
+<h3 id="die-kontrastprüfung-erfand-befunde-wo-eine-fläche-durchscheinend-war">Die Kontrastprüfung erfand Befunde, wo eine Fläche durchscheinend war</h3>
+
+<p>Aufgefallen beim ersten Einsatz in einem <strong>fremden</strong> Repo. Dort meldete
+<code>theme/jekyll/contrast.rb</code> sechs Gruppen mit Werten um 1,07:1 – Text auf einer Fläche
+<code>#6B6B6B</code>. Diese Fläche gibt es dort gar nicht: Die Regel lautet
+<code>background: color-mix(in oklab, var(--avd-academy-color-bg-subtle) 45%, transparent)</code>,
+und <code>#EDEDED</code> bei 45 % <strong>über Schwarz gemessen</strong> ergibt genau <code>#6B6B6B</code>.</p>
+
+<p><strong>Zwei Fehler, einer hinter dem anderen.</strong></p>
+
+<ol>
+  <li>
+    <p><strong>Die Deckkraft wurde geraten statt gemessen.</strong> Die Sonde las den Alpha-Wert per
+regulärem Ausdruck aus <code>rgba(…)</code>. Chrome gibt für <code>color-mix(…, transparent)</code> aber
+<code>color(srgb r g b / 0.45)</code> zurück – der Ausdruck griff nicht, die Fläche galt als
+deckend und wurde über dem schwarzen Canvas-Grund gemessen. Jetzt wird die Farbe
+über <strong>zwei</strong> Gründe gemessen, schwarz und weiß: Stimmen beide überein, ist sie
+deckend; weichen sie ab, ist sie durchscheinend. Das ist unabhängig von der
+Schreibweise.</p>
+  </li>
+  <li>
+    <p><strong>Durchscheinende Schichten wurden übersprungen statt aufgetragen.</strong> Die Sonde
+griff zum ersten deckenden Vorfahren durch. Das ist eine Näherung, und sie ist
+falsch: Eine helle 45-%-Tönung über dunklem Grund ergibt eine mitteldunkle Fläche,
+und genau darauf steht der Text. Jetzt wird der deckende Grund gemalt und die
+durchscheinenden Schichten von außen nach innen darübergelegt – so, wie es der
+Browser tut.</p>
+  </li>
+</ol>
+
+<p><strong>Warum das mehr ist als ein Rechenfehler.</strong> Ein Prüfer, der verlässlich Fehlalarme
+liefert, wird weggeklickt und schützt dann gar nichts mehr. Genau mit dieser Begründung
+steht die Prüfung nicht in <code>make check</code>; ein Werkzeug, das beim ersten Einsatz in einem
+fremden Repo sechs Gruppen erfindet, hätte sie bestätigt.</p>
+
+<p><strong>Der Selbsttest deckt den Fall jetzt ab</strong> – eine durchscheinende Fläche über dem
+Seitengrund, die in <strong>beiden</strong> Schemata trägt und deshalb <strong>kein</strong> Befund sein darf.</p>
+
+<h3 id="zwei-echte-befunde-die-der-korrigierte-prüfer-sofort-fand">Zwei echte Befunde, die der korrigierte Prüfer sofort fand</h3>
+
+<p>In der Simulations-Vorlage standen zwei weitere fest weiße Flächen – als
+<code>rgba(255, 255, 255, …)</code> geschrieben und deshalb von der <code>#fff</code>-Suche in 2.9.0 nicht
+erfasst:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Regel</th>
+      <th>Dark-Theme, vorher</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>.stage-info</code> (<code>rgba(255,255,255,0.94)</code>)</td>
+      <td><strong>1,05:1</strong></td>
+    </tr>
+    <tr>
+      <td><code>.vgrid .cell</code> (<code>rgba(255,255,255,0.6)</code>)</td>
+      <td><strong>2,01:1</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Beide nehmen jetzt <code>color-mix(in srgb, var(--ci-bg) …%, transparent)</code> – dieselbe
+Deckkraft, aber theme-fähig. <code>.voverlay</code> bleibt unverändert: feste dunkle Fläche mit
+fester weißer Schrift, in beiden Schemata richtig.</p>
+
+<p>Danach meldet der Prüfer im eigenen Repo wieder <strong>19 Gruppen</strong>, und alle 19 sind die
+offene Markenfrage.</p>
+
+<h3 id="einstufung-6">Einstufung</h3>
+
+<p><strong>Patch.</strong> Eine Korrektur an einer Prüfung, die Fehlalarme lieferte, plus zwei
+Korrekturen an einer Vorlage, die nicht im npm-Paket liegt. Kein Token, keine Klasse,
+kein Pfad ändert sich; für Autoren gibt es nichts Neues zu nutzen.</p>
+
+<hr />
+
+<h2 id="2120">2.12.0</h2>
+
+<h3 id="der-alarmton-trug-als-schrift-nicht--gefunden-vom-eigenen-neuen-werkzeug">Der Alarmton trug als Schrift nicht – gefunden vom eigenen neuen Werkzeug</h3>
+
+<p><strong>Der erste Lauf von <code>theme/jekyll/contrast.rb</code> (2.11.0) im eigenen Repo.</strong> Zwei Regeln
+in <code>components.css</code> setzen <code>--avd-academy-tone-alert</code> als <strong>Schrift</strong>:</p>
+
+<ul>
+  <li><code>.avd-academy-grouptable__group--tone-alert</code> – die Gruppenzelle einer Zeile außerhalb
+des Rasters färbt ihren Text im Signalton</li>
+  <li><code>.avd-academy-grouptable__alert td</code> – die Ankündigungszeile</li>
+</ul>
+
+<p>Der Ton ist als <strong>Fläche</strong> gerechnet. Als Schrift kam er im Light-Theme auf <strong>4,39:1</strong>,
+auf Kartenflächen auf <strong>3,75:1</strong> – beides unter AA für Kleintext, und die
+Ankündigungszeile steht auf <code>--avd-academy-fs-sm</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>vorher</th>
+      <th>nachher</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Light, auf <code>color-bg</code></td>
+      <td>4,39:1</td>
+      <td><strong>8,53:1</strong></td>
+    </tr>
+    <tr>
+      <td>Light, auf <code>color-bg-subtle</code></td>
+      <td>3,75:1</td>
+      <td><strong>7,29:1</strong></td>
+    </tr>
+    <tr>
+      <td>Dark, auf <code>color-bg</code></td>
+      <td>6,62:1</td>
+      <td><strong>9,99:1</strong></td>
+    </tr>
+    <tr>
+      <td>Dark, auf <code>color-bg-subtle</code></td>
+      <td>5,72:1</td>
+      <td><strong>8,64:1</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Behoben</strong> mit der <code>-ink</code>-Fassung aus 2.10.0: <code>--avd-academy-tone-alert-ink</code>. Die
+<strong>Linie</strong> behält den vollen Ton – sie ist Fläche, nicht Schrift; das Signal bleibt also
+genauso laut.</p>
+
+<p><strong>Bemerkenswert am Zustandekommen.</strong> Diese Regeln stehen seit Langem im Paket. Die
+Rückmeldung, die zu 2.10.0 führte, beschrieb genau diese Fehlerklasse – „sobald ein Repo
+eine Fehlermeldung <strong>schreibt</strong> statt sie zu umranden, gibt es kein Token, das trägt“ –
+und hielt dabei fest, das Theme selbst benutze Danger <strong>ausschließlich</strong> als Rahmenfarbe.
+Das stimmte nicht ganz, und niemandem ist es aufgefallen, auch beim Bauen der
+<code>-ink</code>-Fassungen nicht. Gefunden hat es das Werkzeug, im ersten Lauf, ohne dass jemand
+danach suchte.</p>
+
+<p>Nach der Korrektur meldet es 19 statt 22 Gruppen. Die verbleibenden 19 sind ausnahmslos
+die offene Markenfrage – der Akzent des Fundaments als Schrift auf hellen Flächen.</p>
+
+<h3 id="einstufung-7">Einstufung</h3>
+
+<p><strong>Minor.</strong> Kein Token entfernt oder umbenannt, keine Klasse, kein Pfad; ein Farbwert mit
+sichtbarer Wirkung auf bestehende Seiten – dieselbe Einstufung wie 2.6.0, 2.7.0 und 2.9.0.</p>
+
+<p><strong>Was sich sichtbar ändert:</strong> Der Text einer Alarm-Zeile in einer gruppierten Tabelle ist
+gedämpfter als bisher. Die Linie darüber nicht.</p>
+
+<hr />
+
+<h2 id="2110">2.11.0</h2>
+
+<h3 id="neu-die-kontrastprüfung-themejekyllcontrastrb">Neu: die Kontrastprüfung <code>theme/jekyll/contrast.rb</code></h3>
+
+<p>Ein Farbwert wird gegen <strong>einen</strong> Untergrund entworfen und später vor <strong>einen
+anderen</strong> gestellt. Nichts im Build wird davon rot: Das Schema ist zufrieden, die
+Seite entsteht, der Text steht da – nur lesen kann ihn niemand.</p>
+
+<p>Allein zwischen 2.6.0 und 2.10.0 hat diese Fehlerart <strong>sechsmal</strong> zugeschlagen.
+<strong>Zweimal entstand sie beim Beheben einer anderen.</strong> Gefunden hat sie jedes Mal ein
+Mensch, meist Wochen später und meist in fertigen Schulungsunterlagen. Das Repo prüft
+Paketinhalt, Markup Contract, Schemas, JS-Haken, HTML-Attribute und tote Verweise –
+für Farbe gab es nichts.</p>
+
+<p><strong>Was sie tut.</strong> Sie rendert jede Seite aus <code>_site</code> in <strong>beiden</strong> Farbschemata in
+einem Headless-Browser, ermittelt für jedes Element mit eigenem Textknoten die
+<strong>tatsächlich wirksame</strong> Fläche darunter und rechnet den Kontrast nach WCAG 2.1.
+Gruppiert wird nach CSS-Herkunft, nicht nach Element – aus einer Regel sollen nicht
+zweihundert Zeilen werden.</p>
+
+<p><strong>Warum gegen das gebaute HTML.</strong> Dieselbe Begründung wie bei <code>links.rb</code> und
+<code>bin/js-hooks.sh</code>, hier aber noch zwingender: Kontrast ist eine Eigenschaft
+gerenderter <strong>Paare</strong>. Welche Fläche wirklich unter einem Text liegt, steht in keiner
+einzelnen CSS-Regel. Eine Prüfung über die Quellen hätte ihr Loch genau dort, wo die
+echten Fälle lagen: <code>.bubble.a</code> setzte <code>background: #fff</code> und erbte die Schrift von
+weit oben; die getönte Tafel färbte Schrift und Fläche aus <strong>derselben</strong> Variablen.</p>
+
+<p><strong>Warum beide Farbschemata.</strong> Vier der sechs Fälle zeigten sich nur in einem davon,
+zwei davon nur im Dark-Theme – dem, das beim Schreiben niemand offen hat.</p>
+
+<pre><code class="language-bash">ruby theme/jekyll/contrast.rb --require-site     # Bericht
+ruby theme/jekyll/contrast.rb --self-test        # die Prüfung selbst prüfen
+make contrast                                    # beides
+</code></pre>
+
+<p><strong>Sie bricht nichts, und das ist Absicht.</strong> Der Aufruf meldet und endet mit 0; sie
+steht <strong>nicht</strong> in <code>make check</code> und in keinem Workflow. Ein Prüfer, der aus
+unwichtigem oder unentschiedenem Grund rot wird, wird weggeklickt und schützt dann gar
+nichts mehr – dieselbe Überlegung wie beim Markup Contract. Erst wenn eine
+Ausnahmeliste steht und ein Lauf sauber durchgeht, macht <code>--strict</code> ein Tor daraus.</p>
+
+<p><strong>Was der erste Lauf im eigenen Repo meldet: 22 Gruppen.</strong> Neunzehn davon sind
+dieselbe offene Frage – die Akzentfarbe des Fundaments als Schrift auf hellen Flächen
+(2,75–3,22:1). Das ist eine Markenentscheidung, kein Fehler, und sie ist nicht Teil
+dieser Fassung.</p>
+
+<p>Die übrigen <strong>drei sind echte Befunde</strong>: <code>.avd-academy-grouptable__alert td</code> und die
+zugehörigen Legendenschlüssel setzen <code>--avd-academy-tone-alert</code> als <strong>Schrift</strong> und
+kommen im Light-Theme auf 4,39:1. Das ist genau die Klasse, für die 2.10.0 die
+<code>-ink</code>-Fassungen eingeführt hat – die Prüfung hat sie im ersten Lauf gefunden, in
+Regeln, die seit Langem im Paket stehen. Sie werden getrennt behoben; dieses Release
+liefert das Werkzeug, nicht die Korrektur.</p>
+
+<p><strong>Sie liegt im Paket</strong> und läuft damit in jedem Schulungs-Repo über dessen <strong>eigene</strong>
+Unterlagen. Das ist der eigentliche Punkt: Die Befunde, die zu 2.7.0 bis 2.10.0 geführt
+haben, kamen aus einem Schulungs-Repo, das von Hand in Chromium nachgemessen hat. Eine
+Prüfung, die nur hier läuft, sieht die Beispielseiten des Themes – nicht die
+Präsentation, in der eine Überschrift unlesbar war.</p>
+
+<p><strong>Ausnahmeliste mit Begründungspflicht.</strong> Eine Zeile ist <code>Signatur⇥Begründung</code>; ein
+Eintrag <strong>ohne</strong> Begründung ist ein Fehler, keine stille Ausnahme.</p>
+
+<p><strong>Was sie nicht kann – und meldet.</strong> Text über Verlauf, Bild oder SVG-Fläche (die
+wirksame Farbe ist dort kein einzelner Wert), halbdurchsichtige Schrift, und alles, was
+erst nach einer Eingabe entsteht: aufgeklappte Menüs, Folien hinter der ersten,
+Simulationsschritte. Solche Elemente werden <strong>gezählt und im Bericht genannt</strong>. Stille
+Auslassung liest sich sonst wie „alles geprüft“.</p>
+
+<p><strong>Abhängigkeitsfrei geblieben.</strong> Kein Gem: Der HTTP-Server, den die Messung braucht –
+über <code>file://</code> laufen die wurzelabsoluten Asset-Pfade ins Leere und die Seite rendert
+ganz ohne Theme-CSS –, steht in rund vierzig Zeilen auf <code>socket</code> aus der
+Standardbibliothek. WEBrick ist seit Ruby 3.0 keine Default-Gem mehr und auf einem
+fremden Runner nicht zugesichert.</p>
+
+<p><strong>Browser nötig.</strong> Chrome oder Chromium, gefunden über <code>--browser</code>, <code>CHROME</code> oder die
+üblichen Pfade. Fehlt er, wird <strong>sichtbar</strong> übersprungen (<code>--require-browser</code>
+erzwingt das Scheitern). Ob die eigenen Runner einen mitbringen, ist die Frage, die vor
+einer Aufnahme in die Pipeline zu klären ist.</p>
+
+<p><strong>Selbsttest inklusive</strong>, aus demselben Grund wie bei <code>links.rb</code>: Im eigenen Repo trägt
+nach jeder Korrektur wieder jedes Paar – die interessanten Fälle entstehen dort gar
+nicht. Der Selbsttest baut eine Seite, in der jeder Befund einmal vorkommt <strong>und</strong> jeder
+Fall, der keiner sein darf: großer Text an der 3:1-Schwelle, bewusst gedämpfte
+Bedienelemente, Verlauf, halbdurchsichtige Schrift, nicht gerenderter Text. Dazu zwei
+Gegenproben, die ein vertauschtes oder verschlucktes Farbschema auffliegen lassen.</p>
+
+<p><strong>Laufzeit</strong> rund anderthalb Minuten für 70 Seiten × 2 Schemata mit acht parallelen
+Browsern (<code>--jobs</code>).</p>
+
+<h3 id="einstufung-8">Einstufung</h3>
+
+<p><strong>Minor.</strong> Eine neue Datei im Paket, rein ergänzend. Kein Token, keine Klasse, kein
+Pfad, kein Front-Matter-Feld ändert sich; nichts Bestehendes verhält sich anders, und
+kein Lauf wird davon rot, der es vorher nicht war.</p>
+<h2 id="2101">2.10.1</h2>
+
+<h3 id="die-verweisprüfung-meldete-jeden-folienanker-als-tot">Die Verweisprüfung meldete jeden Folienanker als tot</h3>
+
+<p>Gemeldet aus einem Schulungs-Repo (Register A-004, Nachtrag). <code>links.rb</code> prüft jeden
+<code>#anker</code> gegen eine <code>id</code> im gebauten HTML. Eine Präsentation nummeriert ihre Folien
+aber <strong>zur Laufzeit</strong>: <code>presentation.js</code> liest <code>#/5</code> und springt zur fünften Folie.
+Eine <code>id="/5"</code> steht dafür nicht im HTML – und soll dort auch nicht stehen, die Folien
+entstehen erst im Browser.</p>
+
+<p>Ergebnis: <strong>jeder</strong> Folienanker wurde als toter Anker gemeldet. Im meldenden Repo waren
+das 7 Befunde auf 2 Seiten bei <strong>null</strong> echten toten Verweisen.</p>
+
+<p><strong>Es war kein Autorenfehler.</strong> Die Schreibweise stammt aus dem Werkzeug selbst – der
+Skill <code>konzept-pflegen</code> schreibt „je Kapitel mit Folien-Anker, z. B.
+<code>praesentation.md#/9</code>“ ausdrücklich vor. Das Theme forderte die Schreibweise an einer
+Stelle an und meldete sie an einer anderen als Fehler.</p>
+
+<p><strong>Die Folge wiegt schwerer als die Meldung.</strong> <code>links.rb</code> ist die einzige Prüfung, die
+tote Verweise überhaupt findet. Ein Prüfer, der verlässlich Fehlalarme liefert, wird
+nicht in die Pipeline genommen – im meldenden Repo lief er deshalb <strong>gar nicht</strong>, und
+damit prüfte dort niemand die Verweise. Das Skript verfehlte seinen Zweck genau an der
+Stelle, an der sein eigener Kommentar ihn am besten begründet.</p>
+
+<p><strong>Behoben, und zwar ohne Ausnahmeliste.</strong> Die Prüfung kennt jetzt die beiden Layouts mit
+Laufzeit-Nummerierung und prüft Laufzeit-Anker gegen die <strong>Form</strong>, die das jeweilige
+Skript zusichert, und gegen das <strong>Layout der Zielseite</strong>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Verweis</th>
+      <th>Ziel</th>
+      <th>Ergebnis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>praesentation.html#/5</code></td>
+      <td>Präsentation</td>
+      <td>in Ordnung</td>
+    </tr>
+    <tr>
+      <td><code>simulation.html#/uebersicht</code></td>
+      <td>Simulation</td>
+      <td>in Ordnung</td>
+    </tr>
+    <tr>
+      <td><code>simulation.html#/szenario/2</code></td>
+      <td>Simulation</td>
+      <td>in Ordnung</td>
+    </tr>
+    <tr>
+      <td><code>praesentation.html#/kapitel</code></td>
+      <td>Präsentation</td>
+      <td><strong>Befund</strong> – die Form kennt das Layout nicht</td>
+    </tr>
+    <tr>
+      <td><code>gibt-es.html#/5</code></td>
+      <td>gewöhnliche Seite</td>
+      <td><strong>Befund</strong> – dort schaltet nichts auf <code>#/…</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Der Betroffene ist damit nicht ausgenommen, sondern <strong>anders geprüft</strong>. Eine
+Ausnahmeliste hätte in jedem Repo mit einer Präsentation neu gepflegt werden müssen –
+das meldende Repo hat bewusst darauf verzichtet und stattdessen berichtet. Richtig so.</p>
+
+<p><strong>Was ausdrücklich NICHT geprüft wird:</strong> ob es die fünfte Folie überhaupt gibt. Dafür
+müsste <code>links.rb</code> die Aufteilungsregeln aus <code>presentation.js</code> nachbauen (<code>h2</code> beginnt
+eine Folie, Inhalt davor wird zur Titelfolie, fehlt sie, wird eine erzeugt) und dann bei
+jeder Änderung dort mitwandern – genau die stille Drift, die #152 verursacht hat. Ein
+Anker auf eine Folie, die es nicht gibt, landet auf der letzten; das ist sichtbar, ein
+toter Verweis ist es nicht. Die Quelle der Formen sind die <code>ausHash()</code>-Funktionen der
+beiden Skripte; wer sie dort ändert, ändert sie hier mit. Beides steht als Kommentar an
+der Konstanten.</p>
+
+<p><strong>Zur Frage, ob <code>links.rb</code> als CI-Schritt gedacht ist: ja.</strong> Sie läuft in <code>make check</code>,
+im <code>pages</code>-Workflow dieses Repos mit <code>--require-site</code> und – weil das Skript im Paket
+liegt – in der Kopiervorlage <code>github-pages/deploy.example.yml</code>, die jedes Schulungs-Repo
+übernimmt. Dieser Befund war für die Aufnahme also tatsächlich blockierend.</p>
+
+<p>Der Selbsttest deckt die neuen Fälle ab: vier gültige Laufzeit-Anker, die <strong>kein</strong>
+Befund sein dürfen, und zwei ungültige, die einer sein müssen.</p>
+
+<h3 id="einstufung-9">Einstufung</h3>
+
+<p><strong>Patch.</strong> Eine Korrektur an einer Prüfung, die Fehlalarme lieferte. Kein Token, keine
+Klasse, kein Pfad, kein Front-Matter-Feld ändert sich; für Autoren gibt es nichts Neues
+zu nutzen. Wer die Prüfung bisher wegen der Fehlalarme nicht in der Pipeline hatte, kann
+sie jetzt aufnehmen.</p>
+
+<hr />
+
+<h2 id="2100">2.10.0</h2>
+
+<p>Drei Befunde aus einer Rückmeldung (Register A-004), gemessen an einem gebauten
+Trainer-Bundle über CDP – 13 400 Messungen je Schema, 1 222 eindeutige
+Vordergrund/Flächen-Paare. Alle drei hier gegengerechnet und bestätigt. Dazu die
+Antwort auf eine Frage, die über die Befunde hinausging und die wichtigste
+Änderung dieser Fassung ist.</p>
+
+<h3 id="vordergrundfassungen--ink">Vordergrundfassungen: <code>*-ink</code></h3>
+
+<p>Eine Farbe der Palette ist als <strong>Fläche</strong> gedacht. Als <strong>Schrift</strong> trägt sie nicht:
+<code>--avd-academy-color-danger</code> ergibt auf der Seitenfläche 4,39:1 (Light) bzw. 3,81:1
+(Dark), auf <code>-bg-subtle</code> 3,75:1 bzw. 3,29:1. Das Theme selbst benutzt Danger
+ausschließlich als <strong>Rahmen</strong> (<code>.avd-academy-callout--danger</code>,
+<code>.avd-academy-sim-panel.is-error</code>) – dort ist es richtig, und <strong>deshalb</strong> ist es
+nie aufgefallen. Sobald ein Repo eine Fehlermeldung <em>schreibt</em> statt sie zu
+umranden, gab es kein Token, das trägt.</p>
+
+<p>Neu, nach <strong>einer</strong> Regel abgeleitet – 45 % Farbe im Fließtext:</p>
+
+<p><code>--avd-academy-color-danger-ink</code>, <code>--avd-academy-color-accent-ink</code>,
+<code>--avd-academy-tone-1-ink</code> … <code>-4-ink</code>, <code>--avd-academy-tone-alert-ink</code></p>
+
+<pre><code class="language-css">--avd-academy-color-danger-ink:
+  color-mix(in srgb, var(--avd-academy-color-danger) 45%, var(--avd-academy-color-ink));
+</code></pre>
+
+<p>Weil <code>--avd-academy-color-ink</code> mit dem Farbschema kippt, trägt derselbe Ausdruck in
+beiden Schemata – die Tokens stehen deshalb <strong>nur einmal</strong> in <code>:root</code> und nicht in
+den Dark-Blöcken.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Light</th>
+      <th>auf <code>bg</code></th>
+      <th>Dark</th>
+      <th>auf <code>bg</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>danger-ink</code></td>
+      <td><code>#882D2E</code></td>
+      <td>8,53:1</td>
+      <td><code>#EB8E8E</code></td>
+      <td>7,00:1</td>
+    </tr>
+    <tr>
+      <td><code>accent-ink</code></td>
+      <td><code>#8F4823</code></td>
+      <td>6,73:1</td>
+      <td><code>#F2A883</code></td>
+      <td>8,52:1</td>
+    </tr>
+    <tr>
+      <td><code>tone-3-ink</code></td>
+      <td><code>#776B34</code></td>
+      <td>5,33:1</td>
+      <td><code>#E4DCBB</code></td>
+      <td>12,14:1</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Zugesagt</strong> ist AA auf <code>--avd-academy-color-bg</code> und <code>--avd-academy-color-bg-subtle</code>
+in beiden Schemata; Engpass über alle sieben ist <strong>4,56:1</strong> (Ton 3, Gold, Light).
+<strong>Nicht zugesagt</strong> auf den Füllflächen – dort trägt Gold nur 4,17:1; Text auf einer
+Füllfläche nimmt <code>ink</code> oder <code>ink-muted</code>.</p>
+
+<p><strong>Warum Tokens und nicht nur ein Abschnitt in der Doku.</strong> Im Inline-SVG steht
+<code>fill="var(…)"</code> – dort lässt sich nichts zusammenmischen, man kann nur auf ein Token
+zeigen. Genau dort fielen die gemeldeten Stellen durch, während dieselben Projekte es
+in ihrem CSS selbst lösen konnten: In einem Repo ist die Konstruktion an vier Stellen
+unabhängig voneinander entstanden. Das war das ausschlaggebende Argument.</p>
+
+<p>Die getönten Tafeln (2.9.0) mischen weiterhin mit 35 %. Kein Widerspruch, sondern ein
+anderer Fall: Dort ist die Fläche mit <strong>derselben</strong> Farbe getönt, Schrift und Grund
+wandern miteinander.</p>
+
+<h3 id="füllflächen-im-dark-theme-26---18-">Füllflächen im Dark-Theme: 26 % → 18 %</h3>
+
+<p>Die Ableitung aus 2.7.0 war gegen <code>--avd-academy-color-ink</code> gerechnet – und nur
+dagegen. Sekundärtext auf derselben Fläche fiel bei drei von vier Füllungen durch:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fläche, Dark</th>
+      <th><code>ink</code></th>
+      <th><code>ink-muted</code> vorher</th>
+      <th><code>ink-muted</code> nachher</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>fill-1-bg</code></td>
+      <td>8,62 → 10,10:1</td>
+      <td>4,53:1</td>
+      <td><strong>5,30:1</strong></td>
+    </tr>
+    <tr>
+      <td><code>fill-2-bg</code></td>
+      <td>8,44 → 10,05:1</td>
+      <td>4,43:1</td>
+      <td><strong>5,28:1</strong></td>
+    </tr>
+    <tr>
+      <td><code>fill-3-bg</code></td>
+      <td>7,58 → 9,36:1</td>
+      <td><strong>3,98:1</strong></td>
+      <td><strong>4,91:1</strong></td>
+    </tr>
+    <tr>
+      <td><code>fill-4-bg</code></td>
+      <td>8,21 → 9,82:1</td>
+      <td>4,31:1</td>
+      <td><strong>5,16:1</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Im Light-Theme trug dasselbe Paar immer (4,99–5,39:1) – es war kein Farbfehler,
+sondern derselbe Fehlertyp wie in 2.7.0: ein Token, gegen <strong>einen</strong> Untergrund
+gerechnet und vor <strong>einem anderen</strong> eingesetzt.</p>
+
+<p><strong>Der Preis:</strong> Die Flächen heben sich schwächer von der Seite ab (1,40–1,51:1 statt
+1,64–1,87:1). Vertretbar, weil die Kategorie auch vom Strich <code>--avd-academy-fill-N</code>
+getragen wird. <strong>Der Light-Block bleibt unverändert.</strong></p>
+
+<p>Bemerkenswert am Zustandekommen: Diese Flächen waren vor 2.7.0 im Dark-Theme
+unbrauchbar. Sie wurden erst benutzt, <em>nachdem</em> 2.7.0 sie reparierte – und dabei fiel
+der nächste Fall auf.</p>
+
+<h3 id="metanav-text-stand-unter-aa--und-das-war-hier-falsch-eingestuft"><code>metanav-text</code> stand unter AA – und das war hier falsch eingestuft</h3>
+
+<p><code>--avd-academy-metanav-text</code> hing an <code>--avd-gray-metatext</code> (<code>#707173</code>). Auf der
+Metanav-Fläche (<code>#F4F4F4</code>) sind das <strong>4,44:1</strong>, für Kleintext bei 14 px unter AA – auf
+<strong>jeder</strong> Seite des Themes.</p>
+
+<p>Die Zahl steht seit 2.7.0 im CHANGELOG dieses Pakets, dort mit dem Satz, das Token
+bleibe an <code>gray-metatext</code>, „dort ist es richtig“. Sie war gemessen und die Einstufung
+schlicht falsch. Das Token hängt jetzt an <code>--avd-gray-footer</code>: <strong>5,81:1</strong>. Der
+Dark-Wert war nie betroffen (6,88:1) und bleibt.</p>
+
+<p>Anders als die beiden anderen Befunde kann ein Projekt diesen weder auslösen noch
+vermeiden.</p>
+
+<h3 id="einstufung-10">Einstufung</h3>
+
+<p><strong>Minor.</strong> Kein Token entfernt oder umbenannt, keine Klasse, kein Pfad; die neuen
+<code>-ink</code>-Tokens sind rein ergänzend, die geänderten Werte sind sichtbar, verlangen aber
+von keinem Projekt eine Umstellung.</p>
+
+<p><strong>Für Projekte:</strong></p>
+
+<ul>
+  <li>Wer eine Fehlermeldung, einen Akzent oder einen Ton als <strong>Schrift</strong> setzt – im CSS
+oder im Inline-SVG –, nimmt ab jetzt die <code>-ink</code>-Fassung.</li>
+  <li>Wer die Mischung selbst nachgebaut hat, kann sie durch das Token ersetzen.</li>
+  <li>Sekundärtext auf einer Füllfläche trägt im Dark-Theme jetzt; die Flächen sind dort
+etwas dunkler.</li>
+  <li>Die Meta-Navigation ist einen Hauch dunkler.</li>
+</ul>
+
+<hr />
+
+<h2 id="290">2.9.0</h2>
+
+<h3 id="getönte-tafeln-die-überschrift-stand-im-vollen-ton-auf-ihrer-eigenen-tönung">Getönte Tafeln: die Überschrift stand im vollen Ton auf ihrer eigenen Tönung</h3>
+
+<p>Gefunden von einem Prototyp, der jede gebaute Seite in beiden Farbschemata rendert und
+jedes Vordergrund/Flächen-Paar nachrechnet – nicht von Hand. <strong>Weder gemeldet noch in drei
+Runden Handarbeit aufgefallen.</strong></p>
+
+<p>Eine Tafel mit Ton (<code>.avd-academy-sim-panel--ton-1/-3/-4/-alert</code>) färbt ihre Fläche mit 8 %
+des Tons und ihre Überschrift mit dem <strong>vollen</strong> Ton. Im Dark-Theme geht das auf, weil die
+Töne dort aufgehellt werden. Im Light-Theme stand der rohe Ton auf seiner eigenen blassen
+Tönung:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tafel, Light</th>
+      <th>Schrift auf Fläche</th>
+      <th>vorher</th>
+      <th>nachher</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ton 1 · Slate</td>
+      <td><code>#303E4F</code> auf <code>#DEDFE0</code></td>
+      <td>8,16:1</td>
+      <td>8,21:1</td>
+    </tr>
+    <tr>
+      <td>Ton 4 · Violett</td>
+      <td><code>#7A6FB3</code> auf <code>#E4E3E8</code></td>
+      <td>3,46:1</td>
+      <td><strong>6,27:1</strong></td>
+    </tr>
+    <tr>
+      <td>Ton alert · Rot</td>
+      <td><code>#EE1919</code> auf <code>#EDDCDC</code></td>
+      <td>3,31:1</td>
+      <td><strong>7,08:1</strong></td>
+    </tr>
+    <tr>
+      <td>Ton 3 · Gold</td>
+      <td><code>#C9A227</code> auf <code>#EAE7DD</code></td>
+      <td><strong>1,96:1</strong></td>
+      <td><strong>5,06:1</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Warum es niemandem auffiel:</strong> Dieselbe Regel besteht mit Ton 1 bei 8,16:1 und fällt mit
+Ton 3 bei 1,96:1 durch. Wer eine Simulation öffnet, sieht die Tafel, die gerade da ist – und
+die ist mit zwei von vier Tönen in Ordnung. Die Rückmeldung, die 2.7.0 ausgelöst hat, nannte
+<code>sim-panel__title</code> sogar ausdrücklich (dort 4,17:1 in der <strong>ungetönten</strong> Tafel); der
+schlimmere Fall stand daneben.</p>
+
+<p><strong>Behoben:</strong> Die Schriftfassung des Tons wird zum Fließtext hin gemischt –
+<code>color-mix(in srgb, var(--avd-academy-sim-ton) 35%, var(--avd-academy-color-ink))</code>. Weil
+<code>--avd-academy-color-ink</code> mit dem Farbschema kippt, trägt <strong>derselbe Ausdruck in beiden
+Schemata</strong>: im Light-Theme dunkelt er den Ton ab, im Dark-Theme hellt er ihn weiter auf.
+Gemessen über alle vier Töne: 5,06–8,21:1 hell, 8,27–9,15:1 dunkel.</p>
+
+<p><strong>Der Rahmen behält den vollen Ton.</strong> Die Wiedererkennung einer Tafel über Szenarien hinweg
+hängt an ihm, nicht an der Überschrift – die Zuordnung bleibt also sichtbar.</p>
+
+<p><strong>Was sich sichtbar ändert:</strong> Die Überschrift einer getönten Tafel ist im Light-Theme
+gedämpfter als bisher. Das ist eine sichtbare Änderung am Ergebnis bestehender Simulationen –
+deshalb <strong>Minor</strong>, nicht Patch. Ungetönte Tafeln bleiben unverändert.</p>
+
+<h3 id="einstufung-11">Einstufung</h3>
+
+<p><strong>Minor.</strong> Kein Token entfernt oder umbenannt, keine Klasse, kein Pfad; es ändert sich ein
+Farbwert mit sichtbarer Wirkung auf bestehende Seiten – dieselbe Einstufung wie 2.6.0 und
+2.7.0.</p>
+
+<!-- Die zugehörige Korrektur an der Simulations-VORLAGE (acht fest weiße Flächen) steht
+     nicht hier: templates/ liegt nicht im npm-Paket. Sie ist in plugin/CHANGELOG.md
+     unter 2.5.3 beschrieben. -->
+
+<hr />
+
+<h2 id="280">2.8.0</h2>
+
+<h3 id="accent-soft-folgt-jetzt-dem-akzent--und-eine-regression-aus-270"><code>accent-soft</code> folgt jetzt dem Akzent – und eine Regression aus 2.7.0</h3>
+
+<p>Nachtrag zu 2.7.0. Dort wurde <code>--avd-academy-color-accent-soft</code> nur im <strong>Dark</strong>-Block
+an den Akzent gehängt; im Light-Block hing sie weiter an <code>--avd-orange</code>. Ein Projekt mit
+eigenem Akzent behielt damit im Light-Theme eine <strong>orange getönte</strong> Fläche zu einer Farbe,
+die gar nicht mehr orange ist.</p>
+
+<p><strong>Behoben:</strong> Die Mischung nimmt jetzt in beiden Schemata <code>--avd-academy-color-accent</code> als
+Ausgangsfarbe und mischt in <code>--avd-academy-color-bg</code> statt in festes <code>#fff</code>. <strong>Im
+Auslieferungszustand ändert das nichts</strong> – dort <em>ist</em> der Akzent das ATVANTAGE-Orange und
+die Seitenfläche <code>#FFFFFF</code>, das Ergebnis bleibt <code>#FFEAE1</code>.</p>
+
+<p>Die <strong>kategoriale Füllpalette</strong> bleibt bewusst unangetastet: <code>--avd-academy-fill-2-bg</code> hängt
+weiterhin an <code>--avd-orange</code>. Füllung 2 <em>ist</em> per Definition das ATVANTAGE-Orange (siehe
+<code>docs/theme/academy.md</code>, „Diagramm-Füllpalette“) – sie ist eine Markenfarbe der Palette,
+nicht der Akzent des Projekts. Das ist derselbe Ausdruck, aber nicht dieselbe Bedeutung.</p>
+
+<h4 id="regression-aus-270-bubblemono-in-der-simulations-vorlage">Regression aus 2.7.0: <code>.bubble.mono</code> in der Simulations-Vorlage</h4>
+
+<p>Beim Nachziehen aufgefallen und hier mit behoben. <code>--avd-academy-color-accent-soft</code> ist eine
+<strong>Fläche</strong>. In <code>templates/simulations/simulation-template.html</code> wurde sie an <strong>einer</strong> Stelle
+als <strong>Schriftfarbe</strong> benutzt:</p>
+
+<pre><code class="language-css">.bubble.mono { background: var(--ci-primary-dark); color: var(--ci-accent-soft); }
+</code></pre>
+
+<p>Das ging gut, solange die Fläche in beiden Schemata nahezu weiß war. Seit 2.7.0 schaltet sie
+mit – und <code>--ci-primary-dark</code> (<code>--avd-academy-color-primary-dark</code>, <code>#1A2627</code>) schaltet
+<strong>nicht</strong> mit. Im Dark-Theme stand damit dunkle Schrift auf dunkler Blase: <strong>1,21:1</strong>, vorher
+13,41:1.</p>
+
+<p><strong>Behoben</strong> in der Vorlage, nicht im Token: Die Fläche dieser Blase ist fest dunkel, also muss
+die Schrift es auch sein. Sie wird jetzt <strong>lokal</strong> aus dem Akzent gemischt
+(<code>color-mix(in srgb, var(--ci-accent) 12%, #fff)</code>) – dasselbe Aussehen wie bisher
+(<code>#FFEAE1</code> beim ATVANTAGE-Orange) und 12,5–14,4:1 auch mit einem eigenen Akzent.</p>
+
+<p>Es war die <strong>einzige</strong> solche Stelle; alle 13 übrigen Verwendungen von <code>accent-soft</code> und
+<code>fill-*-bg</code> in der Vorlage sind <code>background</code>, also korrekt.</p>
+
+<!-- Lehre daraus, ohne eigenen Abschnitt: Ein Token, das zur mitschaltenden Fläche wird,
+     muss gegen jede Stelle geprüft werden, die es als VORDERGRUND benutzt – besonders dort,
+     wo die Fläche darunter NICHT mitschaltet. -->
+
+<p><strong>Jedes Projekt mit einer Simulation muss die eine Zeile von Hand nachziehen</strong> – ein
+<code>npm update</code> behebt es nicht. <code>templates/</code> liegt <strong>nicht</strong> im npm-Paket (siehe <code>files</code> in
+<code>theme/package.json</code>); die Vorlage ist zum <strong>Kopieren</strong> gedacht („<code>simulation-template.html</code>
+ins Schulungs-Repo kopieren und sinnvoll benennen“). Jede Simulation da draußen ist also
+eine Kopie. Zu ändern ist in der kopierten Datei:</p>
+
+<pre><code class="language-css">/* .bubble.mono – vorher */
+color: var(--ci-accent-soft);
+/* nachher */
+color: color-mix(in srgb, var(--ci-accent) 12%, #fff);
+</code></pre>
+
+<p>Über das <strong>Plugin</strong> kommt die korrigierte Fassung mit (Asset des Skills
+<code>simulation-erstellen</code>, ab Plugin 2.5.2) – aber auch das erneuert nur die Vorlage, nicht
+eine bereits abgeleitete Datei im Schulungs-Repo.</p>
+
+<h3 id="einstufung-12">Einstufung</h3>
+
+<p><strong>Minor.</strong> Kein Token entfernt oder umbenannt; es ändert sich ein Wert, und zwar nur für
+Projekte, die den Akzent überschreiben. Im Auslieferungszustand ist das Ergebnis identisch.</p>
+
+<hr />
+
+<h2 id="270">2.7.0</h2>
+
+<h3 id="drei-farb-tokens-trugen-ihren-untergrund-nicht">Drei Farb-Tokens trugen ihren Untergrund nicht</h3>
+
+<p>Gemeldet aus einem Schulungs-Repo, alle drei Befunde im gebauten Bundle mit Chromium
+nachgemessen und hier gegen die Token-Dateien gegengemessen. Gemeinsame Ursache: Ein
+Token wurde gegen <strong>einen</strong> Untergrund entworfen und später vor <strong>einen anderen</strong>
+gestellt – ohne dass irgendetwas dabei rot geworden wäre.</p>
+
+<h4 id="füllflächen-ohne-dark-werte">Füllflächen ohne Dark-Werte</h4>
+
+<p><code>--avd-academy-fill-1-bg</code> bis <code>-4-bg</code> und <code>--avd-academy-color-accent-soft</code> blieben im
+Dark-Theme auf ihren hellen Pastelltönen stehen, während <code>--avd-academy-color-ink</code> auf
+<code>#e8edee</code> wechselte. Wer eine Fläche damit füllt und den Text in <code>currentColor</code> setzt –
+der naheliegende Weg für ein Inline-SVG –, bekam <strong>1,00–1,08:1</strong>: Schrift, die nicht da
+ist. Im Bericht waren eine Überschrift und drei Beschriftungen einer Präsentation
+betroffen.</p>
+
+<p>Der Dark-Block hellt die <strong>Töne</strong> seit jeher auf und begründet das damit, dass die
+Füllpalette auf helle Flächen gerechnet ist. Für die zugehörigen <strong>Flächen</strong> gilt dasselbe
+Argument – sie waren übersehen worden.</p>
+
+<p><strong>Behoben:</strong> Beide Dark-Blöcke leiten die Flächen jetzt aus dem bereits aufgehellten
+<strong>Ton</strong> ab, nicht aus der rohen Füllung: <code>color-mix(… var(--avd-academy-tone-N) 26%,
+var(--avd-academy-color-bg))</code>. Über die rohe Füllung wäre Ton 1 (Slate) selbst so dunkel,
+dass die Fläche nur 1,10:1 von der Seite abstände und als Kategorie nicht mehr erkennbar
+wäre. Gemessen nach der Änderung: heller Text <strong>7,58–8,62:1</strong>, Fläche gegen Seite
+<strong>1,64–1,87:1</strong>. Die weiche Akzentfläche folgt demselben Muster und hängt im Dark-Theme
+am Akzent, damit ein Projekt mit eigenem Akzent keine orange getönte Fläche behält.</p>
+
+<p><strong>Der Light-Block bleibt unverändert</strong> – die hellen Werte sind byte-identisch.</p>
+
+<p><em>Bekannte Grenze:</em> Ton 1 (Slate) und Ton 4 (Violett) bleiben schwach gegeneinander
+unterscheidbar (ΔE ≈ 5). Das sind sie im Light-Theme heute schon (ΔE ≈ 6); die Ableitung
+verschlechtert nichts, behebt es aber auch nicht.</p>
+
+<h4 id="text-auf-akzentfläche-stand-fest-auf-weiß">Text auf Akzentfläche stand fest auf Weiß</h4>
+
+<p><code>--avd-academy-color-accent-contrast</code> ist das Token für Schrift <strong>auf</strong> der Akzentfarbe
+(Abspiel-Knopf und Tab-Nummer der Simulation, Intro-Nummer, Hover-Zustand der Knöpfe).
+Es stand fest auf <code>--avd-white</code>.</p>
+
+<p><strong>Das war schon im Auslieferungszustand unter AA, und schon im Light-Theme:</strong> Weiß auf
+ATVANTAGE-Orange trägt <strong>3,22:1</strong>; <code>.avd-academy-sim__btn-text</code> steht auf
+<code>--avd-academy-fs-sm</code> (≈13 px) und ist damit Kleintext, für den WCAG 2.1 AA 4,5:1
+verlangt. Setzt ein Projekt einen eigenen, helleren Akzent, wird daraus 1,9:1. Ein Kippen
+nur im Dark-Block hätte nichts behoben – der Akzent des Themes wechselt zwischen den
+Schemata gar nicht, der Fehler stand in beiden.</p>
+
+<p><strong>Behoben:</strong> Der Wert wird nicht mehr gesetzt, sondern <strong>aus dem Akzent abgeleitet</strong> –
+heller Akzent ergibt schwarze, dunkler Akzent weiße Schrift:</p>
+
+<pre><code class="language-css">@supports (color: oklch(from red l c h)) {
+  :root {
+    --avd-academy-color-accent-contrast:
+      oklch(from var(--avd-academy-color-accent) clamp(0, (l - 0.58) * -1e5, 1) 0 h);
+  }
+}
+</code></pre>
+
+<p>Die Schwelle 0,58 ist nicht geschätzt: über 60 000 Zufallsfarben geprüft, trennt sie
+schwarz und weiß am zuverlässigsten (≈2 % suboptimal; bei 0,62 waren es 9,5 %).</p>
+
+<p><strong>Kein neues Token.</strong> Ein zweites „Text auf Akzentfläche“ wäre ein Duplikat – das
+bestehende bedeutet genau das und wird an fünf Stellen so verwendet. Kaputt war der Wert,
+nicht der Name.</p>
+
+<p><strong>Warum <code>@supports</code> und nicht zwei Deklarationen.</strong> Custom Properties nehmen beim Parsen
+jede Zeichenfolge an; die zweite Deklaration gewinnt also immer, und eine Engine ohne
+relative Farbsyntax lässt <code>color</code> erst beim Rechnen ungültig werden – das Ergebnis ist
+<strong>Schwarz</strong>, nicht der Rückfall auf Weiß. Auf einem dunklen Akzent wäre das exakt der
+Fehler, der hier behoben wird. Beide Varianten in Chrome gegengeprüft. Mit dem Gate bleibt
+es in alten Engines bei Weiß wie bisher.</p>
+
+<p><strong>Was sich sichtbar ändert:</strong> Im Auslieferungszustand trägt der Abspiel-Knopf jetzt
+<strong>schwarze statt weißer</strong> Schrift auf Orange (6,52:1 statt 3,22:1). Das ist eine
+Abweichung vom ATVANTAGE-Fundament, das bei <code>Tag</code>/orange selbst Weiß auf Orange setzt –
+begründet und eingetragen in <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/docs/theme/academy.md"><code>docs/theme/academy.md</code></a>.</p>
+
+<h4 id="--avd-academy-color-ink-muted-unter-aa-auf-abgesetzten-flächen"><code>--avd-academy-color-ink-muted</code> unter AA auf abgesetzten Flächen</h4>
+
+<p>Gemeldet als „4,17:1 auf <code>#fff</code>“ – auf <code>#fff</code> sind es tatsächlich <strong>4,89:1</strong>, und damit
+besteht das Token AA. Die 4,17:1 stehen auf <strong><code>--avd-academy-color-bg-subtle</code></strong>
+(<code>#EDEDED</code>), also auf Karten und erhöhten Flächen; auf dem Metanav-Grau (<code>#F4F4F4</code>) sind
+es 4,44:1. Das Token war nicht theme-weit zu hell, sondern auf den Untergründen zu hell,
+gegen die es nie gerechnet wurde – was auch erklärt, warum es an
+<code>.avd-academy-sim-panel__title</code> und <code>.avd-academy-sim-panel__hint</code> auffiel.</p>
+
+<p><strong>Behoben:</strong> <code>--avd-academy-color-ink-muted</code> hängt jetzt an <code>--avd-gray-footer</code> (<code>#5F5F5F</code>)
+statt an <code>--avd-gray-metatext</code> (<code>#707173</code>). Danach: <strong>6,39:1</strong> auf der Seite, <strong>5,45:1</strong>
+auf abgesetzten Flächen, 5,81:1 auf dem Metanav-Grau.</p>
+
+<p><strong>Das ist keine Abweichung vom Fundament, sondern der richtige Alias.</strong> ATVANTAGE führt
+<code>--avd-gray-footer</code> selbst als „Footer, Schatten, <strong>sekundärer Text</strong>“ und
+<code>--avd-gray-metatext</code> als „Meta-Navigation, Affiliation-Leiste“. <code>ink-muted</code> hing am Token
+der Meta-Navigation. <code>--avd-academy-metanav-text</code> bleibt unverändert an
+<code>--avd-gray-metatext</code> – dort ist es richtig.</p>
+
+<p>Der Dark-Wert (<code>#9fb0b3</code>) war nie betroffen (6,42–7,43:1) und bleibt.</p>
+
+<h4 id="markup-contract-fünf-nachgetragene-namen">Markup Contract: fünf nachgetragene Namen</h4>
+
+<p><code>bin/markup-contract.sh</code> meldete beim Nachziehen fünf „neue“ öffentliche Namen:
+<code>--avd-academy-fill-1-bg</code> bis <code>-4-bg</code> und <code>avd-academy-sim__btn-text</code>. Sie sind <strong>nicht
+neu</strong> – die vier Tokens stehen seit jeher in der Doku und werden von
+<code>templates/simulations/simulation-template.html</code> benutzt. Sie fehlten im Artefakt, weil
+das Skript <strong>eine Variable je Zeile</strong> liest und <code>--avd-academy-fill-N</code> und
+<code>--avd-academy-fill-N-bg</code> gepaart auf einer Zeile standen. Durch die eigenen Zeilen im
+Dark-Block werden sie jetzt gefunden. Das Artefakt ist nachgezogen; damit sind diese
+Namen ab sofort auch gegen stilles Wegfallen geschützt.</p>
+
+<h3 id="einstufung-13">Einstufung</h3>
+
+<p><strong>Minor.</strong> Keines der Major-Kriterien greift: kein Token entfernt, keines umbenannt, kein
+Pfad und kein Front-Matter-Feld geändert. Es ändern sich <strong>Werte</strong> – sichtbar, aber ohne
+dass ein Projekt etwas umstellen müsste. Dieselbe Einstufung wie 2.6.0, die ebenfalls das
+Ergebnis bestehender Seiten sichtbar veränderte.</p>
+
+<p><strong>Was Projekte prüfen sollten, auch wenn nichts zu tun ist:</strong></p>
+
+<ul>
+  <li>Wer <code>--avd-academy-color-accent</code> überschreibt, bekommt die passende Schriftfarbe jetzt
+<strong>von allein</strong> und kann ein eigenes <code>--avd-academy-color-accent-contrast</code> entfernen.
+Wer es gesetzt lässt, überstimmt die Ableitung weiterhin – das Gate steht in <code>:root</code>,
+eine projekteigene Regel gleicher Spezifität später im Kaskadenlauf gewinnt.</li>
+  <li>Wer eigene Flächen aus <code>--avd-academy-fill-*-bg</code> baut, sieht sie im Dark-Theme jetzt
+<strong>zum ersten Mal</strong> – vorher waren sie dort unbrauchbar.</li>
+  <li>Sekundärtext ist theme-weit einen Hauch dunkler.</li>
+</ul>
 
 <hr />
 
@@ -276,7 +1404,7 @@ unter mehreren Hosts ausgeliefert – lokal, im Container, in der Cloud, alles a
 Image –, kann der Build die Adresse gar nicht kennen; <code>url</code> ist dort die falsche Antwort.
 Die Doku benennt den Fall jetzt und beschreibt das Muster dafür (Platzhalter zur Bauzeit,
 den der ausliefernde Dienst je Anfrage ersetzt):
-<a href="../docs/verwendung/einbindung.md#mehr-host">Einbindung → Eine Site unter mehreren Adressen</a>.</p>
+<a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/docs/verwendung/einbindung.md">Einbindung → Eine Site unter mehreren Adressen</a>.</p>
 
 <h2 id="254">2.5.4</h2>
 
@@ -354,7 +1482,7 @@ Blindheit hat 2.5.1 grün durchlaufen lassen.</p>
 <p><strong>Für Konsumenten:</strong> Beide Workflow-Vorlagen (<code>github-pages/deploy.example.yml</code>,
 <code>theme/jekyll/starter/pages.yml</code>, Vorlagenversion <strong>10</strong>) rufen die Prüfung nach dem
 Build auf. Wer eine ältere Kopie hat, zieht den Schritt nach – nötig ist er nicht.
-Doku: <a href="../github-pages/#verweise-pruefen">GitHub Pages → Tote Verweise finden</a>.</p>
+Doku: <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/github-pages/index.md">GitHub Pages → Tote Verweise finden</a>.</p>
 
 <h3 id="behoben-die-automatische-brotkrume-verlinkte-ordner-die-es-nicht-gibt">Behoben: die automatische Brotkrume verlinkte Ordner, die es nicht gibt</h3>
 
@@ -615,7 +1743,7 @@ Screenshots das müssen.</p>
 
 <p>Neu: <code>theme/jekyll/_includes/avd-i18n.html</code> (Sprache, Sprachfassungen, Wörterbuch),
 <code>theme/jekyll/_includes/avd-lang-value.html</code> (Sprachkarten auflösen), die Klasse
-<code>avd-academy-tool--lang</code>. Doku: <a href="../docs/theme/mehrsprachigkeit.md">Mehrsprachigkeit</a>.</p>
+<code>avd-academy-tool--lang</code>. Doku: <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/docs/theme/mehrsprachigkeit.md">Mehrsprachigkeit</a>.</p>
 
 <hr />
 

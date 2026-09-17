@@ -142,7 +142,17 @@
   gap: 4rem;
   align-items: start;
 }
-.avd-academy-guide-main { min-width: 0; display: flex; flex-direction: column; gap: 3.5rem; }
+/* Fluss statt `flex`+`gap`: Ein `gap` behandelt alle Bloecke gleich und kann eine
+   Ueberschrift nicht an ihren Abschnitt binden - gemessen standen 60px zwischen
+   einer Ueberschrift und ihrem eigenen ersten Absatz. Die Masse kommen aus
+   `--avd-academy-rhythm-*` und sind dieselben wie in der gewoehnlichen Spalte.
+   `display: block` AUSDRUECKLICH und nicht `unset`: `display` erbt nicht, `unset`
+   waere `initial` und damit `inline`. */
+.avd-academy-guide-main { min-width: 0; display: block; }
+.avd-academy-guide-main > * + * { margin-top: var(--avd-academy-rhythm-block); }
+/* Listen trugen `margin: 0`, weil frueher der `gap` den Abstand machte. Ohne ihn
+   muessen sie ihn selbst mitbringen - sonst kleben sie am Absatz davor. */
+.avd-academy-guide-main > ul, .avd-academy-guide-main > ol { margin-bottom: 0; }
 
 /* Breite Tabellen: NICHT die Spalte verengen, sondern der Tabelle das Schrumpfen
    erlauben. Die Grid-Spalte ist schon korrekt (`minmax(0, 1fr)` + `min-width: 0`) –
@@ -179,7 +189,9 @@
 
 /* Sektions-Überschriften ohne Emoji */
 .avd-academy-guide-main h2 {
-  margin: 0 0 0.25rem;
+  /* Oben der Abschnittsabstand, unten fast nichts - so bindet die Ueberschrift
+     an ihren Text statt frei zwischen zwei Abschnitten zu schweben. */
+  margin: var(--avd-academy-rhythm-section) 0 var(--avd-academy-rhythm-heading);
   font-size: var(--h3-base, 28px);
   font-weight: 600;
   color: var(--avd-academy-color-headline);
@@ -188,7 +200,7 @@
 
 /* H3-Überschriften (Basis, ohne Nummer) – für allgemeine Seiten. */
 .avd-academy-guide-main h3 {
-  margin: 1.5rem 0 0.25rem;
+  margin: 1.75rem 0 var(--avd-academy-rhythm-heading);
   font-size: var(--h5-base, 22px);
   font-weight: 600;
   color: var(--avd-academy-color-headline);

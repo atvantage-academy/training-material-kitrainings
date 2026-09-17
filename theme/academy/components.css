@@ -273,10 +273,13 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-grouptable__group--tone-3 { --avd-academy-grouptable-tone: var(--avd-academy-tone-3); }
 .avd-academy-grouptable__group--tone-4 { --avd-academy-grouptable-tone: var(--avd-academy-tone-4); }
 /* Signalton: für Gruppen, die außerhalb des regulären Rasters liegen. Hier färbt
-   er auch die Schrift – die Zeile soll auffallen, nicht bloß markiert sein. */
+   er auch die Schrift – die Zeile soll auffallen, nicht bloß markiert sein.
+   Als SCHRIFT die `-ink`-Fassung: Der rohe Ton ist als Fläche gerechnet und trug
+   im Light-Theme nur 4,39:1 (gefunden von `theme/jekyll/contrast.rb`). Der
+   Streifen behält den vollen Ton – er ist Fläche, nicht Schrift. */
 .avd-academy-grouptable__group--tone-alert {
   --avd-academy-grouptable-tone: var(--avd-academy-tone-alert);
-  color: var(--avd-academy-tone-alert);
+  color: var(--avd-academy-tone-alert-ink);
 }
 
 /* Schmale Zahlenspalte: rechtsbündig, nie umbrechend – so stehen die Werte
@@ -368,7 +371,8 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   padding: var(--avd-academy-space-1) var(--avd-academy-space-3);
   font-size: var(--avd-academy-fs-sm);
   font-weight: 600;
-  color: var(--avd-academy-tone-alert);
+  /* Schrift in der `-ink`-Fassung, Linie im vollen Ton – siehe oben. */
+  color: var(--avd-academy-tone-alert-ink);
   border-top: 2px solid var(--avd-academy-tone-alert);
 }
 
@@ -689,6 +693,40 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 }
 .avd-academy-header__brand { display: inline-flex; align-items: center; text-decoration: none; }
 .avd-academy-header__logo { height: 22px; width: auto; display: block; }
+
+/* Wortmarke in der Akzentfarbe – nur wenn `brand.logo_ratio` gesetzt ist.
+   Ein <img> laedt das SVG als EIGENES Dokument: Dort sind weder die Tokens der
+   Seite noch `currentColor` noch `data-avd-academy-theme` sichtbar. Eine Farbe im
+   SVG selbst waere ein zweiter Handwert neben `--avd-academy-accent-base` – genau
+   das, was 2.13.0 abgeschafft hat.
+
+   Deshalb liegt die eingefaerbte Fassung als MASKE auf einem <span> NEBEN dem
+   Bild. Nicht auf dem Bild: Gemessen traegt die Maske dort nicht – weder
+   `content: ""` noch `content: none` noch `-webkit-mask` entfernen den
+   Bildinhalt, das Original malt darueber. Auf einem nicht ersetzten Element
+   traegt sie.
+
+   Weil der span keine Eigengroesse hat, muss das Verhaeltnis von aussen kommen.
+   Es steht als `brand.logo_ratio` in der `_config.yml` – dort ist es ein Datum
+   neben dem Logo-Pfad und kein Zahlenpaar, das in einer fremden Style-Datei
+   verwaist.
+
+   Der span ist DEFAULT UNSICHTBAR und das <img> sichtbar: Kann eine Engine keine
+   Masken, bleibt es beim unveraenderten Bild. Der Rueckfall ist damit der
+   Normalfall – ein fehlendes Logo sieht man nicht im Build, sondern beim Kunden. */
+.avd-academy-header__logo-mask { display: none; }
+
+@supports (mask: url("#x") no-repeat) {
+  .avd-academy-header__logo-mask ~ .avd-academy-header__logo,
+  .avd-academy-header__logo:has(~ .avd-academy-header__logo-mask) { display: none; }
+  .avd-academy-header__logo-mask {
+    display: block;
+    height: 22px;
+    aspect-ratio: var(--avd-academy-logo-ratio);
+    background-color: var(--avd-academy-color-accent);
+    mask: var(--avd-academy-logo-src) no-repeat left center / contain;
+  }
+}
 .avd-academy-header__nav { margin-left: auto; display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 .avd-academy-header__nav a {
   text-decoration: none; font-weight: 500; font-size: 17px;
