@@ -59,15 +59,18 @@
 --><html lang="de">
 <head>
   <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Änderungen am ATVANTAGE Academy Theme · ATVANTAGE Academy</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Änderungen am ATVANTAGE Academy Theme · ATVANTAGE Academy</title><meta property="og:site_name" content="ATVANTAGE Academy">
+<meta property="og:title" content="Änderungen am ATVANTAGE Academy Theme">
+
+<meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789706501"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789706501">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789706501">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789706501">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789706501"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789706501">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789706501" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789706501" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789706501">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789737846"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789737846">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789737846">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789737846">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789737846"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789737846">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789737846" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789737846" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789737846">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -95,8 +98,8 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789706501">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789706501"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789737846">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789737846"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
@@ -122,7 +125,6 @@
     </div><h1>Änderungen am ATVANTAGE Academy Theme</h1>
   </section><div class="avd-academy-guide-layout">
     <main class="avd-academy-guide-main" id="avd-academy-content">
-      <h1 id="änderungen-am-atvantage-academy-theme">Änderungen am ATVANTAGE Academy Theme</h1>
 
 <p>Dieses Paket folgt ab <code>1.0.0</code> der <strong>semantischen Versionierung</strong>:</p>
 
@@ -157,6 +159,420 @@
 inkompatibel gilt und wie eingestuft wird, steht in
 <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/AGENTS.md"><code>AGENTS.md</code></a>,
 Abschnitt „Theme-Version“.</p>
+
+<hr />
+
+<h2 id="2220">2.22.0</h2>
+
+<h3 id="neu-zielgruppengefiltert-bauen-ist-eine-komponente-des-themes">Neu: Zielgruppengefiltert bauen ist eine Komponente des Themes</h3>
+
+<p>Das Paket bringt ab sofort <code>jekyll/_bin/build.sh</code> mit – die Baukomponente, die eine
+Site <strong>einmal je Zielgruppe</strong> baut und dabei alles entfernt, was nicht dorthin gehört.
+Bisher trug jedes Repo dieses Skript als <strong>Kopie</strong>; bei jeder Korrektur musste die
+Nummer im Kopf verglichen und die Kopie nachgezogen werden. Ab dieser Fassung kommt es
+mit der gepinnten Theme-Version – lokal wie in der Pipeline dieselbe Datei.</p>
+
+<pre><code class="language-bash">sh theme/jekyll/_bin/build.sh «zielgruppe» «ausgabeordner» «baseurl»
+</code></pre>
+
+<p><strong>Die Komponente kennt keine Zielgruppe.</strong> Das ist dieselbe Grenze wie beim Schema
+(#130): Das Theme liefert den Mechanismus, die Werte gehören dem Werkzeug, das die Site
+baut. Gelesen wird der neue Schlüssel <code>audience_filter</code> der <code>_config.yml</code>:</p>
+
+<pre><code class="language-yaml">audiences: [internal, public]     # die Deklaration, wie bisher
+
+audience_filter:
+  public:                         # NUR `public` bekommt eine gefilterte Ausgabe
+    exclude_names: ['intern-*']   # Rückfall für Seiten ohne `audiences`
+</code></pre>
+
+<p>Wer in <code>audience_filter</code> steht, bekommt nur Seiten, die ihn in ihrem <code>audiences</code> nennen
+oder gar keine Angabe tragen. Wer <strong>nicht</strong> darin steht, bekommt alles Publizierbare –
+auch Seiten fremder Zielgruppe. Die Asymmetrie ist Absicht und gehört der Site:
+„Material der einen Gruppe nicht an die andere“ gilt oft nur in eine Richtung.</p>
+
+<p><strong>Geprüft wird ab jetzt auch im ungefilterten Build.</strong> Ein Tippfehler im Front Matter
+(<code>audiences: [publik]</code>) bricht jeden Build ab, nicht nur den gefilterten. Vorher meldete
+ihn niemand, bis der gefilterte Build eine Seite verlor, die dorthin gehörte – und eine
+Ausgabe, der eine Seite fehlt, sieht vollständig aus.</p>
+
+<p><strong><code>audience_filter</code> wird geprüft wie jede Zielgruppen-Angabe.</strong> <code>validate.rb</code> vergleicht
+seine Schlüssel mit <code>audiences</code>. Das war nötig, weil sie dort als <strong>Schlüssel</strong> stehen und
+nicht als Werte: Der bisherige Durchlauf hätte sie nie zu Gesicht bekommen, und ein
+Tippfehler wirkte still – die Regel griffe nie, die Ausgabe wäre ungefiltert statt
+gefiltert.</p>
+
+<p><strong>Der Ordner heißt <code>_bin</code>, mit Unterstrich.</strong> Jekyll lässt Unterstrich-Einträge von sich
+aus weg; das Skript landet also in keinem Bundle, ohne dass ein einziges Repo seine
+<code>exclude</code>-Liste nachziehen muss. Das ist bewusst anders gelöst als bei der Werkstatt des
+Fundaments (dort über <code>files</code> in der <code>package.json</code>, siehe 2.x/#67) – ein <code>exclude</code> hätte
+hier nicht genügt, weil Jekyll die Liste <strong>ersetzt</strong> statt sie zu mergen und Repos mit
+eigener Liste leer ausgingen.</p>
+
+<p><strong>Für Konsumenten:</strong> rein ergänzend. Wer weiter sein eigenes Build-Skript fährt, merkt
+nichts. Wer umsteigt, ersetzt den Aufruf und löscht die Kopie – die Semantik ist
+dieselbe, sofern die bisher fest verdrahtete Filterregel als <code>audience_filter</code> in die
+<code>_config.yml</code> wandert.</p>
+
+<hr />
+
+<h2 id="2211">2.21.1</h2>
+
+<h3 id="behoben-das-adressen-plugin-verschob-collection-dokumente">Behoben: Das Adressen-Plugin verschob Collection-Dokumente</h3>
+
+<p><strong>Wen es traf:</strong> Jede Site mit einer Collection, die <code>output: true</code> und einen eigenen
+<code>permalink</code> führt. Seit <strong>2.18.0</strong> landeten deren Dokumente unter der aus dem <strong>Quellpfad</strong>
+abgeleiteten Adresse statt unter dem konfigurierten Muster:</p>
+
+<pre><code>2.17.0   /en/updates/3-1-0/index.html      der konfigurierte permalink
+2.18.0   /en/_updates/3.1.0.html           aus dem Quellpfad
+</code></pre>
+
+<p>Die Verzeichnistiefe sank damit von drei auf zwei, und <strong>jeder relative Verweis im
+Dokument zeigte ins Leere</strong> – gemeldet wurden 24 tote Verweise auf 16 Seiten, an Dateien,
+die seit Wochen niemand angefasst hatte. Die Zahl der gebauten Seiten blieb gleich; es
+waren nicht zusätzliche Seiten, sondern <strong>andere Adressen</strong>.</p>
+
+<p><strong>Zwei Ursachen, beide nachgestellt:</strong></p>
+
+<ul>
+  <li>Die Aktivierung hing an <code>data['slug']</code>. Bei Collection-Dokumenten setzt <strong>Jekyll</strong> den
+Schlüssel selbst, aus dem Dateinamen – eine Site mit Output-Collection erfüllte die
+Bedingung also, ohne dass je jemand <code>slug:</code> geschrieben hätte. Das Plugin lief dann für
+alle Seiten.</li>
+  <li>Der Schutz prüfte <code>seite.data['permalink']</code>. Ein an der <strong>Collection</strong> konfigurierter
+<code>permalink</code> steht dort nicht – er wirkt über <code>doc.url</code>. Der Schutz griff nicht.</li>
+</ul>
+
+<p><strong>Die Korrektur setzt an der Wurzel:</strong> Das Plugin rührt nur noch Seiten an, deren Adresse
+<strong>noch niemand bestimmt hat</strong> – deren <code>url</code> also genau die ist, die sich aus dem Quellpfad
+ergibt. Alles andere gehört jemandem: einem <code>permalink</code> im Front Matter, einem an der
+Collection, einer Vorgabe der Site. Damit sind Collection-Dokumente grundsätzlich außen
+vor; ihre Adresse kommt aus ihrem Muster.</p>
+
+<p><strong>Die Spur <code>.avd-addresses</code> nennt jetzt beide Zahlen</strong> – <code>abgebildet</code> und <code>uebergangen</code>.
+Steht dort eine Zahl bei <code>uebergangen</code> und ein Slug wirkt trotzdem nicht, ist das der erste
+Ort zum Nachsehen.</p>
+
+<p><strong>Neu: <code>bin/addresses-test.sh</code></strong> baut eine Fixture und rechnet fünf Lagen nach –
+Collection-<code>permalink</code>, ausdrückliches <code>permalink</code>, Ordner-Slug, Seiten-Slug, Sprachbasis.
+Ein Fehler, der Adressen verschiebt, ist mit blossem Hinsehen nicht zu finden; er braucht
+eine Rechnung. Die Prüfung hängt in <code>make check</code> und in der Pipeline.</p>
+
+<p>Dank an die Rückmeldung aus einem Konsumenten-Repo – der Bericht benannte beide Ursachen
+und die Reproduktion mit.</p>
+
+<hr />
+
+<h2 id="2210">2.21.0</h2>
+
+<h3 id="geteilte-links-bekommen-eine-vorschau-suchmaschinen-eine-kanonische-adresse">Geteilte Links bekommen eine Vorschau, Suchmaschinen eine kanonische Adresse</h3>
+
+<p><strong>Ohne Zutun und ohne <code>site.url</code></strong> entstehen jetzt <code>og:site_name</code>, <code>og:title</code>,
+<code>og:description</code> und <code>og:type</code> – aus <code>title</code>, <code>description</code> und dem Layout (<code>article</code> bei
+einem Guide, sonst <code>website</code>). Damit erscheint eine geteilte Adresse in Slack, Teams oder
+LinkedIn als Karte statt als nackter Link, auch in einem Schulungs-Repo ohne absolute
+Adresse. Das ist der häufigere Fall als die Suchmaschine.</p>
+
+<p><strong>Ein Bild kommt nicht von selbst</strong> – zwei neue Stellen dafür:</p>
+
+<pre><code class="language-yaml"># _config.yml – für die ganze Site
+brand:
+  og_image: /assets/academy-share.png
+</code></pre>
+
+<pre><code class="language-yaml"># Front Matter – nur für diese Seite
+image: /assets/kurs-http.png
+</code></pre>
+
+<p>Ohne beides entsteht <strong>kein</strong> <code>og:image</code>. Absicht: Ein Tag, das auf ein fehlendes Bild
+zeigt, ist schlechter als keines – manche Dienste zeigen dann gar keine Karte mehr.</p>
+
+<p><strong>Mit gesetztem <code>site.url</code></strong> kommen <code>&lt;link rel="canonical"&gt;</code>, <code>og:url</code>, ein <strong>absolutes</strong>
+<code>og:image</code> und eine <strong>BreadcrumbList</strong> als JSON-LD dazu.</p>
+
+<p><strong>Ohne <code>site.url</code> entsteht keines davon – mit Absicht.</strong> Wird dieselbe gebaute
+Site unter mehreren Adressen ausgeliefert, kennt der Build die Adresse grundsätzlich nicht;
+ein Canonical zeigte dann von der einen Instanz auf die andere. <code>absolute_url</code> steht
+deshalb ausdrücklich <strong>innerhalb</strong> der Bedingung: Der Filter löst unter
+<code>JEKYLL_ENV=production</code> <code>jekyll-github-metadata</code> aus, und das lässt auf GHE ohne
+Repo-Namen den Build scheitern.</p>
+
+<p><strong>Die BreadcrumbList wird aus der SICHTBAREN Brotkrume abgeleitet</strong>, nicht zweitgerechnet.
+Sie entsteht auf drei Wegen (<code>breadcrumb.ancestors</code>, das alte Array, automatisch aus der
+Verzeichnisstruktur); alle drei zu verdoppeln hiesse, zwei Fassungen zu pflegen, die
+auseinanderlaufen – und dann behauptete die Auszeichnung einen anderen Pfad, als der Leser
+sieht.</p>
+
+<p><strong>Keine eigenen Felder</strong> für Titel, Beschreibung, <code>og:type</code> oder Canonical: Es gibt
+<code>title</code> und <code>description</code>, der Typ folgt dem Layout, und die kanonische Adresse ist
+berechenbar. Zwei Paare, die auseinanderlaufen können, sind schlechter als eines, das
+stimmt.</p>
+
+<h3 id="schema-und-doku-werden-gegeneinander-geprüft">Schema und Doku werden gegeneinander geprüft</h3>
+
+<p><code>bin/schema-docs.sh</code> vergleicht jede Eigenschaft beider Schemas gegen <strong>beide</strong>
+Sprachfassungen der Doku. Der Anlass ist belegt: <code>slug</code> und <code>folder_slug</code> standen nach
+ihrer Einführung nur in der deutschen Feldtabelle – auffallen konnte das niemandem, die
+englische Seite baut ja. Die Prüfung fand beim Bau zwei weitere Lücken.</p>
+
+<hr />
+
+<h2 id="2200">2.20.0</h2>
+
+<h3 id="eine-seite-trägt-genau-eine-h1--im-dokument-nicht-nur-in-der-anzeige">Eine Seite trägt genau eine H1 – im Dokument, nicht nur in der Anzeige</h3>
+
+<p>Der Hero rendert den Titel; die erste <code>#</code>-Überschrift des Markdowns war eine <strong>zweite,
+wortgleiche</strong> H1 und wurde per CSS versteckt. Versteckt heißt aber nur unsichtbar: Für
+Screenreader und Crawler stand das doppelte Überschriften-Markup weiter da.</p>
+
+<p>Sie fällt jetzt <strong>aus dem DOM</strong>, unter drei Bedingungen: Der Hero hat wirklich eine H1
+gerendert, vor ihr steht nichts Sichtbares, und sie ist geschlossen. Ein HTML-Kommentar
+davor zählt nicht als Inhalt – die Vorlagen beginnen mit einem, und ohne diese Nachsicht
+bliebe genau dort die Dopplung stehen.</p>
+
+<p><strong>Gemessen über die ganze Doku-Site:</strong> jede Seite genau eine H1. Die Regeln
+<code>.avd-academy-guide-main &gt; h1:first-child { display: none }</code> und ihr Gegenstück in
+<code>site.css</code> sind entfallen; die Lead-Auszeichnung des ersten Absatzes hängt jetzt an
+<code>&gt; p:first-child</code>, das es ohnehin schon gab.</p>
+
+<p>Der Titel im Browser-Tab und im Hero kommt unverändert aus der ersten Überschrift, wenn
+kein <code>title</code> im Front Matter steht – die Ableitung läuft vor dem Entfernen.</p>
+
+<h3 id="neues-feld-noindex">Neues Feld <code>noindex</code></h3>
+
+<pre><code class="language-yaml">noindex: true
+</code></pre>
+
+<p>Setzt <code>&lt;meta name="robots" content="noindex"&gt;</code>. Für Seiten, die öffentlich erreichbar und
+trotzdem <strong>ungelistet</strong> sein sollen – ein Training nur für seine Teilnehmenden, eine
+Fassung im Entwurf. Vorher gab es dafür keinen Weg: Das Front-Matter-Schema ist
+geschlossen, eine Site kann das Tag nicht selbst setzen, und <code>robots.txt</code> wirkt je Pfad
+statt je Seite.</p>
+
+<p>Nur <code>noindex</code>, <strong>kein</strong> <code>nofollow</code>: Die Verweise der Seite dürfen weiter verfolgt werden,
+sonst schnitte eine ungelistete Seite alles ab, was unter ihr hängt. Das Feld braucht
+<strong>kein</strong> gesetztes <code>site.url</code> – es spricht über diese Seite, nicht über eine Adresse.</p>
+
+<hr />
+
+<h2 id="2190">2.19.0</h2>
+
+<h3 id="die-doku-richtet-sich-an-theme-nutzer">Die Doku richtet sich an Theme-NUTZER</h3>
+
+<p>Sie trug bisher zwei Publika auf denselben Seiten: wer eine Unterlage schreibt, und wer das
+Theme weiterentwickelt. Auf <code>academy.md</code> standen Autorenhinweise neben Begründungen für
+Maintainer – 874 Zeilen „bewusste Abweichungen“, die niemand braucht, der eine Schulung
+baut.</p>
+
+<p><strong>Entfernt:</strong> die Abweichungs-Begründungen, „Ein Feld ergänzen“ (Schema-Dateien des Themes
+bearbeiten), „Komponenten als JSX“ und der Pflegehinweis. Was daran für Nutzer galt, ist
+geblieben und an den passenden Ort gezogen:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>bleibt, als</th>
+      <th>Inhalt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Academy-Theme</strong> (417 statt 2257 Zeilen)</td>
+      <td>Anpassung: Schulungsfarbe, Logo, eigenes CSS, Tokens für Diagramme, Kontrast und Rhythmus, Dark-Mode, Drucklayout, Barrierefreiheit</td>
+    </tr>
+    <tr>
+      <td><strong>Layouts, Schalter und Bedienelemente</strong></td>
+      <td>die zwei Achsen, Schaltertabellen, QR-Code, Sprachumschalter, „Markdown kopieren“, Dropdowns, Fußbereich, Anker, Brotkrumen</td>
+    </tr>
+    <tr>
+      <td><strong>Bausteine</strong></td>
+      <td>der Katalog mit Markup</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="ein-eigenes-layout-ist-eine-anpassung-keine-theme-änderung">Ein eigenes Layout ist eine Anpassung, keine Theme-Änderung</h3>
+
+<p>Das Kapitel dazu war für Maintainer geschrieben – es wies auf <code>theme/jekyll/_layouts/</code>, das
+bei jedem <code>make theme</code> überschrieben wird. Neu geschrieben für Konsumenten, mit der Hürde,
+die dabei gemessen wurde:</p>
+
+<p><strong>Jekyll kennt genau ein <code>layouts_dir</code> und keine Kette.</strong> Zeigt es aufs Theme, wird ein
+eigenes Layout daneben nicht gefunden; zeigt es auf einen eigenen Ordner, löst <code>layout:
+page</code> nicht mehr auf und der Rahmen fehlt vollständig. Beides nachgestellt. Dokumentiert
+ist deshalb der Weg, der trägt: eigener Ordner, Theme-Layouts beim Bauen hineinkopiert,
+Kopien nicht eingecheckt.</p>
+
+<p>Ebenfalls benannt: Die <a href="https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/layouts.html#schalter">Schalter</a>
+kann ein eigenes Layout <strong>nicht</strong> mitbenutzen – welche Bausteine ein Layout tragen darf,
+steht im Theme.</p>
+
+<hr />
+
+<h2 id="2180">2.18.0</h2>
+
+<h3 id="die-adresse-kommt-vom-ordner-los-folder_slug-und-slug">Die Adresse kommt vom Ordner los: <code>folder_slug</code> und <code>slug</code></h3>
+
+<p>Ein Pfad trug drei Aufgaben auf einmal – Ordnung für den Autor, öffentliche Adresse,
+und bis 2.17.0 hing die Sprache mit daran. Die dritte hat <code>lang</code> übernommen, die zweite
+nimmt ihm jetzt der Slug ab.</p>
+
+<pre><code class="language-yaml"># 03-http/index.md
+folder_slug:
+  de: http-grundlagen
+  en: http-basics
+</code></pre>
+
+<p>Der Ordner heißt weiter <code>03-http</code> – die Nummer sortiert im Editor und taucht in der
+Adresse nicht auf. <strong>Ein schlichter Text genügt</strong> und gilt für jede Sprache; eine
+einsprachige Schulung schreibt <code>folder_slug: http-grundlagen</code> hin und braucht dafür weder
+eine Sprachkarte noch eine <code>i18n</code>-Konfiguration. Gewählt wird nach der Sprache <strong>der
+Seite</strong>: Eine englische Seite im selben Quellordner landet unter <code>/http-basics/…</code>, eine
+deutsche unter <code>/http-grundlagen/…</code>.</p>
+
+<p><strong>Zwei Schlüssel, weil es zwei Dinge sind.</strong> <code>folder_slug</code> benennt den <strong>Ordner</strong> und
+gehört ausschließlich in dessen <code>index.md</code>; <code>slug</code> benennt <strong>eine Seite</strong> und ist auf
+einer Index-Seite nicht erlaubt. Deren Adresse <em>ist</em> der Ordner – ein <code>slug</code> dort schöbe
+die Datei aus ihm heraus, der Ordner hätte danach keine Index-Datei mehr und <code>/kapitel/</code>
+liefe ins Leere. Die Schema-Prüfung weist beide Verwechslungen mit einer Meldung zurück,
+die den gemeinten Schlüssel nennt.</p>
+
+<p><strong>Die Rangfolge ist vollständig:</strong> Sprache der Seite → Angabe für alle Sprachen →
+Standardsprache → unveränderter Name. Kein „irgendein Eintrag aus der Karte“ – das gäbe
+einer dritten Sprache stillschweigend die englische Adresse, je nach Schreibreihenfolge.</p>
+
+<p><strong>Im Nebeneinander-Layout darf jede Index-Datei den Ordner für ihre Sprache benennen</strong>
+(<code>index.md</code> deutsch, <code>index_en.md</code> englisch) statt einer Karte in einer der beiden. Zwei
+Angaben zur selben Sprache mit verschiedenem Wert brechen den Build ab – sonst entschiede
+die Lesereihenfolge, und die unterlegene Angabe verschwände spurlos.</p>
+
+<p><strong>Verweise brechen dabei nicht.</strong> <code>jekyll-relative-links</code> löst
+<code>[Text](../03-http/einstieg.md)</code> gegen die <strong>URL des Ziels</strong> auf, nicht gegen dessen
+Pfad – wird die Adresse verbogen, folgt der Verweis mit. Der Link bleibt im
+Markdown-Editor klickbar; das war die Bedingung.</p>
+
+<p><strong>Zwei Dinge brechen den Build ab</strong>, beide mit Absicht laut: zwei Seiten auf derselben
+Adresse (Jekyll schriebe beide, die zweite gewänne, die erste wäre spurlos weg – im
+grünen Build), und ein <code>folder_slug</code> auf der Wurzel eines Sprachbaums (aus diesem Pfadstück
+liest das Theme die Sprache jeder Seite ohne <code>lang</code>).</p>
+
+<h3 id="zwei-sprachfassungen-dürfen-in-einem-ordner-liegen">Zwei Sprachfassungen dürfen in einem Ordner liegen</h3>
+
+<p>Damit das trägt, kommen zwei Regeln dazu, die beide nichts mit <code>slug</code> zu tun haben:</p>
+
+<ul>
+  <li><strong>Ein Anhängsel <code>_«code»</code> im Dateinamen ist keine Adresse.</strong> <code>responsive.md</code> gibt es
+deutsch und englisch – als Datei nur einmal je Ordner. Die englische heißt
+<code>responsive_en.md</code>; für die URL zählt der Name davor. Ein Ordner-Index in der zweiten
+Sprache heißt entsprechend <code>index_«code».md</code> und gilt weiter als Index.</li>
+  <li><strong>Der Sprachbaum kommt aus <code>lang</code>, nicht aus dem Ordner.</strong> Lag die englische Fassung
+unter <code>en/</code>, kam <code>/en/</code> aus dem Pfad; liegt sie neben der deutschen, setzt das Theme
+den Präfix aus der Sprache der Seite. Steht er schon im Pfad, bleibt es dabei – die
+Ablage in Sprachbäumen trägt unverändert weiter, auch <strong>neben</strong> der neuen in derselben
+Site.</li>
+</ul>
+
+<p><strong>Diese Doku-Site macht es selbst so.</strong> Den Ordner <code>en/</code> gibt es dort nicht mehr; jede
+englische Seite liegt neben ihrer deutschen Fassung. Nachgemessen am Verzeichnis aller
+gebauten Adressen: <strong>keine einzige öffentliche Adresse hat sich geändert.</strong></p>
+
+<h3 id="die-doku-ist-aufgeteilt-die-migrationsseite-entfallen">Die Doku ist aufgeteilt, die Migrationsseite entfallen</h3>
+
+<p><code>academy.md</code> trug 2257 Zeilen – 41 % der deutschen Doku, mit einem einzigen Abschnitt von
+874 Zeilen und 27 Unterüberschriften darin. Sie ist jetzt drei Seiten:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Seite</th>
+      <th>Inhalt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Academy-Theme</strong></td>
+      <td>Namensraum, die bewussten Abweichungen von der Marke, Customizations, Dark-Mode</td>
+    </tr>
+    <tr>
+      <td><strong>Bausteine</strong></td>
+      <td>Karten, Callouts, gruppierte Tabellen, Dokumentlinks, Materialübersicht, Reveal, Fold, Buttons, Badges, Syntaxhervorhebung</td>
+    </tr>
+    <tr>
+      <td><strong>Layouts und Schalter</strong></td>
+      <td>Layouts und ihre Eigenschaften, Schaltertabellen, Sprungmarken, Brotkrumen</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Die Anker <code>#schalter</code>, <code>#layout-eigenschaften</code> und <code>#anker</code> liegen damit auf der
+Layout-Seite; alle vierzehn Verweise darauf sind nachgezogen. Gefunden hat sie die
+Verweisprüfung – sie prüft Anker, nicht nur Adressen.</p>
+
+<p><strong>Die Seite „Migration auf 2.0“ ist entfallen.</strong> Theme 1 ist abgelöst und soll nicht mehr
+verwendet werden. Wer wirklich noch dort steht, findet das Werkzeug unverändert unter
+<code>bin/migrate.rb</code>.</p>
+
+<h3 id="eindeutig-ist-die-ganze-adresse-nicht-der-einzelne-name">Eindeutig ist die ganze Adresse, nicht der einzelne Name</h3>
+
+<p>Derselbe <code>slug</code> darf in verschiedenen Ordnern stehen; <code>index.md</code> und <code>index_en.md</code> im
+selben Ordner tragen beide den Namen <code>index</code>. Was zählt, ist die <strong>zusammengesetzte</strong>
+Adresse – und die unterscheidet sich schon durch den Ordnernamen je Sprache und das
+Sprachpräfix. Deshalb braucht eine englische Fassung meist gar keinen eigenen <code>slug</code>.</p>
+
+<p>Die Kehrseite: Eine Dopplung kann von <strong>weit oben</strong> kommen, wenn zwei Ordner denselben
+<code>folder_slug</code> tragen. Die Abbruchmeldung nennt darum beide Quelldateien und weist
+ausdrücklich auf die Ordner darüber hin.</p>
+
+<h3 id="eine-prüfung-gegen-das-stille-versagen">Eine Prüfung gegen das stille Versagen</h3>
+
+<p>Ein Plugin, das nicht lädt, wäre der teuerste Fehler dieses Themes: Die Slugs wirken
+nicht, der Build bleibt <strong>grün</strong>, die Seiten stehen unter falschen Adressen. Das Plugin
+legt deshalb beim Bauen eine Spur (<code>.avd-addresses</code> im Ausgabeverzeichnis), und die
+Schema-Prüfung schlägt an, wenn eine Site sie bräuchte und nicht findet:</p>
+
+<pre><code>ruby theme/jekyll/schema/validate.rb --site _site
+</code></pre>
+
+<p>Gebraucht wird sie, sobald eine Seite <code>slug</code> oder <code>folder_slug</code> trägt <strong>oder</strong> ihre Sprache deklariert,
+ohne im passenden Sprachbaum zu liegen. Geprüft wird die <strong>Spur</strong>, nicht das Ergebnis –
+eine nachgerechnete Adresse wäre die Abbildungsregel ein zweites Mal. Mit
+<code>--require-site</code> ist eine fehlende Site ein Fehler statt eines Hinweises; so steht sie in
+der Pipeline hinter dem Build.</p>
+
+<h3 id="avd-seitensprachehtml-heißt-jetzt-avd-page-langhtml"><code>avd-seitensprache.html</code> heißt jetzt <code>avd-page-lang.html</code></h3>
+
+<p>Im Theme sind <strong>Dateinamen und alles, was ein Konsument sieht, englisch</strong> – Includes,
+Front-Matter-Schlüssel, CSS-Namen, Skripte; deutsch sind die Kommentare und die internen
+Methodennamen der Ruby-Werkzeuge. Der in 2.17.0 eingeführte Include fiel aus der Reihe
+und ist umbenannt, bevor der Name sich festsetzt. Das neue Plugin heißt aus demselben
+Grund <code>avd-addresses.rb</code> und legt seine Spur als <code>.avd-addresses</code>.</p>
+
+<p><strong>Zu tun ist nichts</strong>, solange kein eigenes Layout den Include direkt einbindet – er
+beantwortet eine Frage, die das Theme intern stellt. Wer ihn doch aufruft, ändert den
+Namen mit.</p>
+
+<h3 id="das-theme-bringt-erstmals-ein-jekyll-plugin-mit">Das Theme bringt erstmals ein Jekyll-Plugin mit</h3>
+
+<p>Die Zuordnung macht <code>theme/jekyll/_plugins/avd-addresses.rb</code>, geladen über <code>plugins_dir</code>
+aus <code>_config.defaults.yml</code>. Der eigene <code>_plugins</code>-Ordner eines Repos bleibt daneben
+bestehen – die Array-Form ist geprüft.</p>
+
+<p><strong>Wer sein <code>Gemfile</code> selbst pflegt, prüft eine Sache:</strong> Das <code>github-pages</code>-Gem
+erzwingt Jekylls Safe-Modus und übergeht jeden Plugin-Ordner <strong>stillschweigend</strong> – der
+Build bleibt grün, die Slugs wirken einfach nicht. Die Kopiervorlage der Konzept-Repos
+baut ohnehin mit <code>jekyll</code> plus <code>jekyll-optional-front-matter</code> und
+<code>jekyll-relative-links</code>; die Doku-Site dieses Repos ist mit diesem Release genauso
+umgestellt.</p>
+
+<p><strong>Warum überhaupt ein Plugin.</strong> <code>permalink</code> je Seite kann Jekyll von Haus aus – dann
+stünde die Zuordnung aber n-mal statt einmal, und wer einen Ordner umbenennt, müsste
+jede Seite darin anfassen. Genau das beendet der Slug.</p>
+
+<p><strong>Ohne eine einzige Slug-Angabe ändert sich nichts.</strong> Der Generator bricht nach dem
+Einsammeln ab und rührt keine Seite an.</p>
+
+<p>Doku: <a href="https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/adressen.html">Adressen</a>.</p>
 
 <hr />
 

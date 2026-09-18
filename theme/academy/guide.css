@@ -175,7 +175,6 @@
 
 /* Einleitung / User Story: erster Absatz (Titel steht im Hero). */
 .avd-academy-guide-lead,
-.avd-academy-guide-main > h1:first-child + p,
 .avd-academy-guide-main > p:first-child {
   margin: 0;
   font-size: var(--text-size-hero, 1.35rem);
@@ -185,7 +184,6 @@
   padding-left: 22px;
   text-wrap: pretty;
 }
-.avd-academy-guide-main > h1:first-child { display: none; }
 
 /* Sektions-Überschriften ohne Emoji */
 .avd-academy-guide-main h2 {

@@ -304,6 +304,25 @@ def zielgruppen_pruefen(daten, deklariert, quelle, pfad = [])
       # `audiences` auf der WURZEL einer Konfiguration ist die Deklaration selbst, keine
       # Verwendung – sonst pruefte sie sich gegen sich.
       deklaration = k == 'audiences' && pfad.empty?
+      # `audience_filter` benutzt die Zielgruppen als SCHLÜSSEL, nicht als Werte – der
+      # Durchlauf unten würde sie nie zu Gesicht bekommen. Ein Tippfehler darin wirkt
+      # still: Die Regel greift nie, die Ausgabe ist ungefiltert statt gefiltert, und
+      # weil eine ungefilterte Ausgabe VOLLSTÄNDIG aussieht, fällt es niemandem auf.
+      if k == 'audience_filter' && pfad.empty? && v.is_a?(Hash)
+        v.each_key do |zielgruppe|
+          next unless zielgruppe.is_a?(String)
+          if deklariert.nil? || deklariert.empty?
+            meldungen << ["audience_filter.#{zielgruppe}",
+                          "Zielgruppe `#{zielgruppe}` benutzt, aber die Site deklariert keine " \
+                          '`audiences`. Ohne Deklaration ist der Wert nicht prüfbar.']
+          elsif !deklariert.include?(zielgruppe)
+            meldungen << ["audience_filter.#{zielgruppe}",
+                          "`#{zielgruppe}` ist keine deklarierte Zielgruppe. Deklariert sind: " \
+                          "#{deklariert.join(', ')} (Schlüssel `audiences` in der _config.yml)."]
+          end
+        end
+        next
+      end
       benutzt = !deklaration && (k == 'audiences' || (k == 'audience' && v.is_a?(String)))
       if benutzt
         voll = (pfad + [k.to_s]).join('.')
@@ -552,6 +571,8 @@ fm_schema = nil
 cfg_schema = nil
 selbsttest_nur = false
 argv = ARGV.dup
+site_dir = nil
+site_pflicht = false
 until argv.empty?
   case (arg = argv.shift)
   when '--root'  then wurzel = argv.shift
@@ -560,6 +581,8 @@ until argv.empty?
   when '--config-schema'      then cfg_schema = argv.shift
   when '--config'  then configs << argv.shift
   when '--self-test' then selbsttest_nur = true
+  when '--site' then site_dir = argv.shift
+  when '--require-site' then site_pflicht = true
   when '--help', '-h'
     puts File.read(__FILE__).lines[2..24].map { |z| z.sub(/\A# ?/, '') }.join
     exit 0
@@ -685,6 +708,11 @@ sammlungsseiten = 0
 uebersetzungen = {}
 dateinamen = {}
 ohne_sprachangabe = []
+# Braucht diese Site das Adressen-Plugin? Zwei Anzeichen, beide allein am QUELLTEXT
+# ablesbar – die Pruefung rechnet KEINE Adresse nach. Sonst staende die Abbildungsregel
+# ein zweites Mal hier und koennte von der im Plugin abweichen.
+slug_vorhanden = false
+nebeneinander = false
 Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
   rel = pfad.sub(/\A#{Regexp.escape(wurzel)}\/?/, '')
   next if uebersprungen?(rel, ausschluss, sammlungen)
@@ -711,7 +739,12 @@ Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
   # sind der Normalfall (jeder Ordner hat eine `index.md`) und erst dann ein Problem, wenn
   # jemand darauf verweist.
   seitensprache = sprache_von_pfad(rel, sprachen, standardsprache)
+  slug_vorhanden = true if daten.is_a?(Hash) && (daten['slug'] || daten['folder_slug'])
   if daten.is_a?(Hash) && daten['lang'].is_a?(String)
+    # SPRACHE DEKLARIERT, ORDNER SAGT ETWAS ANDERES: Die Seite liegt NEBEN ihrer
+    # Uebersetzung statt im Sprachbaum. Dann erzeugt nur das Plugin das `/en/`-Praefix.
+    nebeneinander = true if daten['lang'].split('-').first.downcase !=
+                            seitensprache.split('-').first.downcase
     seitensprache = daten['lang']
   elsif daten.is_a?(Hash)
     # OHNE `lang` entscheidet der Ordner. Das bleibt gültig und ist der bequeme
@@ -720,13 +753,40 @@ Dir.glob(File.join(wurzel, '**', '*.{md,markdown,html}')).sort.each do |pfad|
     # als HINWEIS, nicht als Verstoß: Ein Abbruch würde jede bestehende
     # mehrsprachige Site auf einen Schlag rot machen.
     #
-    # NUR fuer Dateien MIT Front Matter (`daten` ist ein Hash). Eine .html ohne
-    # Front Matter rendert Jekyll nicht, es kopiert sie durch – das Theme loest
-    # fuer sie nie eine Sprache auf, und ein `lang:` haette dort keine Wirkung.
+    # NUR für Dateien MIT Front Matter (`daten` ist ein Hash). Eine .html ohne
+    # Front Matter rendert Jekyll nicht, es kopiert sie durch – das Theme löst
+    # für sie nie eine Sprache auf, und ein `lang:` hätte dort keine Wirkung.
     # Die Vorlagen-Decks unter templates/ sind genau dieser Fall: Sie tragen ihr
-    # `<html lang>` selbst. Sie zu mahnen hiesse, eine Angabe zu verlangen, die
+    # `<html lang>` selbst. Sie zu mahnen hieße, eine Angabe zu verlangen, die
     # nichts bewirkt.
     ohne_sprachangabe << rel
+  end
+
+  # ZWEI SCHLUESSEL, ZWEI ORTE – und keiner davon darf am falschen stehen.
+  #
+  # `folder_slug` benennt den ORDNER, `slug` die SEITE. Auf einer Index-Seite gibt es
+  # nichts zu benennen: Ihre Adresse IST der Ordner. Ein `slug` dort schoebe die Datei
+  # aus dem Ordner heraus (`/kapitel/einstieg.html` statt `/kapitel/`) – der Ordner
+  # haette dann KEINE Index-Datei mehr, und `/kapitel/` waere 404. Deshalb verboten,
+  # nicht bloss unnoetig.
+  #
+  # Umgekehrt benennt `folder_slug` auf einer gewoehnlichen Seite einen Ordner, in dem
+  # sie nur zufaellig liegt – die Angabe gehoert an EINE Stelle je Ordner, sonst ist
+  # nicht bestimmt, wer sie fuehrt.
+  if daten.is_a?(Hash)
+    basis = File.basename(rel, '.*')
+    kurz = basis.sub(/_#{Regexp.escape(seitensprache.to_s.split('-').first.downcase)}\z/, '')
+    ist_index = kurz == 'index'
+    if daten['folder_slug'] && !ist_index
+      meldungen << "#{rel}: `folder_slug` benennt den ORDNER und gehört deshalb in " \
+                   'dessen `index.md` (bzw. `index_«code».md`), nicht in eine ' \
+                   'gewöhnliche Seite. Für DIESE Seite ist `slug` gemeint.'
+    end
+    if daten['slug'] && ist_index
+      meldungen << "#{rel}: `slug` ist auf einer Index-Seite nicht erlaubt – ihre " \
+                   'Adresse IST der Ordner. Die Angabe nähme dem Ordner seine ' \
+                   'Index-Datei, `/…/` liefe ins Leere. Gemeint ist `folder_slug`.'
+    end
   end
   if daten.is_a?(Hash) && daten['page_id'].is_a?(String)
     vergebene_ids << daten['page_id']
@@ -812,6 +872,50 @@ if seiten.zero?
   warn '       Damit hat die Prüfung nichts geprüft – das ist ein Befund, kein Erfolg.'
   warn '       Stimmt --root? Schließt `exclude` versehentlich alles aus?'
   exit 2
+end
+
+# ---------------------------------------------------------------------------
+# HAT DAS ADRESSEN-PLUGIN GEWIRKT?
+#
+# Der teuerste Fehler dieses Themes ist ein STILLER: `github-pages` erzwingt Jekylls
+# Safe-Modus und uebergeht jeden Plugin-Ordner, ohne das zu melden. Dann wirken `slug`
+# und das `/«code»/`-Praefix einfach nicht – der Build bleibt gruen, und die Seiten
+# stehen unter falschen Adressen. Gemerkt haette es niemand.
+#
+# Geprueft wird deshalb die SPUR, die das Plugin beim Bauen legt, nicht das Ergebnis:
+# Eine nachgerechnete Adresse waere die Abbildungsregel ein zweites Mal – zwei Stellen,
+# die auseinanderlaufen koennen. Die Spur ist eindeutig und kostet nichts.
+if site_dir
+  spur = File.join(site_dir, '.avd-addresses')
+  braucht = slug_vorhanden || nebeneinander
+  if !Dir.exist?(site_dir)
+    if site_pflicht
+      warn "FEHLER: --require-site verlangt eine gebaute Site, #{site_dir}/ gibt es nicht."
+      exit 2
+    end
+    warn "Hinweis: Adressen-Plugin NICHT geprüft – keine gebaute Site unter #{site_dir}/."
+    warn ''
+  elsif braucht && !File.exist?(spur)
+    grund = []
+    grund << '`slug`-Angaben im Front Matter' if slug_vorhanden
+    grund << 'Seiten, die ihre Sprache deklarieren und NICHT im Sprachbaum liegen' if nebeneinander
+    warn 'FEHLER: Das Adressen-Plugin des Themes hat beim Bauen NICHT gewirkt.'
+    warn ''
+    warn "       Diese Site braucht es – sie hat #{grund.join(' und ')}."
+    warn "       In #{site_dir}/ fehlt aber die Spur `.avd-addresses`, die es beim"
+    warn '       Bauen legt. Ohne das Plugin stehen die Seiten unter den Adressen,'
+    warn '       die Ordner- und Dateiname vorgeben – ohne jede Meldung.'
+    warn ''
+    warn '       Häufigste Ursache: Der Build läuft mit dem Gem `github-pages`. Es'
+    warn '       erzwingt Jekylls Safe-Modus und übergeht Plugin-Ordner STILLSCHWEIGEND.'
+    warn '       Abhilfe: `jekyll` plus `jekyll-optional-front-matter` und'
+    warn '       `jekyll-relative-links` verwenden, wie in der Kopiervorlage.'
+    warn ''
+    warn '       Zweitfrage: Steht `plugins_dir` mit `theme/jekyll/_plugins`? Es kommt'
+    warn '       aus `theme/jekyll/_config.defaults.yml` – wird die Datei nicht geladen,'
+    warn '       fehlt der Schlüssel.'
+    exit 1
+  end
 end
 
 # EIN Hinweis, nicht siebzig. Eine Warnung, die je Seite erscheint, scrollt die

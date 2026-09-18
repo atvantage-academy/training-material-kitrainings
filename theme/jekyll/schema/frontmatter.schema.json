@@ -47,6 +47,42 @@
         "modul-tcp-ip"
       ]
     },
+    "folder_slug": {
+      "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+      "description": "NAME DES ORDNERS in der Adresse – für jede Seite darin. Gehört AUSSCHLIESSLICH in die `index.md` eines Ordners (bzw. `index_«code».md`); in einer gewöhnlichen Seite ist `slug` gemeint. Damit trägt ein Ordner, was im Editor hilft und in der Adresse nichts verloren hat: eine Nummerierung (`03-http/` → `/http-grundlagen/`) oder ein deutscher Name in einer englischen Fassung. EIN TEXT gilt für jede Sprache; eine SPRACHKARTE gibt je Sprache einen eigenen Ordnernamen. Im Nebeneinander-Layout darf ihn stattdessen jede Index-Datei für IHRE Sprache nennen – zwei Angaben zur selben Sprache mit verschiedenem Wert brechen den Build ab. RANGFOLGE: Sprache der Seite, dann eine Angabe für alle Sprachen, dann die Standardsprache, dann der unveränderte Ordnername. NICHT ERLAUBT auf der Wurzel eines Sprachbaums (`en/index.md`).",
+      "examples": [
+        "http-grundlagen",
+        {
+          "de": "http-grundlagen",
+          "en": "http-basics"
+        }
+      ]
+    },
+    "slug": {
+      "$ref": "frontmatter.schema.json#/definitions/sprachtext",
+      "description": "ADRESSSTÜCK DIESER SEITE – entkoppelt die URL vom DATEINAMEN. Benennt NUR diese eine Seite; den Ordner benennt `folder_slug` in dessen `index.md`. AUF EINER INDEX-SEITE NICHT ERLAUBT: Deren Adresse IST der Ordner, ein `slug` schöbe die Datei aus ihm heraus (`/kapitel/einstieg.html` statt `/kapitel/`) – der Ordner hätte dann keine Index-Datei mehr und `/kapitel/` liefe ins Leere. Damit dürfen Ordner tragen, was im Editor hilft und in der Adresse nichts verloren hat – eine Nummerierung (`03-http/` → `/http-grundlagen/`) oder ein deutscher Name in einer englischen Fassung. EIN TEXT GENÜGT und gilt für JEDE Sprache – in einer einsprachigen Unterlage also schlicht für die Standardsprache aus `lang` der Site; eine `i18n`-Konfiguration ist dafür NICHT nötig. Als SPRACHKARTE gibt es je Sprache eine eigene Adresse; das Theme wählt dann nach der Sprache DER SEITE (siehe `lang`), sonst nach der Standardsprache. GILT IN: allen. STANDARD: keiner – dann ist der Datei- bzw. Ordnername die Adresse. NICHT ERLAUBT auf der Wurzel eines Sprachbaums (`en/index.md`): Aus diesem Pfadstück liest das Theme die Sprache jeder Seite ohne `lang`. Ein ausdrückliches `permalink` gewinnt gegen `slug`. Zwei Seiten auf derselben Adresse brechen den Build ab.",
+      "examples": [
+        "http-grundlagen",
+        {
+          "de": "http-grundlagen",
+          "en": "http-basics"
+        }
+      ]
+    },
+    "image": {
+      "type": "string",
+      "description": "VORSCHAUBILD DIESER SEITE für geteilte Links – setzt `og:image`. So erscheint eine geteilte Adresse in Slack, Teams oder LinkedIn mit Bild statt als nackter Link. STANDARD: `brand.og_image` der Site; ohne beides entsteht KEIN `og:image` – ein Tag auf ein Bild, das es nicht gibt, ist schlechter als keines. Ist `site.url` gesetzt, wird die Adresse absolut gemacht; ohne bleibt sie relativ und wird nicht von jedem Dienst gefunden. GILT IN: allen. Heisst `image` und nicht `og_image`, weil es das Bild DIESER SEITE beschreibt und kein Protokolldetail.",
+      "examples": [
+        "/assets/kurs-http.png"
+      ]
+    },
+    "noindex": {
+      "type": "boolean",
+      "description": "DIESE SEITE NICHT INDIZIEREN LASSEN. Setzt `<meta name=\"robots\" content=\"noindex\">` in den Kopf. WOFÜR: Eine Unterlage darf öffentlich erreichbar und trotzdem UNGELISTET sein – ein Training, das nur seine Teilnehmenden aufrufen, oder eine Fassung im Entwurf. Nur `noindex`, KEIN `nofollow`: Die Verweise der Seite dürfen weiter verfolgt werden, sonst schnitte eine ungelistete Seite alles ab, was unter ihr hängt. GILT IN: allen. STANDARD: `false` – die Seite darf indiziert werden. Braucht KEIN gesetztes `site.url`: Die Angabe spricht über diese Seite, nicht über eine Adresse.",
+      "examples": [
+        true
+      ]
+    },
     "permalink": {
       "type": "string",
       "description": "Jekyll-Standard: abweichende Ziel-URL dieser Seite. STANDARD: der Pfad der Datei."

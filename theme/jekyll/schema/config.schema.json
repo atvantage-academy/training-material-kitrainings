@@ -245,6 +245,23 @@
       "type": "string",
       "description": "Die Zielgruppe DIESES Builds. Wird nicht von Hand gesetzt, sondern vom Build als Overlay (`_config.audience.yml`); Seiten und Einträge fremder Zielgruppe entfallen dann. STANDARD: keine – dann ist alles sichtbar (die lokale Vorschau). Der Wert muss in `audiences` deklariert sein."
     },
+    "audience_filter": {
+      "type": "object",
+      "description": "Welche Zielgruppen eine GEFILTERTE Ausgabe bekommen – gelesen von der Baukomponente `theme/jekyll/_bin/build.sh`. Ein Schlüssel ist eine Zielgruppe aus `audiences`; wer hier steht, bekommt nur Seiten, die ihn in ihrem `audiences` nennen oder gar keine Angabe tragen. Wer hier NICHT steht, bekommt alles Publizierbare. DIE ASYMMETRIE IST ABSICHT UND GEHÖRT DER SITE: „Material der einen Gruppe nicht an die andere“ gilt oft nur in eine Richtung. Das Theme legt die Werte NICHT fest – wie bei `audiences` ist das eine Festlegung des Werkzeugs, das die Site baut. STANDARD: keiner – dann ist jede Ausgabe ungefiltert.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "exclude_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Zusätzlich entfallen Dateien, deren DATEINAME auf eines dieser Glob-Muster passt (z. B. `intern-*`) – die Namenskonvention als Rückfall für Seiten ohne `audiences` im Front Matter. EIN AUSDRÜCKLICHES `audiences` STICHT: Eine Seite, die diese Zielgruppe nennt, bleibt auch dann, wenn ihr Name auf ein Muster passt. STANDARD: keine – dann entscheidet allein das Front Matter."
+          }
+        }
+      }
+    },
     "i18n": {
       "type": "object",
       "additionalProperties": false,
@@ -372,6 +389,10 @@
               "description": "Apple-Touch-Icon 180×180 für den iOS-Homescreen."
             }
           }
+        },
+        "og_image": {
+          "type": "string",
+          "description": "VORSCHAUBILD DER SITE für geteilte Links – Rückfall, wenn eine Seite kein eigenes `image` trägt. Setzt `og:image`. Ohne diesen Schlüssel und ohne `image` entsteht kein `og:image`. Empfohlen ist ein Bild im Seitenverhältnis 1,91:1 (z. B. 1200×630); kleinere werden von manchen Diensten nicht als grosse Karte gezeigt."
         }
       }
     },
