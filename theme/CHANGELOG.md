@@ -15,6 +15,241 @@ Abschnitt „Theme-Version“.
 
 ---
 
+## 2.27.1
+
+### Behoben: Die Reiter sahen nicht aus wie Reiter
+
+Aus der Praxis gemeldet: „Ich sehe nur die Titel, untereinander statt nebeneinander, keinen
+Hintergrund bei den Tabs und im Inhalt."
+
+**Die Mechanik war in Ordnung** – nachgewiesen gegen die deployten Dateien: Leiste gebaut,
+fünf Reiter, `--enhanced` gesetzt. Die Gestaltung taugte nicht:
+
+| Befund | Ursache |
+| ------ | ------- |
+| untereinander statt nebeneinander | `flex-wrap: wrap` – fünf Beschriftungen passen nicht in eine Inhaltsspalte und **brachen um** |
+| kein Hintergrund bei den Tabs | nur ein Unterstrich, keine Fläche |
+| kein Hintergrund im Inhalt | das offene Panel hatte gar keine |
+
+Ein umgebrochener Streifen ohne Fläche liest sich als Liste von Titeln – also genau als
+das, was er ersetzen sollte.
+
+**Die Leiste rollt jetzt, statt umzubrechen** (`flex-wrap: nowrap` + `overflow-x: auto`).
+Das ist die einzige Form, die bei jeder Breite ein Streifen bleibt; die frühere
+Sonderregel für schmale Bildschirme entfällt damit, weil sie zur Regel geworden ist.
+
+**Reiter und Inhalt bekommen Flächen.** Der gewählte Reiter trägt den Seitenhintergrund
+und sitzt optisch vor der Trennlinie, die übrigen dahinter; die Inhaltsfläche schließt
+**unmittelbar** an die Leiste an. Ein Abstand dazwischen ließe beide als getrennte Dinge
+erscheinen.
+
+### Nebenbei: ein Token, das es nicht gibt
+
+`--avd-academy-space-5` wurde verwendet, ist aber nirgends definiert (die Skala geht
+1, 2, 3, 4, 6, 8, 12, 16). Dank Rückfallwert wirkte es trotzdem – ein erfundenes Token
+gehört trotzdem nicht ins Theme. Ersetzt durch `--avd-academy-space-6`.
+
+---
+
+## 2.27.0
+
+### Neu: Tabs – ein langer Leitfaden in schaltbaren Abschnitten
+
+Eine Seite, die zu lang zum Scrollen ist, bekommt Reiter. Dokumentiert unter
+[Bausteine → Tabs](https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/bausteine.html#tabs).
+
+```html
+<div class="avd-academy-tabs" markdown="1">
+<details class="avd-academy-tabs__panel" name="leitfaden" open markdown="1">
+<summary>Tag 1</summary>
+…
+</details>
+</div>
+```
+
+**Grundlage ist `<details name="…">`, kein Klick-Handler.** Der Browser schaltet damit von
+sich aus exklusiv. Das ist dieselbe Entscheidung wie beim aufdeckbaren Inhalt und aus
+demselben Grund: Ein Umschalter, der nur mit JavaScript existiert, **verliert im
+Fehlerfall Schulungsinhalt**.
+
+| | ohne JavaScript | mit JavaScript |
+| --- | --------------- | -------------- |
+| Darstellung | Akkordeon | Reiterstreifen oben |
+| Umschalten | nativ über `name` | Klick auf den Reiter |
+| Strg+F | findet alles | findet alles |
+| Tiefe Verweise | Browser springt | öffnet zusätzlich den Reiter |
+
+`atvantage.js` baut die Leiste aus den `<summary>` und setzt erst **danach**
+`--enhanced`. Bricht etwas vorher ab, steht das Akkordeon – nie eine halbe Oberfläche.
+
+**Warum nicht rein mit CSS:** Ein echter Reiterstreifen braucht die Beschriftungen getrennt
+von den Inhalten – eine Leiste oben, darunter eine gemeinsame Fläche. In `<details>` steckt
+jede Beschriftung in ihrem eigenen Element. `display: contents` würde sie herauslösen,
+zerlegt aber in mehreren Browsern die Auf-/Zu-Mechanik selbst.
+
+### Zwei Feinheiten, die sonst stillschweigend schiefgingen
+
+**Im Ausdruck** entfällt die Leiste (sie ist eine Bedienung), und die Zusammenfassungen
+kommen als Zwischenüberschriften zurück. Beim Aufklappen steckt die Falle: Ein
+`<details name="…">` **schließt beim Öffnen seine Geschwister** – eine Schleife, die reihum
+öffnet, ließe am Ende genau einen Reiter offen und der Rest fehlte auf dem Papier.
+`atvantage.js` entfernt den Namen deshalb vor dem Druck und setzt ihn danach zurück.
+
+**Mit der Tastatur** wechseln Pfeiltasten den Reiter, `Home`/`End` springen an den Rand.
+Ohne das wäre der Streifen unerreichbar: Nicht gewählte Reiter tragen `tabindex="-1"`,
+damit die Leiste ein Tab-Stopp ist und nicht sechs.
+
+### Für Konsumenten
+
+Rein ergänzend. Geschrieben werden nur `avd-academy-tabs` und
+`avd-academy-tabs__panel`; Leiste und Reiter legt das Skript an.
+
+---
+
+## 2.26.0
+
+### Behoben: `folder_slug` ging beim Zielgruppenfilter verloren
+
+`folder_slug` benennt einen Ordner in der **Adresse** um – der typische Fall ist eine
+Nummer im Dateisystem (`03-http/`), die in der URL nichts verloren hat (`/http/`). Das
+Schema verlangt die Angabe in der `index.md` des Ordners.
+
+Genau die gehört in einer Schulungsunterlage aber oft **nur einer Zielgruppe** (das
+Trainer-Thema eines Moduls). Der Filter entfernte sie – und mit ihr die Adressangabe. Der
+Ordner behielt dann seinen Dateinamen, also die Nummer, **ausgerechnet in der öffentlichen
+Ausgabe**, während die übrigen Seiten weiter auf die Slug-Adresse zeigten.
+
+**Gemessen** an einem Schulungsrepo mit zwölf nummerierten Modulen: In der Trainer-Ausgabe
+stimmten alle Adressen, in der Lernenden-Ausgabe hieß **jeder** Ordner wieder `NN-…` – ein
+toter Verweis je Modul. Der Linkcheck fängt das erst nach dem Build; ohne ihn wäre es
+unbemerkt deployt worden.
+
+Die Baukomponente verschiebt die Angabe jetzt auf eine Seite, die **bleibt**, und meldet es
+sichtbar:
+
+```
+==> folder_slug gerettet: 12 Ordner, deren Index-Seite der Filter entfernt hat
+```
+
+**Warum das geht:** Das Adressen-Plugin liest `folder_slug` von **jeder** Seite eines
+Ordners, nicht nur von der Index-Datei. Die Beschränkung im Schema ist eine Konvention für
+Autoren – sie hält die Angabe an einer auffindbaren Stelle –, keine technische Bedingung.
+Zwei Angaben mit gleichem Wert sind zulässig; nur verschiedene brechen ab.
+
+Bleibt keine Seite übrig, ist der Ordner ohnehin weg und es gibt nichts zu retten.
+
+---
+
+## 2.25.0
+
+### Behoben: In Callouts, Zitaten und Zellen klebten die Absätze aneinander
+
+`base.css` räumt mit `* { margin: 0 }` alle Abstände ab; zurück holte sie **eine** Regel:
+
+```css
+.avd-academy-guide-main > * + * { margin-top: var(--avd-academy-rhythm-block); }
+```
+
+Der Selektor greift nur bei **direkten Kindern**. Alles, was in einem Container steckte,
+blieb ohne Abstand – und das ist auf einer Unterlage nicht der Randfall, sondern der
+Normalfall: Callout, Zitat, aufdeckbarer Block, Listeneintrag, Tabellenzelle.
+
+**Gemessen am Trainerleitfaden eines echten Schulungsrepos:** 2 von 3 `blockquote` und der
+einzige Callout hatten je zwei Absätze **ohne einen Pixel dazwischen** – sieben
+Absatzübergänge allein auf dieser Seite. Am Bildschirm liest sich das wie ein einziger
+Block, und es traf jede Seite jedes Repos.
+
+Der Rhythmus gilt jetzt auch **innerhalb** dieser Container:
+
+```css
+.avd-academy-guide-main :where(blockquote, li, td, th, figure,
+  .avd-academy-callout, .avd-academy-reveal__body, .avd-academy-fold__body) > * + * {
+  margin-top: var(--avd-academy-rhythm-block);
+}
+```
+
+Dieselbe Ergänzung in `site.css` für die gewöhnliche Seite (`.avd-academy-doc-main`) –
+beide Spalten lesen denselben Rhythmus, also müssen sie ihn auch gleich anwenden.
+
+**`:where()` hält die Spezifität bei null.** Ein Repo, das in seiner `custom.css` einen
+dieser Container eigens setzt, gewinnt weiterhin ohne `!important`.
+
+### Warum Minor und nicht Patch
+
+Die Korrektur **ändert das Aussehen jeder Seite** – dort, wo bisher nichts war, steht
+jetzt ein Abstand. Das ist mehr als eine stille Korrektur, aber kein Bruch: Kein Repo muss
+etwas tun, und wer den Abstand irgendwo nicht will, setzt ihn in seiner `custom.css`
+zurück.
+
+---
+
+## 2.24.0
+
+### Behoben: Eine Klasse des Regie-Decks hieß das Gegenteil von dem, was sie tut
+
+`avd-academy-regie__handlung` heißt jetzt **`avd-academy-regie__material`**.
+
+Die Vorlage, aus der der Baustein entstand, nennt die Klasse `.r--hand` – kurz für
+**„zur Hand"**, also die **rechte** Spalte mit den Verweisen aufs Material. Beim Übertragen
+wurde daraus „Handlung" gelesen und benannt. Das CSS tat von Anfang an das Richtige, aber
+der Name sagte das Gegenteil, und die Dokumentation beschrieb damit die falsche Spalte
+(„die linke Spalte: was zu tun ist").
+
+**Die Handlungs-Spalte braucht gar keine Klasse.** Sie ist negativ selektiert – Handlung
+ist, was nicht Material ist. Das ist nicht nur kürzer, es ist robuster: Eine Klasse, die
+man setzen müsste, kann man vergessen; diese hier nicht.
+
+### Warum das trotz Umbenennung Minor ist
+
+Nach den Regeln in `AGENTS.md` ist eine umbenannte Klasse **Major**. Diese Regel schützt
+Konsumenten – und hier gibt es nachweislich keine: Der Name stammt aus 2.23.0, veröffentlicht
+eine knappe Stunde zuvor, und **kein einziges Repo** verwendet die Regie-Klassen bisher
+(geprüft über alle vier Schulungsrepos und den Playground). Das erste Deck wird gerade
+umgestellt – auf den neuen Namen.
+
+Ein Major-Sprung hätte jedes Repo auf eine neue Spanne gezwungen, um einen Namen zu
+reparieren, den noch niemand tippen konnte. Die Umbenennung steht trotzdem hier und im
+Markup Contract als Entfernung – wer später sucht, findet sie.
+
+---
+
+## 2.23.0
+
+### Neu: Regie-Deck – Folien zum Bedienen, nicht zum Zeigen
+
+Ein Foliensatz, der **während** der Durchführung bedient wird: eine Folie je Einheit, oben
+die Uhrzeit, links die Handlung, rechts die Verweise aufs Material, höchstens eine Falle.
+Bewusst Text und Liste statt Bild – das ist kein Lehrmedium, sondern ein Spickzettel im
+Blätterformat.
+
+Dreizehn Klassen unter `avd-academy-regie__*`, dokumentiert unter
+[Layouts → Regie-Deck](https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/layouts.html#regie-deck).
+
+**Warum das ins Theme gehört.** Die Form entstand in einem Schulungsrepo
+(`training-concept-api-engineering`, A-006) als **92 Zeilen CSS im Seitenkopf**. Das trug,
+solange es zwei Seiten waren. Sobald jedes Repo ein Regie-Deck führt, wären es dieselben
+92 Zeilen in jedem – dieselbe Kopie-Drift, gegen die die Vorlagenversion überhaupt
+existiert. Was in jedem Repo gleich aussieht, ist Design.
+
+**Wann** man ein Regie-Deck schreibt und was daraufsteht, bleibt didaktisch und steht im
+Didaktikon. Die Grenze verläuft wie immer: hier die Klassen, dort der Zweck.
+
+**`:has()` statt einer Modifier-Klasse.** Die Inhaltsspalte einer Folie ist sonst kein
+Flex-Container; das Deck braucht sie als solchen. Eine Klasse dafür müsste jede Folie
+tragen und wäre genau das, was man vergisst – die Folie säße dann oben statt mittig, und
+niemand wüsste warum.
+
+**Die Klassen stehen im Markup Contract** – kuratiert, nicht per Scan: `theme/jekyll/`
+pauschal mitzuscannen hätte 109 weitere Namen aufgenommen, fast alle interne
+Layout-Klassen. Die Regie-Klassen sind Autorenfläche; sie stehen im Markdown eines
+Schulungsrepos, in jeder Folie.
+
+**Für Konsumenten:** rein ergänzend. Ein Deck, das seine Klassen weiter im Seitenkopf
+definiert, läuft unverändert – die Namen kollidieren nicht (dort `.k`, `.r`, hier
+`avd-academy-regie__*`).
+
+---
+
 ## 2.22.0
 
 ### Neu: Zielgruppengefiltert bauen ist eine Komponente des Themes

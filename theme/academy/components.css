@@ -378,7 +378,13 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 
 /* Legende zur Tabelle – erklärt die Töne und die Schraffur. Eigenständig
    verwendbar, auch mehrfach über mehreren Tabellen. */
-.avd-academy-grouptable-legend {
+/* DER KLASSENNAME STEHT ZWEIMAL, mit Absicht. Der Flussrhythmus
+   `.avd-academy-guide-main > * + *` in guide.css hat DIESELBE Spezifitaet wie
+   ein einfacher Klassenselektor (0-1-0) - und guide.css laedt spaeter als diese
+   Datei. Bei Gleichstand gewinnt das Spaetere, der eigene Abstand kaeme also nie
+   an. Die Dopplung hebt auf 0-2-0 und entscheidet die Sache unabhaengig von der
+   Ladereihenfolge. Nicht wegraeumen. */
+.avd-academy-grouptable-legend.avd-academy-grouptable-legend {
   display: flex; flex-wrap: wrap;
   gap: var(--avd-academy-space-1) var(--avd-academy-space-4);
   margin: var(--avd-academy-space-2) 0 var(--avd-academy-space-4);
@@ -449,7 +455,13 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    Visualisierungen, Simulationen). Diese Trennung ist der Zweck der
    Darstellung – und sie steht je Themenblock, nicht global, damit
    Zusammengehörendes zusammen bleibt.                                  */
-.avd-academy-topic { margin: var(--avd-academy-space-8) 0 0; }
+/* DER KLASSENNAME STEHT ZWEIMAL, mit Absicht. Der Flussrhythmus
+   `.avd-academy-guide-main > * + *` in guide.css hat DIESELBE Spezifitaet wie
+   ein einfacher Klassenselektor (0-1-0) - und guide.css laedt spaeter als diese
+   Datei. Bei Gleichstand gewinnt das Spaetere, der eigene Abstand kaeme also nie
+   an. Die Dopplung hebt auf 0-2-0 und entscheidet die Sache unabhaengig von der
+   Ladereihenfolge. Nicht wegraeumen. */
+.avd-academy-topic.avd-academy-topic { margin: var(--avd-academy-space-8) 0 0; }
 .avd-academy-topic > h3 {
   margin: 0 0 var(--avd-academy-space-3);
   padding-bottom: .35rem;
@@ -974,3 +986,186 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    die Seite selbst bekommt niemals einen waagerechten Balken. */
 .avd-academy-tablescroll { overflow-x: auto; }
 .avd-academy-tablescroll > table { margin: 0; }
+
+/* ===========================================================================
+   TABS – ein langer Leitfaden in schaltbaren Abschnitten
+   ---------------------------------------------------------------------------
+   GRUNDLAGE IST `<details name="…">`, nicht ein Klick-Handler. Der Browser
+   schaltet damit von sich aus exklusiv: Oeffnet man eines, schliessen die
+   anderen. Ohne JavaScript ist es ein Akkordeon, in dem jeder Inhalt erreichbar
+   bleibt - dieselbe Zusage wie beim Reveal-Baustein.
+
+   `atvantage.js` ERGAENZT den Tab-Streifen: Es baut aus den `<summary>` eine
+   Leiste und blendet die Zusammenfassungen aus. Fehlt das Skript, sieht man das
+   Akkordeon; es fehlt nichts.
+
+   WARUM NICHT REIN MIT CSS: Ein echter Tab-Streifen braucht die Beschriftungen
+   getrennt von den Inhalten - eine Leiste oben, darunter eine gemeinsame
+   Flaeche. In `<details>` steckt jede Beschriftung in ihrem eigenen Element.
+   `display: contents` am `<details>` wuerde sie herausloesen, zerlegt aber in
+   mehreren Browsern die Auf-/Zu-Mechanik selbst.
+   =========================================================================== */
+
+/* OBEN MEHR LUFT ALS UNTEN. Die Reiterleiste ist ein Bedienelement, kein
+   Absatz - sie braucht sichtbaren Abstand zu dem, was ueber ihr steht, sonst
+   liest sie sich als Fortsetzung des vorigen Textes. */
+/* DER KLASSENNAME STEHT ZWEIMAL, mit Absicht. Der Flussrhythmus
+   `.avd-academy-guide-main > * + *` in guide.css hat DIESELBE Spezifitaet wie
+   ein einfacher Klassenselektor (0-1-0) - und guide.css laedt spaeter als diese
+   Datei. Bei Gleichstand gewinnt das Spaetere, der eigene Abstand kaeme also nie
+   an. Die Dopplung hebt auf 0-2-0 und entscheidet die Sache unabhaengig von der
+   Ladereihenfolge. Nicht wegraeumen. */
+.avd-academy-tabs.avd-academy-tabs {
+  margin: var(--avd-academy-space-12, 3rem) 0 var(--avd-academy-space-6, 1.5rem);
+}
+
+/* --- Ohne JavaScript: Akkordeon ------------------------------------------- */
+.avd-academy-tabs__panel { border-top: 1px solid var(--avd-academy-color-border); }
+.avd-academy-tabs__panel:last-of-type { border-bottom: 1px solid var(--avd-academy-color-border); }
+.avd-academy-tabs__panel > summary {
+  cursor: pointer; list-style: none;
+  padding: var(--avd-academy-space-3, 0.75rem) 0;
+  font-weight: var(--avd-academy-fw-bold, 700);
+}
+.avd-academy-tabs__panel > summary::-webkit-details-marker { display: none; }
+.avd-academy-tabs__panel > summary::before {
+  content: "▸"; display: inline-block; width: 1.2em;
+  color: var(--avd-academy-color-accent);
+  transition: transform var(--avd-academy-transition, 160ms ease);
+}
+.avd-academy-tabs__panel[open] > summary::before { transform: rotate(90deg); }
+
+/* --- Mit JavaScript: Tab-Streifen ----------------------------------------- */
+/* Die Klasse setzt das Skript, erst wenn die Leiste steht. Ohne sie greift
+   nichts hiervon - die Seite faellt also nicht in einen halben Zustand. */
+.avd-academy-tabs--enhanced > .avd-academy-tabs__panel { border: 0; }
+.avd-academy-tabs--enhanced > .avd-academy-tabs__panel > summary { display: none; }
+
+/* EIN RAHMEN UM DAS GANZE, KEINE FLAECHEN DARIN. Der Kasten mit seinem Schatten
+   fasst Leiste und Inhalt zu einem Bedienelement zusammen; deshalb braucht
+   drinnen nichts mehr eine eigene Fuellung, um zusammenzugehoeren. Nur die
+   --enhanced-Fassung bekommt ihn: Das Akkordeon ohne JavaScript ist eine Liste
+   und soll auch wie eine aussehen. */
+.avd-academy-tabs--enhanced {
+  border: 1px solid var(--avd-academy-color-border);
+  border-radius: var(--avd-academy-radius-lg, 8px);
+  /* Zwei Lagen: die enge aus dem Token fuer die Kante, eine weiche darunter fuer
+     die Tiefe. Beide in neutralem Grau und NICHT aus einer Textfarbe gemischt -
+     im dunklen Schema kippt die ins Helle, und ein heller Schatten ist ein
+     Leuchten. */
+  box-shadow: var(--avd-academy-shadow-1), 0 6px 18px rgba(26, 38, 39, 0.07);
+}
+
+/* DIE LEISTE BRICHT NIE UM, SIE ROLLT. Mit `flex-wrap: wrap` legten sich fuenf
+   Beschriftungen in einer Inhaltsspalte untereinander - und ein umgebrochener
+   Reiterstreifen ohne Flaeche sieht aus wie eine Liste von Titeln. Genau so wurde
+   er gemeldet. Rollen ist die einzige Form, die bei jeder Breite ein Streifen
+   bleibt. */
+/* Waagerecht oben. Sie ROLLT, statt umzubrechen: Mit `flex-wrap: wrap` legten
+   sich fuenf Beschriftungen in einer Inhaltsspalte untereinander, und das las
+   sich als Liste von Titeln statt als Bedienelement. */
+.avd-academy-tabs__bar {
+  display: flex; flex-wrap: nowrap; gap: 0;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  margin-bottom: 0;
+  padding: 0 var(--avd-academy-space-2, 0.5rem);
+  /* Die einzige Linie im Inneren: Sie trennt Bedienung von Inhalt. */
+  border-bottom: 1px solid var(--avd-academy-color-border);
+}
+
+/* DIE WAHL ZEIGT EIN UNTERSTRICH, KEINE FLAECHE. Die Akzentfarbe steckt in
+   Linie und Schrift - alles aus Tokens, damit es mit dem Farbschema kippt und
+   bei einer anderen Schulungsfarbe richtig bleibt. Die durchsichtige Linie am
+   nicht gewaehlten Reiter ist kein Rest: Sie haelt den Platz, sonst ruecken
+   beim Umschalten alle Beschriftungen um drei Pixel. */
+.avd-academy-tabs__tab {
+  appearance: none; cursor: pointer; position: relative;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0.7rem 1.15rem;
+  color: var(--avd-academy-color-ink);
+  font: inherit; font-weight: var(--avd-academy-fw-bold, 700);
+  white-space: nowrap;
+  transition: color var(--avd-academy-transition, 160ms ease),
+              border-color var(--avd-academy-transition, 160ms ease);
+}
+.avd-academy-tabs__tab:hover {
+  color: var(--avd-academy-color-accent-ink);
+  border-bottom-color: color-mix(in srgb, var(--avd-academy-color-accent) 35%, transparent);
+}
+.avd-academy-tabs__tab[aria-selected="true"] {
+  color: var(--avd-academy-color-accent-ink);
+  border-bottom-color: var(--avd-academy-color-accent);
+}
+.avd-academy-tabs__tab:focus-visible {
+  outline: 2px solid var(--avd-academy-color-accent); outline-offset: 2px;
+}
+/* Wer Bewegung abbestellt hat, bekommt keine. */
+@media (prefers-reduced-motion: reduce) {
+  .avd-academy-tabs__tab { transition: none; }
+}
+
+/* Der Inhalt braucht nur noch Innenabstand - den Zusammenhalt leistet der
+   Rahmen um das Ganze. */
+.avd-academy-tabs--enhanced > .avd-academy-tabs__panel[open] {
+  padding: var(--avd-academy-space-6, 1.5rem);
+}
+
+/* --- Reiter links statt oben (`--side`) ----------------------------------- *
+   WOFUER: Beschriftungen, die ganze Saetze sind. Der waagerechte Streifen
+   rollt und bricht nie um - bei sieben Saetzen waere er unbedienbar. Links
+   untereinander darf jede Beschriftung umbrechen und trotzdem lesbar bleiben.
+
+   Es ist dieselbe Komponente, nur anders angeordnet: dasselbe Markup, dasselbe
+   Skript, dieselben Anker, dieselben Druckregeln. Nur diese Datei weiss davon.  */
+
+/* Leiste in Spalte 1, ALLE Panels in Spalte 2 - ausdruecklich gesetzt und nicht
+   dem Fluss ueberlassen. Ein geschlossenes `<details>` ist im Gitter weiterhin
+   ein Element und bekaeme sonst eine eigene Zelle; die Panels wanderten dann
+   treppenfoermig nach unten, obwohl nur eines sichtbar ist. */
+.avd-academy-tabs--enhanced.avd-academy-tabs--side {
+  display: grid;
+  grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr);
+}
+.avd-academy-tabs--side > .avd-academy-tabs__bar    { grid-area: 1 / 1; }
+.avd-academy-tabs--side > .avd-academy-tabs__panel  { grid-area: 1 / 2; }
+
+.avd-academy-tabs--side > .avd-academy-tabs__bar {
+  flex-direction: column;
+  overflow-x: visible;
+  padding: var(--avd-academy-space-2, 0.5rem) 0;
+  border-bottom: 0;
+  border-right: 1px solid var(--avd-academy-color-border);
+}
+
+/* Die Wahl wandert von der Unter- an die linke Kante - sonst alles wie oben.
+   `white-space: normal` ist hier der Punkt: Waagerecht darf nichts umbrechen,
+   senkrecht MUSS es. */
+.avd-academy-tabs--side > .avd-academy-tabs__bar > .avd-academy-tabs__tab {
+  text-align: left;
+  white-space: normal;
+  border-bottom: 0;
+  border-left: 3px solid transparent;
+  transition: color var(--avd-academy-transition, 160ms ease),
+              border-color var(--avd-academy-transition, 160ms ease);
+}
+.avd-academy-tabs--side > .avd-academy-tabs__bar > .avd-academy-tabs__tab:hover {
+  border-left-color: color-mix(in srgb, var(--avd-academy-color-accent) 35%, transparent);
+}
+.avd-academy-tabs--side > .avd-academy-tabs__bar > .avd-academy-tabs__tab[aria-selected="true"] {
+  border-left-color: var(--avd-academy-color-accent);
+}
+
+/* Schmal ist eine Seitenspalte keine: Unter dieser Breite bliebe fuer den Text
+   nichts uebrig. Dann steht die Leiste wieder oben - untereinander, nicht als
+   Streifen, denn die langen Beschriftungen sind ja der Grund fuer `--side`. */
+@media (max-width: 46rem) {
+  .avd-academy-tabs--enhanced.avd-academy-tabs--side { display: block; }
+  .avd-academy-tabs--side > .avd-academy-tabs__bar {
+    border-right: 0;
+    border-bottom: 1px solid var(--avd-academy-color-border);
+  }
+}

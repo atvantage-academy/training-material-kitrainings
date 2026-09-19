@@ -136,6 +136,27 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 .avd-academy-doc-main > h3 { margin-top: 1.75rem; margin-bottom: var(--avd-academy-rhythm-heading); }
 .avd-academy-doc-main > h4 { margin-top: 1.25rem; margin-bottom: var(--avd-academy-rhythm-heading); }
 
+/* --- Rhythmus AUCH INNERHALB der Fluss-Container --------------------------
+   `* { margin: 0 }` aus base.css raeumt alle Abstaende ab; zurueck holt sie die
+   Eulenregel darueber - aber nur fuer DIREKTE Kinder. Alles, was in einem
+   Container steckt, blieb damit ohne Abstand: Zwei Absaetze in einem Callout, in
+   einem Zitat oder in einer Tabellenzelle klebten aneinander.
+
+   GEMESSEN an einer echten Seite (Trainerleitfaden eines Schulungsrepos): 2 von 3
+   `blockquote` und der einzige Callout hatten je zwei Absaetze ohne einen Pixel
+   dazwischen. Auf dem Bildschirm liest sich das wie ein einziger Block - und es
+   traf jede Seite jedes Repos, nicht eine einzelne.
+
+   `:where()` HAELT DIE SPEZIFITAET BEI NULL: Ein Repo, das in seiner custom.css
+   einen dieser Container eigens setzt, gewinnt weiterhin ohne `!important`. Und
+   die Regel zaehlt nur Geschwister - ein einzelnes Kind bekommt nichts.
+   ------------------------------------------------------------------------- */
+.avd-academy-doc-main :where(blockquote, li, td, th, figure,
+  .avd-academy-callout, .avd-academy-reveal__body, .avd-academy-fold__body) > * + * {
+  margin-top: var(--avd-academy-rhythm-block);
+}
+
+
 .avd-academy-doc-sidebar {
   position: sticky; top: calc(var(--topnav-height, 80px) + 1.5rem);
   align-self: start;

@@ -302,3 +302,130 @@
   .avd-academy-slide h2 { font-size: 18pt; }
   .avd-academy-slide--title h1 { font-size: 24pt; }
 }
+
+/* ===========================================================================
+   REGIE-DECK – der Spickzettel im Blätterformat
+   ---------------------------------------------------------------------------
+   Ein Foliensatz, der WÄHREND der Durchführung bedient wird, nicht davor
+   gelesen. Eine Folie je Einheit: oben die Uhrzeit, links die Handlung, rechts
+   die Verweise auf das Material, höchstens eine Falle. Bewusst Text und Liste
+   statt Bild – das hier ist kein Lehrmedium.
+
+   WARUM DAS INS THEME GEHÖRT: Die Form entstand in einem Schulungsrepo
+   (`training-concept-api-engineering`, A-006) als 92 Zeilen CSS im Seitenkopf.
+   Das trug, solange es zwei Seiten waren. Sobald jedes Repo ein Regie-Deck
+   führt, wären es dieselben 92 Zeilen in jedem – also dieselbe Kopie-Drift, die
+   die Vorlagenversion überhaupt erst nötig macht. Was in jedem Repo gleich
+   aussieht, ist Design und gehört hierher; WANN man ein Regie-Deck schreibt und
+   was daraufsteht, bleibt didaktisch und steht im Didaktikon.
+   =========================================================================== */
+
+/* Kopfzeile. Die UHRZEIT steht vorn und groß: Beim Blättern ist die erste Frage
+   immer „liege ich noch im Plan?", nicht „welche Einheit ist das". */
+.avd-academy-regie__kopf {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.9rem;
+  margin: 0 0 1.5rem 0;
+}
+.avd-academy-regie__zeit {
+  font-size: 1.5rem; line-height: 1.1;
+  font-weight: var(--avd-academy-fw-bold, 700);
+  color: var(--avd-academy-color-accent);
+  font-variant-numeric: tabular-nums;
+}
+.avd-academy-regie__meta {
+  font-size: 0.92rem; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--avd-academy-color-ink-muted);
+}
+
+/* Zweispaltig: links die Handlung, rechts das Material. Unter 62rem
+   untereinander – ein Pult-Bildschirm ist nicht immer breit. */
+.avd-academy-regie__spalten {
+  display: grid; grid-template-columns: 1.9fr 1fr; gap: 2.4rem 3rem;
+  align-items: start;
+}
+@media (max-width: 62rem) {
+  .avd-academy-regie__spalten { grid-template-columns: 1fr; gap: 1.4rem; }
+}
+
+.avd-academy-regie__spalten h3 {
+  font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--avd-academy-color-ink-muted);
+  margin: 0 0 0.7rem 0; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--avd-academy-color-border);
+}
+/* Die Überschrift der HANDLUNGS-Spalte trägt den Auftrag, nicht das Wort „Tun".
+   Sie soll sich lesen wie eine Regieanweisung, deshalb steht sie als Satz und
+   nicht als Rubrik. SELEKTIERT WIRD NEGATIV: Handlung ist, was NICHT die
+   Material-Spalte ist. Sie braucht damit keine eigene Klasse und kann sie auch
+   nicht vergessen. */
+.avd-academy-regie__spalten > div:not(.avd-academy-regie__material) > h3 {
+  font-size: 1.1rem; letter-spacing: 0; text-transform: none;
+  color: var(--avd-academy-color-accent);
+  border-bottom-color: color-mix(in srgb, var(--avd-academy-color-accent) 45%, transparent);
+}
+/* Erwartbare Antworten als Gedankenstütze – leiser als die Anweisung selbst. */
+.avd-academy-regie__spalten li em {
+  color: var(--avd-academy-color-ink-muted); font-size: 0.92em;
+}
+.avd-academy-regie__spalten ul { margin: 0; padding-left: 1.15rem; }
+.avd-academy-regie__spalten li { margin-bottom: 0.8rem; line-height: 1.45; }
+/* Die Material-Spalte listet Verweise: ohne Aufzählungspunkte und kleiner, damit
+   sie neben der Handlung nicht wie ein zweiter Auftrag wirkt. */
+.avd-academy-regie__material ul { list-style: none; padding-left: 0; }
+.avd-academy-regie__material li { font-size: 0.95rem; margin-bottom: 0.7rem; }
+
+/* Die eine Sache, die schiefgeht, wenn man nicht daran denkt. HÖCHSTENS EINE je
+   Folie – zwei Fallen sind keine Falle mehr, sondern eine Liste. */
+.avd-academy-regie__falle {
+  margin: 1.6rem 0 0 0; padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--avd-academy-tone-alert);
+  background: color-mix(in srgb, var(--avd-academy-tone-alert) 8%, transparent);
+  font-size: 0.95rem;
+}
+
+/* Was nach dieser Einheit kommt – steht auf der LETZTEN Folie eines Blocks,
+   damit die Pause sichtbar ist, bevor man sie überblättert. */
+.avd-academy-regie__naechst {
+  margin: 1.6rem 0 0 0; padding-top: 0.7rem;
+  border-top: 1px solid var(--avd-academy-color-border);
+  font-size: 0.95rem; color: var(--avd-academy-color-ink-muted);
+}
+.avd-academy-regie__naechst strong { color: var(--avd-academy-color-ink); }
+
+/* Pausenfolie: trägt nur die Uhr. Sie ist im Blätterfluss der Ankerpunkt. */
+.avd-academy-regie__pause { text-align: center; color: var(--avd-academy-color-ink-muted); }
+.avd-academy-regie__uhr {
+  display: block; font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: var(--avd-academy-fw-bold, 700);
+  color: var(--avd-academy-color-ink); line-height: 1.1;
+}
+
+/* Tagesraster – die Übersichtsfolie am Anfang. */
+.avd-academy-regie__raster { width: 100%; font-size: 0.95rem; }
+.avd-academy-regie__raster td { padding: 0.4rem 0.6rem; vertical-align: top; }
+.avd-academy-regie__raster .avd-academy-regie__rz {
+  white-space: nowrap; color: var(--avd-academy-color-ink-muted); width: 1%;
+}
+.avd-academy-regie__raster .avd-academy-regie__rd {
+  white-space: nowrap; text-align: right; width: 1%;
+  color: var(--avd-academy-color-accent); font-weight: var(--avd-academy-fw-bold, 700);
+}
+.avd-academy-regie__raster tr.avd-academy-regie__trenn td {
+  border-top: 1px solid var(--avd-academy-color-border);
+}
+
+/* Senkrecht mittig, aber leicht ÜBER der optischen Mitte: Mittig zentriert
+   klaffte unter dem Titel eine breite Lücke, weil der Titel oben anschlägt.
+   
+   `:has()` STATT EINER MODIFIER-KLASSE: Die Inhaltsspalte ist sonst kein
+   Flex-Container; das Regie-Deck brauchte sie als solchen. Eine Klasse dafür
+   müsste jede Folie tragen und wäre genau das, was man vergisst – die Folie
+   säße dann oben statt mittig, und niemand wüsste warum. */
+.avd-academy-slide__inner:has(> [class*="avd-academy-regie__"]) {
+  display: flex; flex-direction: column; flex: 1 1 auto;
+}
+.avd-academy-slide__inner > .avd-academy-regie__spalten {
+  flex: 1 1 auto; align-content: center; padding-bottom: 6vh;
+}
+.avd-academy-slide__inner > .avd-academy-regie__raster,
+.avd-academy-slide__inner > .avd-academy-regie__pause { margin-block: auto; }

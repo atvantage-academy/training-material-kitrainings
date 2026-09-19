@@ -187,4 +187,28 @@
   h1, h2, h3, h4 { break-after: avoid-page; }
   pre, blockquote, table, figure, img { break-inside: avoid; }
   img { max-width: 100% !important; }
+
+  /* --- Tabs: auf Papier gibt es keine Reiter ------------------------------
+     Die Leiste ist eine Bedienung und auf dem Papier sinnlos; sie entfaellt. Die
+     Zusammenfassungen kommen dafuer zurueck - sie sind im Ausdruck die
+     Zwischenueberschriften, an denen man sich orientiert. Das Aufklappen selbst
+     macht atvantage.js (siehe dort: ein geschlossenes <details> verbirgt seinen
+     Inhalt im Shadow DOM, da kommt CSS nicht heran).
+
+     DIESER BLOCK GEHOERT IN `@media print` UND NUR DORTHIN. Er stand einmal am
+     Dateiende und damit DANEBEN: print.css wird ohne `media="print"` eingebunden
+     und kapselt selbst. Die Folge war, dass die Leiste auf dem BILDSCHIRM
+     ausgeblendet und die Zusammenfassungen eingeblendet waren - also genau ein
+     Akkordeon, und wegen `!important` durch nichts zu ueberschreiben.
+     ---------------------------------------------------------------------- */
+  /* Auch das Gitter der seitlichen Fassung: Ohne die Leiste stuende sonst eine
+     leere Spalte neben dem Text, und der Text haette nur den Rest der Seite. */
+  .avd-academy-tabs--side { display: block !important; }
+  .avd-academy-tabs__bar { display: none !important; }
+  .avd-academy-tabs--enhanced > .avd-academy-tabs__panel > summary {
+    display: block !important;
+    font-weight: var(--avd-academy-fw-bold, 700);
+    break-after: avoid;
+  }
+  .avd-academy-tabs--enhanced > .avd-academy-tabs__panel > summary::before { content: none; }
 }
