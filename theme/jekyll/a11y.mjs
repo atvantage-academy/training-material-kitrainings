@@ -44,11 +44,38 @@ const NICHT_SCHEITERN = process.argv.includes("--no-fail");
 const AUSSCHLUSS = arg("exclude", "theme/atvantage,theme/academy").split(",").filter(Boolean);
 const LAUT = process.argv.includes("--verbose");
 
-/* Regeln, die hier NICHT gelten sollen, mit Begründung. Leer lassen ist die
-   Regel; jeder Eintrag ist eine bewusste Entscheidung und gehört begründet. */
-const AUSNAHMEN = {
-  /* Beispiel: "color-contrast": "Markenfarbe, entschieden am …" */
-};
+/* --- Benannte Ausnahmen ---------------------------------------------------
+   JEDER EINTRAG IST EINE ENTSCHEIDUNG, KEIN AUSSCHALTER. Deshalb wirkt eine
+   Ausnahme nicht auf die ganze Regel, sondern nur auf Stellen, die zu ihrem
+   Merkmal passen – eine abgeschaltete `color-contrast` machte künftige, echte
+   Kontrastfehler unsichtbar, und genau das darf nicht passieren.
+
+   Und sie verschweigt nichts: Der Bericht zählt am Ende, wie viele Stellen
+   welche Ausnahme unterdrückt hat. Eine Zahl, die wächst, fällt auf.
+
+   Felder: `regel` (axe-Kennung), `wenn` (Merkmale aus axes `data`, alle müssen
+   passen; Farben ohne Beachtung von Gross/Klein), `grund`, `seit`. */
+const AUSNAHMEN = [
+  {
+    regel: "color-contrast",
+    wenn: { fgColor: "#ff5401" },
+    seit: "2026-09-21",
+    grund: "Marken-Orange als Schrift (3,22:1 auf Weiss). Bewusste Entscheidung: " +
+           "Die Marke traegt die Verweise; dass es Verweise SIND, zeigt die " +
+           "Unterstreichung im Fliesstext (1.4.1). Die Abweichung steht in " +
+           "docs/theme/barrierefreiheit.md."
+  }
+];
+
+function ausnahmeFuer(regel, daten) {
+  return AUSNAHMEN.find(function (a) {
+    if (a.regel !== regel) return false;
+    return Object.keys(a.wenn || {}).every(function (k) {
+      var ist = daten && daten[k];
+      return typeof ist === "string" && ist.toLowerCase() === String(a.wenn[k]).toLowerCase();
+    });
+  });
+}
 
 const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
@@ -207,10 +234,11 @@ async function seiteMessen(b, sitzung, url, axeQuelle, breite, schema) {
       return JSON.stringify(r.violations.map(v => ({
         id: v.id, impact: v.impact, help: v.help, hilfe: v.helpUrl,
         stellen: v.nodes.length,
-        beispiele: v.nodes.slice(0, 3).map(n => ({
+        knoten: v.nodes.map(n => ({
           ziel: n.target.join(" "),
           markup: (n.html || "").replace(/\\s+/g, " ").slice(0, 160),
-          grund: (n.any || []).concat(n.all || []).map(a => a.message).join("; ").slice(0, 200)
+          grund: (n.any || []).concat(n.all || []).map(a => a.message).join("; ").slice(0, 200),
+          daten: ((n.any || [])[0] || {}).data || null
         }))
       })));
     })()`,
@@ -236,6 +264,7 @@ catch (e) { server.close(); console.error("FEHLER beim Start von Chrome: " + e.m
 
 const funde = new Map();   // Regel -> { stellen, seiten:Set, beispiele[] }
 let gemessen = 0, kaputt = [];
+const unterdrueckt = new Map();   // Ausnahme -> Zahl der Stellen
 
 try {
  for (const schema of SCHEMATA) {
@@ -254,12 +283,20 @@ try {
         gemessen++;
         if (LAUT) console.log(`  ${String(Date.now() - t0).padStart(5)} ms  ${seite} @${breite} ${schema}`);
         for (const v of verstoesse) {
-          if (AUSNAHMEN[v.id]) continue;
+          /* Je Stelle entscheiden, nicht je Regel: Eine Ausnahme fuer das
+             Marken-Orange darf einen schlechten Grauton nicht mitdecken. */
+          const bleibt = [];
+          for (const n of v.knoten) {
+            const a = ausnahmeFuer(v.id, n.daten);
+            if (a) { unterdrueckt.set(a, (unterdrueckt.get(a) || 0) + 1); continue; }
+            bleibt.push(n);
+          }
+          if (!bleibt.length) continue;
           if (!funde.has(v.id)) funde.set(v.id, { ...v, stellen: 0, seiten: new Set(), beispiele: [] });
           const e = funde.get(v.id);
-          e.stellen += v.stellen;
+          e.stellen += bleibt.length;
           e.seiten.add(seite + " @" + breite + " " + schema);
-          for (const bsp of v.beispiele) if (e.beispiele.length < 3) e.beispiele.push(bsp);
+          for (const bsp of bleibt) if (e.beispiele.length < 3) e.beispiele.push(bsp);
         }
       } catch (e) {
         kaputt.push(seite + " @" + breite + " " + schema + ": " + e.message);
@@ -277,6 +314,13 @@ try {
 /* --- Bericht -------------------------------------------------------------- */
 const sortiert = [...funde.values()].sort((a, c) => c.stellen - a.stellen);
 console.log(`Barrierefreiheit: ${gemessen} Messungen (${seiten.length} Seiten × ${BREITEN.length} Breiten × ${SCHEMATA.length} Farbschemata), Regelsatz ${TAGS.join(", ")}`);
+if (unterdrueckt.size) {
+  console.log("\nDurch benannte Ausnahmen nicht gemeldet:");
+  for (const [a, n] of unterdrueckt) {
+    console.log(`  ${n} Stellen · ${a.regel} · seit ${a.seit}`);
+    console.log(`     ${a.grund}`);
+  }
+}
 if (kaputt.length) {
   console.log("\nNicht messbar:");
   kaputt.forEach((k) => console.log("  ! " + k));
@@ -302,7 +346,12 @@ if (MDZIEL) {
   const z = [];
   const summe = sortiert.reduce((n, v) => n + v.stellen, 0);
   z.push("<!-- avd-academy-a11y -->");
-  z.push("## " + (sortiert.length ? "⚠️ Barrierefreiheit: " + sortiert.length + " Regel(n) verletzt" : "✅ Barrierefreiheit: keine Verletzung gefunden"));
+  const zusatz = unterdrueckt.size
+    ? " (" + [...unterdrueckt.values()].reduce((a, b) => a + b, 0) + " Stellen durch benannte Ausnahmen)"
+    : "";
+  z.push("## " + (sortiert.length
+    ? "⚠️ Barrierefreiheit: " + sortiert.length + " Regel(n) verletzt" + zusatz
+    : "✅ Barrierefreiheit: keine Verletzung gefunden" + zusatz));
   z.push("");
   z.push("Gemessen mit **axe-core " + AXE_VERSION + "** in Chrome – " + gemessen + " Messungen (" +
     seiten.length + " Seiten × " + BREITEN.join(" und ") + " Pixel Breite × Farbschema " +
@@ -334,6 +383,14 @@ if (MDZIEL) {
     z.push("Keine der geprüften Regeln ist verletzt. Das Werkzeug misst, was mechanisch " +
       "entscheidbar ist – ob ein Alternativtext das Bild wiedergibt oder eine Simulation " +
       "ohne Maus zu Ende zu bedienen ist, sagt es nicht.");
+  }
+  if (unterdrueckt.size) {
+    z.push("");
+    z.push("**Durch benannte Ausnahmen nicht gemeldet:**");
+    z.push("");
+    for (const [a, n] of unterdrueckt) {
+      z.push("- **" + n + " Stellen** · `" + a.regel + "` · seit " + a.seit + " – " + a.grund);
+    }
   }
   if (kaputt.length) {
     z.push("");

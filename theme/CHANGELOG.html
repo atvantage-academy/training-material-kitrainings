@@ -64,13 +64,13 @@
 
 <meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789992834"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789992834">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789992834">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789992834">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789992834"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789992834">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789992834" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789992834" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789992834">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789994992"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789994992">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789994992">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789994992">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789994992"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789994992">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789994992" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789994992" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789994992">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -113,8 +113,8 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789992834">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789992834"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789994992">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789994992"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
@@ -174,6 +174,32 @@ inkompatibel gilt und wie eingestuft wird, steht in
 Abschnitt „Theme-Version“.</p>
 
 <hr />
+
+<h2 id="2340">2.34.0</h2>
+
+<h3 id="die-verweise-sind-wieder-orange--als-benannte-abweichung">Die Verweise sind wieder orange – als benannte Abweichung</h3>
+
+<p>2.33.0 hatte die Verweisfarbe abgedunkelt, weil <code>#FF5401</code> als Schrift nur 3,22:1
+erreicht. <strong>Die Marke kommt zurück:</strong> Sie trägt die Verweise. Dass es Verweise sind,
+zeigt die <strong>Unterstreichung</strong> im Fließtext – das erfüllt 1.4.1, <strong>nicht</strong> 1.4.3. Die
+Kontrastforderung bleibt also unerfüllt, und genau so steht es jetzt da: als
+<strong>bekannte Abweichung</strong> mit Begründung und Datum in
+<a href="https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/barrierefreiheit.html">Barrierefreiheit</a>.</p>
+
+<p><code>--avd-academy-color-link</code> und <code>--avd-academy-color-link-hover</code> bleiben erhalten und
+zeigen jetzt auf den Akzent. <strong>Wer die Abweichung nicht mitgehen will, setzt die
+beiden Token auf eine dunklere Mischung</strong> (die Doku nennt die Werte) und ist ohne
+weiteres Zutun konform – alle Verweise folgen ihnen.</p>
+
+<h3 id="ausnahmen-gelten-je-stelle-nicht-je-regel">Ausnahmen gelten je Stelle, nicht je Regel</h3>
+
+<p>Damit die Abweichung die Prüfung nicht blind macht, kennt <code>a11y.mjs</code> jetzt <strong>benannte
+Ausnahmen mit Merkmal</strong>: Die Ausnahme nennt den Vordergrundton <code>#FF5401</code>, nicht die
+Regel <code>color-contrast</code>. Ein schlechter Grauton fällt weiterhin auf.</p>
+
+<p><strong>Verschwiegen wird nichts:</strong> Jeder Lauf zählt, wie viele Stellen welche Ausnahme
+deckt, und schreibt es in den Bericht – auf der Konsole, in der Zusammenfassung des
+Laufs und in den Kommentar am Pull Request. Eine Zahl, die wächst, fällt auf.</p>
 
 <h2 id="2330">2.33.0</h2>
 

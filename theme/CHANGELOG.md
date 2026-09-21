@@ -15,6 +15,32 @@ Abschnitt „Theme-Version“.
 
 ---
 
+## 2.34.0
+
+### Die Verweise sind wieder orange – als benannte Abweichung
+
+2.33.0 hatte die Verweisfarbe abgedunkelt, weil `#FF5401` als Schrift nur 3,22:1
+erreicht. **Die Marke kommt zurück:** Sie trägt die Verweise. Dass es Verweise sind,
+zeigt die **Unterstreichung** im Fließtext – das erfüllt 1.4.1, **nicht** 1.4.3. Die
+Kontrastforderung bleibt also unerfüllt, und genau so steht es jetzt da: als
+**bekannte Abweichung** mit Begründung und Datum in
+[Barrierefreiheit](https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/barrierefreiheit.html).
+
+`--avd-academy-color-link` und `--avd-academy-color-link-hover` bleiben erhalten und
+zeigen jetzt auf den Akzent. **Wer die Abweichung nicht mitgehen will, setzt die
+beiden Token auf eine dunklere Mischung** (die Doku nennt die Werte) und ist ohne
+weiteres Zutun konform – alle Verweise folgen ihnen.
+
+### Ausnahmen gelten je Stelle, nicht je Regel
+
+Damit die Abweichung die Prüfung nicht blind macht, kennt `a11y.mjs` jetzt **benannte
+Ausnahmen mit Merkmal**: Die Ausnahme nennt den Vordergrundton `#FF5401`, nicht die
+Regel `color-contrast`. Ein schlechter Grauton fällt weiterhin auf.
+
+**Verschwiegen wird nichts:** Jeder Lauf zählt, wie viele Stellen welche Ausnahme
+deckt, und schreibt es in den Bericht – auf der Konsole, in der Zusammenfassung des
+Laufs und in den Kommentar am Pull Request. Eine Zahl, die wächst, fällt auf.
+
 ## 2.33.0
 
 ### Barrierefreiheit als Maßstab – und als Messung

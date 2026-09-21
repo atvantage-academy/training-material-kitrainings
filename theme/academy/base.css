@@ -73,11 +73,6 @@ th { font-weight: 600; }
 /* --- Barrierefreiheit ----------------------------------------------------- */
 :focus-visible { outline: 3px solid var(--avd-orange); outline-offset: 2px; }
 
-/* --- Verweise ------------------------------------------------------------- */
-/* DAS FUNDAMENT SETZT `a:hover{color:var(--color-orange)}` – und damit landete
-   der Zeiger-Zustand wieder bei 3,22:1. Ein Kriterium gilt in JEDEM Zustand;
-   deshalb bekommt auch der Zeiger eine eigene, dunklere Mischung. */
-a:hover { color: var(--avd-academy-color-link-hover); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }

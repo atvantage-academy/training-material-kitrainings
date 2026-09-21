@@ -41,7 +41,7 @@
   text-decoration: none;
 }
 .avd-academy-topbar__nav a:hover,
-.avd-academy-topbar__nav a[aria-current] { color: var(--avd-academy-color-link); }
+.avd-academy-topbar__nav a[aria-current] { color: var(--avd-orange); }
 
 /* --- Hero-Band ------------------------------------------------------------ */
 .avd-academy-guide-hero {
@@ -57,7 +57,7 @@
   flex-wrap: wrap;
 }
 .avd-academy-guide-hero__crumbs a { color: inherit; text-decoration: none; }
-.avd-academy-guide-hero__crumbs a:hover { color: var(--avd-academy-color-link-hover); }
+.avd-academy-guide-hero__crumbs a:hover { color: var(--avd-orange); }
 .avd-academy-guide-hero__crumbs [aria-current] { color: var(--avd-academy-color-headline); }
 /* Meta-Zeile im Hero: Tags links, Werkzeuge rechts (auf Topics-Höhe). */
 .avd-academy-guide-hero__meta {
@@ -150,8 +150,7 @@
   font-weight: 500;
   line-height: 1.5;
 }
-/* Rand bleibt Marke (Flaeche, 3:1 genuegt), Schrift wird dunkler (4,5:1). */
-.avd-academy-tag--time { border-color: var(--avd-orange); color: var(--avd-academy-color-link); }
+.avd-academy-tag--time { border-color: var(--avd-orange); color: var(--avd-orange); }
 
 /* --- Zweispaltiges Layout ------------------------------------------------- */
 .avd-academy-guide-layout {
@@ -391,8 +390,8 @@
 }
 .avd-academy-toc { display: flex; flex-direction: column; gap: 10px; }
 .avd-academy-toc a { color: var(--avd-academy-color-ink); text-decoration: none; font-size: 16px; }
-.avd-academy-toc a:hover { color: var(--avd-academy-color-link-hover); }
-.avd-academy-toc a[aria-current="true"] { color: var(--avd-academy-color-link); font-weight: 500; }
+.avd-academy-toc a:hover { color: var(--avd-orange); }
+.avd-academy-toc a[aria-current="true"] { color: var(--avd-orange); font-weight: 500; }
 .avd-academy-toc .avd-academy-toc--h3 { padding-left: 14px; font-size: 15px; }
 
 /* Fortschritt */
@@ -402,7 +401,7 @@
 
 /* Weiterführende Informationen */
 .avd-academy-guide-side__links { display: flex; flex-direction: column; gap: 10px; }
-.avd-academy-guide-side__links a { color: var(--avd-academy-color-link); text-decoration: none; font-size: 16px; }
+.avd-academy-guide-side__links a { color: var(--avd-orange); text-decoration: none; font-size: 16px; }
 .avd-academy-guide-side__links a:hover { text-decoration: underline; }
 
 /* --- Fuß (dunkel, atvantage-Slate) ---------------------------------------- */

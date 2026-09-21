@@ -569,9 +569,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   width: fit-content;
   cursor: pointer;
   font-weight: 600;
-  /* Die dunklere Verweisfarbe statt des reinen Akzents: Der Text ist anklickbar
-     und muss 4,5:1 tragen - das Marken-Orange kommt auf Weiß nur auf 3,22:1. */
-  color: var(--avd-academy-color-link);
+  color: var(--avd-academy-color-accent);
   border-bottom: 1px dashed currentColor;
   list-style: none;             /* Standard-Dreieck weg (Firefox) */
 }

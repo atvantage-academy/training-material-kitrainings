@@ -38,21 +38,18 @@
      ab (siehe „Text auf Akzentfläche“ weiter unten). */
   --avd-academy-color-accent-contrast: var(--avd-white);
 
-  /* --- Verweisfarbe: dunkler als die Marke, aus der Marke gemischt ----------
-     WARUM NICHT EINFACH DAS ORANGE: Als Schrift auf Weiß erreicht #FF5401 nur
-     3,22:1 – gefordert sind 4,5:1 (WCAG 1.4.3). Verweise sind der häufigste Text
-     einer Doku-Seite; gemessen waren es 468 Stellen auf 49 Seiten. GEMISCHT statt
-     fest gesetzt, damit die Farbe DEM AKZENT folgt – ein Projekt mit eigenem
-     Akzent bekäme sonst ein Orange, das sonst nirgendwo mehr vorkommt.
-       hell:   72 % Akzent in Schwarz  →  5,7:1 auf Weiß, 4,9:1 auf Code-Grau
-       Zeiger: 62 % Akzent in Schwarz  →  7,1:1
-     ALS FLÄCHE, RAND, BALKEN UND FOKUSRING BLEIBT DIE MARKE UNVERÄNDERT: Dort
-     gilt 3:1, und das erfüllt das Orange. Betroffen ist nur Schrift.
-     `--color-link` gehört dem Fundament (theme/atvantage/tokens/base.css setzt
-     `a{color:var(--color-link)}`); es hier umzubiegen färbt jeden Verweis, ohne
-     eine Zeile im Fundament zu ändern. */
-  --avd-academy-color-link:       color-mix(in srgb, var(--avd-academy-color-accent) 72%, #000);
-  --avd-academy-color-link-hover: color-mix(in srgb, var(--avd-academy-color-accent) 62%, #000);
+  /* --- Verweisfarbe: die Marke, bewusst --------------------------------------
+     Als SCHRIFT erreicht `#FF5401` auf Weiß nur 3,22:1; WCAG 1.4.3 verlangt 4,5:1.
+     Das ist eine ENTSCHEIDUNG, keine Übersehung: Die Marke trägt die Verweise, und
+     dass sie Verweise SIND, zeigt die Unterstreichung im Fließtext (1.4.1). Die
+     Abweichung steht mit Begründung und Datum in `docs/theme/barrierefreiheit.md`
+     und als benannte Ausnahme in `theme/jekyll/a11y.mjs`; die Prüfung zählt sie in
+     jedem Lauf sichtbar mit, statt sie zu verschweigen.
+     Die beiden Token bleiben bestehen – ein Projekt, das die Abweichung nicht
+     mitgehen will, setzt sie auf eine dunklere Mischung und ist ohne weiteres
+     Zutun konform. */
+  --avd-academy-color-link:       var(--avd-academy-color-accent);
+  --avd-academy-color-link-hover: var(--avd-academy-color-accent);
   --color-link: var(--avd-academy-color-link);
 
   /* --- Neutrale / Flächenfarben (theme-fähig; Light-Defaults) -------------
@@ -280,11 +277,6 @@
     --avd-academy-metanav-bg:      #101a18;
     --avd-academy-metanav-text:    #93a5a2;
     --avd-academy-code-bg:         #24332f;
-    /* Verweise andersherum: auf dunklem Grund muss die Farbe HELLER werden.
-       85 % Akzent in Weiß → 5,2:1 auf der Seitenfläche, 4,7:1 auf Code-Grau;
-       das reine Orange käme dort nur auf 4,1:1. */
-    --avd-academy-color-link:       color-mix(in srgb, var(--avd-academy-color-accent) 85%, #fff);
-    --avd-academy-color-link-hover: color-mix(in srgb, var(--avd-academy-color-accent) 70%, #fff);
     /* Gruppen-Töne aufhellen: Die Füllpalette ist auf helle Flächen gerechnet;
        auf dunklem Grund wäre besonders Ton 1 (Slate) nicht mehr zu sehen. Kein
        eigener Farbwert – dieselben Töne, nur zu Weiß hin gemischt. */
@@ -337,9 +329,6 @@
   --avd-academy-metanav-bg:      #101a18;
   --avd-academy-metanav-text:    #93a5a2;
   --avd-academy-code-bg:         #24332f;
-  /* Verweise heller – Begründung siehe System-Dark-Block oben. */
-  --avd-academy-color-link:       color-mix(in srgb, var(--avd-academy-color-accent) 85%, #fff);
-  --avd-academy-color-link-hover: color-mix(in srgb, var(--avd-academy-color-accent) 70%, #fff);
   /* Gruppen-Töne aufhellen – Begründung siehe System-Dark-Block oben. */
   --avd-academy-tone-1: color-mix(in srgb, var(--avd-academy-fill-1) 45%, #fff);
   --avd-academy-tone-2: color-mix(in srgb, var(--avd-academy-fill-2) 60%, #fff);
