@@ -54,8 +54,10 @@
 
      Unbekannte Sprache fällt auf Deutsch zurück, wie im Wörterbuch des Layouts. */
   var TEXTE = {
-    de: { kopieren: "Kopieren", kopiert: "Kopiert!", schließen: "Schließen" },
-    en: { kopieren: "Copy",     kopiert: "Copied!",  schließen: "Close" }
+    de: { kopieren: "Kopieren", kopiert: "Kopiert!", schließen: "Schließen",
+          erledigt: "erledigt", schritt: "Arbeitsschritt" },
+    en: { kopieren: "Copy",     kopiert: "Copied!",  schließen: "Close",
+          erledigt: "done",     schritt: "Step" }
   };
   var T = TEXTE[(document.documentElement.getAttribute("lang") || "de").split("-")[0].toLowerCase()] || TEXTE.de;
 
@@ -183,8 +185,15 @@
              etwas gewinnt. Die Fortschrittskarte blendet sich in initGuideProgress()
              selbst ein – die laeuft vorher, ihr [hidden] ist hier also endgueltig.
              Hat die Seite den Zustand selbst gesetzt, gilt sie und beides bleibt aussen vor. */
+          /* SCHMAL IMMER ZUGEKLAPPT - und zwar vor allem anderen. Das Verzeichnis
+             steht dort ueber dem Text; offen schoebe es den Anfang der Seite unter
+             den Bildschirmrand. Die Angaben aus `_config.yml` und Front Matter
+             beschreiben eine SEITENSPALTE; auf einem Telefon gibt es keine. */
+          var schmal = window.matchMedia && window.matchMedia("(max-width: 960px)").matches;
           var vorgabe = tocCard.getAttribute("data-avd-academy-toc-open");
-          if (vorgabe !== null) {
+          if (schmal) {
+            tocCard.open = false;
+          } else if (vorgabe !== null) {
             tocCard.open = vorgabe !== "false";
           } else {
             var darunter = false;
@@ -236,6 +245,20 @@
      Voraussetzungen). Läuft VOR der Doc-Sidebar-Sichtbarkeitsprüfung in
      initGuideToc(), damit die (per [hidden]) versteckte Fortschrittskarte dort
      korrekt als „leer“ zählt. */
+  /* --- Namen fuer die Kaestchen aus Markdown-Aufgabenlisten --------------- */
+  /* EIGENE FUNKTION, NICHT TEIL DES FORTSCHRITTS: Aufgabenlisten stehen auch auf
+     Seiten ohne Fortschrittskarte (Doku, Uebersichten). Dort blieben die Kaestchen
+     sonst namenlos - eine Vorlesehilfe sagt fuenfzehnmal „Kontrollkaestchen“ und
+     nichts weiter. Der Name kommt aus dem Listeneintrag, in dem es steht. */
+  function initCheckboxNamen() {
+    document.querySelectorAll('li > input[type="checkbox"]').forEach(function (c, i) {
+      if (c.getAttribute("aria-label") || (c.labels && c.labels.length)) return;
+      var li = c.closest("li");
+      var name = li ? li.textContent.replace(/\s+/g, " ").trim() : "";
+      c.setAttribute("aria-label", name || (T.schritt + " " + (i + 1)));
+    });
+  }
+
   function initGuideProgress() {
     var box = document.querySelector("[data-avd-academy-progress]");
     var main = document.querySelector(".avd-academy-guide-main, .avd-academy-doc-main");
@@ -245,16 +268,32 @@
     box.hidden = false;
     var fill = box.querySelector(".avd-academy-progress__fill");
     var text = box.querySelector(".avd-academy-progress__text");
+    var bar = box.querySelector(".avd-academy-progress__bar");
+
+    /* DER BALKEN IST EINE ANZEIGE, KEIN BILD. Ohne Rolle ist er fuer eine
+       Vorlesehilfe ein leeres Kaestchen; mit `progressbar` und `aria-valuenow`
+       sagt er den Stand an. Der Text daneben traegt `aria-live`, damit das
+       Abhaken hoerbar wird - sonst passiert beim Klicken nichts Hoerbares. */
+    if (bar) {
+      bar.setAttribute("role", "progressbar");
+      bar.setAttribute("aria-valuemin", "0");
+      bar.setAttribute("aria-valuemax", "100");
+    }
+    if (text) text.setAttribute("aria-live", "polite");
+
     function update() {
       var done = 0;
       checks.forEach(function (c) { if (c.checked) done++; });
       var pct = Math.round((done / checks.length) * 100);
       if (fill) fill.style.width = pct + "%";
-      if (text) text.textContent = done + " / " + checks.length + " erledigt";
+      if (bar) bar.setAttribute("aria-valuenow", String(pct));
+      if (text) text.textContent = done + " / " + checks.length + " " + T.erledigt;
       // Vollständig erledigt → grüner Haken (Balken/Text bleiben sichtbar).
       box.classList.toggle("is-complete", done === checks.length);
     }
     checks.forEach(function (c) {
+      /* EINGESCHALTET heißt: ein echtes Bedienelement. Den Namen hat es von
+         `initCheckboxNamen()`, die vorher laeuft - auch auf Seiten ohne Karte. */
       c.disabled = false;
       c.addEventListener("change", update);
     });
@@ -265,6 +304,10 @@
   function closeAllMenus(except) {
     document.querySelectorAll(".avd-academy-header__submenu[data-open]").forEach(function (s) {
       if (s === except) return;
+      /* EIN ELTERNMENUE BLEIBT OFFEN. Seit es drei Ebenen gibt, liegt das Menue
+         der dritten IN dem der zweiten - wer beim Oeffnen stumpf alles schließt,
+         zieht sich den Boden unter dem eigenen Menue weg. */
+      if (except && s.contains(except)) return;
       s.removeAttribute("data-open");
       var t = s.parentNode.querySelector(".avd-academy-header__grouptoggle");
       if (t) t.setAttribute("aria-expanded", "false");
@@ -274,8 +317,10 @@
     var groups = document.querySelectorAll("[data-avd-academy-menu]");
     if (!groups.length) return;
     groups.forEach(function (group) {
-      var toggle = group.querySelector(".avd-academy-header__grouptoggle");
-      var submenu = group.querySelector(".avd-academy-header__submenu");
+      /* :scope - sonst griffe eine Gruppe der ersten Ebene nach dem Schalter
+         einer verschachtelten und schoebe beide Ebenen mit einem Klick auf. */
+      var toggle = group.querySelector(":scope > .avd-academy-header__grouptoggle");
+      var submenu = group.querySelector(":scope > .avd-academy-header__submenu");
       if (!toggle || !submenu) return;
       toggle.addEventListener("click", function (e) {
         e.preventDefault();
@@ -290,17 +335,209 @@
           toggle.setAttribute("aria-expanded", "true");
         }
       });
+
+      /* DER FOKUS OEFFNET DAS MENUE EBENFALLS - das macht das Stylesheet ueber
+         `:focus-within`, damit man sich mit der Tabulatortaste hineinbewegen
+         kann, ohne vorher zu klicken. Dann muss `aria-expanded` mitziehen:
+         Sonst sagt eine Vorlesehilfe „zugeklappt“ ueber ein Menue, in dem der
+         Fokus gerade steht. Nur wenn nicht ohnehin geklickt wurde - `data-open`
+         hat Vorrang, sonst schloesse das Verlassen ein geklicktes Menue. */
+      group.addEventListener("focusin", function () {
+        if (!submenu.hasAttribute("data-open")) toggle.setAttribute("aria-expanded", "true");
+      });
+      group.addEventListener("focusout", function (e) {
+        if (submenu.hasAttribute("data-open")) return;
+        if (e.relatedTarget && group.contains(e.relatedTarget)) return;
+        toggle.setAttribute("aria-expanded", "false");
+      });
     });
+    /* KLICK DANEBEN SCHLIESST - aber nur, was wirklich daneben liegt. Ein Klick
+       im Menue der dritten Ebene liegt INNERHALB der Gruppe der ersten; wer hier
+       pauschal alles schließt, macht das Untermenue unbedienbar. */
     document.addEventListener("click", function (e) {
-      document.querySelectorAll("[data-avd-academy-menu]").forEach(function (group) {
-        if (!group.contains(e.target)) {
-          var s = group.querySelector(".avd-academy-header__submenu[data-open]");
-          if (s) closeAllMenus();
-        }
+      var drin = e.target.closest && e.target.closest("[data-avd-academy-menu]");
+      if (!drin) { closeAllMenus(); return; }
+      document.querySelectorAll(".avd-academy-header__submenu[data-open]").forEach(function (s) {
+        if (s.contains(e.target)) return;
+        s.removeAttribute("data-open");
+        var t = s.parentNode.querySelector(".avd-academy-header__grouptoggle");
+        if (t) t.setAttribute("aria-expanded", "false");
       });
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeAllMenus();
+    });
+  }
+
+  /* --- Bleibt der rechte Bereich leer? ------------------------------------ *
+     Eine Visualisierung schaltet ihn AUS. Eine gewoehnliche Seite kann ihn nur
+     ZUFAELLIG leer lassen - wenn die Seite zu wenige Ueberschriften fuer ein
+     Verzeichnis hat, keine Checkboxen fuer den Fortschritt und keine
+     weiterfuehrenden Links. Dann reserviert das Raster 300px fuer nichts, und die
+     Seite haengt links statt mittig zu stehen.
+
+     ERST JETZT ENTSCHEIDBAR: Das Inhaltsverzeichnis entsteht im Browser, und die
+     Fortschrittskarte blendet sich selbst ein. Deshalb laeuft diese Pruefung
+     NACH beiden - die Reihenfolge in `init()` ist Teil der Sache.
+
+     Gepruefte Bedingung ist die SICHTBARKEIT, nicht die Existenz: Die Karten
+     stehen als `[hidden]` im Markup und bleiben es, wenn sie nichts zu zeigen
+     haben. */
+  function initSidebarLeer() {
+    var sidebar = document.querySelector(".avd-academy-guide-sidebar");
+    if (!sidebar) return;
+    var etwasDa = Array.prototype.some.call(sidebar.children, function (karte) {
+      if (karte.hidden) return false;
+      return karte.offsetParent !== null || karte.getClientRects().length > 0;
+    });
+    document.body.classList.toggle("avd-academy-guide--sidebar-empty", !etwasDa);
+  }
+
+  /* --- TopNav: Umbruch messen, Seite des Flyouts waehlen ------------------ *
+     ZWEI DINGE, die CSS nicht kann.
+
+     ERSTENS: Passt die Leiste in eine Zeile? Die Anzahl der Eintraege steht in
+     Liquid (`nav.compact_after`), aber lange Beschriftungen und schmale Fenster
+     kennt nur der Browser. Gemessen wird die NATUERLICHE Breite - also die, die
+     die Leiste haette, wenn sie nicht umbrechen duerfte. Das geht nur, wenn man
+     den Umbruch kurz abschaltet und wieder herstellt; sonst misst man den bereits
+     umgebrochenen Zustand und bekaeme nie ein "passt nicht".
+
+     Die Falle dabei: Sobald `--compact` gesetzt ist, liegt die Leiste als Klappfeld
+     und waere immer "schmal genug" - das Ergebnis schwankte bei jeder Messung.
+     Deshalb wird fuer die Messung auch `--compact` kurz abgenommen.
+
+     ZWEITENS: Faehrt das Menue der dritten Ebene nach rechts oder nach links aus?
+     Das entscheidet der Platz bis zum Fensterrand, und den kennt erst der Browser. */
+  function initNavLayout() {
+    var header = document.querySelector("[data-avd-academy-header]");
+    if (!header) return;
+    var nav = header.querySelector(".avd-academy-header__nav");
+    if (!nav) return;
+
+    /* Aus Liquid gesetzt? Dann bleibt es dabei - die Anzahl ist eine Ansage des
+       Autors, keine Messung, und sie soll nicht durch eine weggemessen werden. */
+    var festGesetzt = header.classList.contains("avd-academy-header--compact");
+
+    /* PASST DIE LEISTE IN EINE ZEILE?
+       Nicht ausgerechnet, sondern abgelesen: Liegt der letzte Eintrag tiefer als
+       der erste, hat die Leiste umgebrochen. Das ist genau die Frage, und es ist
+       die einzige Rechnung, die nicht daneben liegen kann - eine Schaetzung aus
+       Header-Breite minus Wortmarke minus Werkzeuge vergisst Innenabstaende und
+       Abstaende und sagte bei 950 px noch "passt", waehrend die Leiste bereits
+       dreizeilig war (gemessen).
+
+       Gemessen wird OHNE `--compact`: Mit der Klasse liegt die Leiste als Spalte,
+       und jede Zeile stuende tiefer als die vorige - das Ergebnis waere immer
+       "umgebrochen" und der Zustand schwankte. Zwischen Abnehmen und Wiederanlegen
+       liegt kein `await` und kein Ereignis, der Browser malt also nichts davon. */
+    function passtInEineZeile() {
+      var vorherCompact = header.classList.contains("avd-academy-header--compact");
+      header.classList.remove("avd-academy-header--compact");
+      var kinder = nav.children;
+      var umbruch = false;
+      if (kinder.length > 1) {
+        var oben = kinder[0].offsetTop;
+        for (var i = 1; i < kinder.length; i++) {
+          if (kinder[i].offsetTop > oben + 2) { umbruch = true; break; }
+        }
+      }
+      if (vorherCompact) header.classList.add("avd-academy-header--compact");
+      return !umbruch;
+    }
+
+    function nachmessen() {
+      if (festGesetzt) return;
+      /* Unter der Media-Query-Schwelle misst niemand: Dort gilt ohnehin der
+         Burger, und die Leiste ist ausgeblendet - jede Messung waere Unsinn. */
+      if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) {
+        header.classList.remove("avd-academy-header--compact");
+        return;
+      }
+      header.classList.toggle("avd-academy-header--compact", !passtInEineZeile());
+      /* DAS KLAPPFELD GEHOERT UNTER DEN KNOPF. Wo der steht, weiß nur das
+         Layout - CSS kann die Stelle nicht ausrechnen. Deshalb kommt sie als
+         Custom Property herein; das Stylesheet setzt sie ein. */
+      var burger = header.querySelector(".avd-academy-header__burger");
+      if (burger) header.style.setProperty("--avd-academy-nav-left", burger.offsetLeft + "px");
+    }
+
+    nachmessen();
+
+    /* NOCH EINMAL, WENN DIE SCHRIFT DA IST. Beim ersten Messen steht oft noch die
+       Ersatzschrift; die Beschriftungen sind dann schmaler, die Leiste passt
+       scheinbar in eine Zeile, und gleich darauf laedt Outfit nach und sie bricht
+       um - ohne dass ein `resize` faellt. Gemessen: Bei 940 px blieb die Leiste
+       dreizeilig und der Burger aus. */
+    if (document.fonts && document.fonts.ready) {
+      /* EIN BILD SPAETER. `fonts.ready` sagt "geladen", nicht "neu umbrochen" -
+         der Reflow mit der echten Schrift kommt erst danach. Direkt gemessen
+         blieb die Leiste bei 940 px dreizeilig und der Burger aus (gemessen). */
+      document.fonts.ready.then(function () { window.requestAnimationFrame(nachmessen); });
+    }
+
+    var wartet = false;
+    window.addEventListener("resize", function () {
+      if (wartet) return;
+      wartet = true;
+      window.requestAnimationFrame(function () { wartet = false; nachmessen(); });
+    });
+
+    /* Seite des seitlichen Menues. Beim Oeffnen und beim Ueberfahren pruefen, ob
+       rechts noch Platz ist; sonst nach links. */
+    /* WELCHE SEITE. Nicht "rechts, ausser es passt nicht" - sondern die Seite mit
+       mehr Platz, falls rechts nicht reicht. Der Unterschied zeigt sich erst im
+       Grenzfall: Ein Menue, das rechts um zehn Pixel ueberlaeuft, lief nach dem
+       blossen Umkippen links um zweihundert ueber (gemessen). */
+    function seiteWaehlen(menu, gruppe) {
+      menu.classList.remove("avd-academy-header__submenu--flip");
+      var noetig = menu.offsetWidth;
+      var g = gruppe.getBoundingClientRect();
+      var platzRechts = window.innerWidth - g.right - 8;
+      var platzLinks = g.left - 8;
+      if (noetig > platzRechts && platzLinks > platzRechts) {
+        menu.classList.add("avd-academy-header__submenu--flip");
+      }
+    }
+    /* Und beim Betreten eines gewoehnlichen Eintrags derselben Ebene: Wer von
+       „Referenz" auf „Ueberblick" faehrt, will das Untermenue nicht weiter sehen. */
+    header.querySelectorAll(".avd-academy-header__submenu > a").forEach(function (a) {
+      a.addEventListener("mouseenter", function () {
+        if (header.classList.contains("avd-academy-header--compact")) return;
+        if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) return;
+        document.querySelectorAll(".avd-academy-header__submenu--side[data-open]").forEach(function (offen) {
+          if (offen.contains(a)) return;
+          offen.removeAttribute("data-open");
+          var t = offen.parentNode.querySelector(":scope > .avd-academy-header__grouptoggle");
+          if (t) t.setAttribute("aria-expanded", "false");
+        });
+      });
+    });
+
+    header.querySelectorAll(".avd-academy-header__group--sub").forEach(function (g) {
+      var menu = g.querySelector(".avd-academy-header__submenu--side");
+      if (!menu) return;
+      /* EIN ANDERES MENUE UEBERNIMMT. Am Schreibtisch oeffnet der Hover per CSS,
+         ein Klick setzt zusaetzlich `data-open` - und das bliebe stehen, waehrend
+         nebenan schon das naechste aufgeht. Beim Betreten einer Gruppe schließt
+         deshalb alles, was weder sie selbst noch ein Vorfahr von ihr ist. */
+      function uebernehmen() {
+        /* NUR AM SCHREIBTISCH. Im Burger oeffnet und schließt allein der Klick -
+           dort ist die Maus kein Zeigegeraet ueber einem Streifen, sondern faehrt
+           beim Scrollen ueber alles hinweg. Gemeldet: Ein Klick auf „Grundlagen"
+           oeffnete, das blosse Ueberfahren von „Referenz" schloss es wieder. */
+        if (header.classList.contains("avd-academy-header--compact")) return;
+        if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) return;
+        seiteWaehlen(menu, g);
+        document.querySelectorAll(".avd-academy-header__submenu[data-open]").forEach(function (offen) {
+          if (offen === menu || offen.contains(g)) return;
+          offen.removeAttribute("data-open");
+          var t = offen.parentNode.querySelector(":scope > .avd-academy-header__grouptoggle");
+          if (t) t.setAttribute("aria-expanded", "false");
+        });
+      }
+      g.addEventListener("mouseenter", uebernehmen);
+      g.addEventListener("focusin", uebernehmen);
     });
   }
 
@@ -393,6 +630,7 @@
   function closeQrZoom() {
     document.querySelectorAll(".avd-academy-qr").forEach(function (host) {
       host.classList.remove("is-zoom");
+      if (host.hasAttribute("aria-pressed")) host.setAttribute("aria-pressed", "false");
       /* Auch den Fokus abgeben: Solange die Schaltfläche ihn hat, hält ihn
          `:focus-visible` vergrößert – Zuklappen sähe wirkungslos aus. Betrifft
          die Tastaturbedienung; wer klickt oder tippt, hat keinen sichtbaren
@@ -449,8 +687,14 @@
          kennt kein Überfahren – dort öffnet ein Tipp den Code, ein Tipp daneben
          oder Escape schließt ihn wieder. */
       hosts.forEach(function (host) {
+        /* GEDRUECKT ODER NICHT - das ist hier der Zustand, und eine Vorlesehilfe
+           erfaehrt ihn nur ueber `aria-pressed`. Ohne das Attribut ist der Knopf
+           eine Schaltflaeche, die scheinbar nichts tut: Das Vergroessern ist rein
+           optisch, und der angesagte Text bleibt in beiden Zustaenden derselbe. */
+        host.setAttribute("aria-pressed", "false");
         host.addEventListener("click", function () {
-          host.classList.toggle("is-zoom");
+          var auf = host.classList.toggle("is-zoom");
+          host.setAttribute("aria-pressed", auf ? "true" : "false");
         });
       });
       /* Klick daneben schließt. Bewusst OHNE `stopPropagation` am Knopf selbst:
@@ -563,7 +807,7 @@
        Ausdruck, der die Musterlösung mitbringt, nimmt der Übung den Sinn.
        Nach dem Druck wird der vorherige Zustand wiederhergestellt. */
     var fuerDruckGeoeffnet = [];
-    /* EXKLUSIVITAET VORUEBERGEHEND AUFHEBEN. Ein `<details name="…">` schliesst
+    /* EXKLUSIVITAET VORUEBERGEHEND AUFHEBEN. Ein `<details name="…">` schließt
        beim Oeffnen seine Geschwister - das ist am Bildschirm der Zweck und beim
        Drucken der Fehler: Die Schleife unten oeffnet reihum und liesse am Ende
        GENAU EINEN Reiter offen, der Rest waere auf dem Papier verschwunden.
@@ -595,7 +839,7 @@
     function nachDemDruck() {
       fuerDruckGeoeffnet.forEach(function (d) { d.open = false; });
       fuerDruckGeoeffnet = [];
-      /* Erst schliessen, dann die Namen zurueck: Andersherum schloesse der
+      /* Erst schließen, dann die Namen zurueck: Andersherum schloesse der
          Browser beim Setzen des Namens selbst Geschwister und der Zustand von
          vor dem Druck waere nicht wiederhergestellt, sondern geraten. */
       nameAn();
@@ -663,7 +907,7 @@
            steht womoeglich schon in einem Link.
 
            Kollidiert der Name mit etwas anderem auf der Seite (eine Ueberschrift
-           heisst leicht genauso), gewinnt das Vorhandene und der Reiter bekommt
+           heißt leicht genauso), gewinnt das Vorhandene und der Reiter bekommt
            den technischen Namen - zwei gleiche IDs waeren schlimmer als eine
            haessliche. */
         if (!panel.id) {
@@ -755,18 +999,81 @@
     ausHash();
   }
 
+  /* --- Waagerecht scrollende Bereiche (Tabellen, Code) -------------------- */
+  /* ZWEI DINGE AUF EINMAL, weil es dieselbe Ursache hat: Eine breite Tabelle
+     schiebt auf einem schmalen Gerät die GANZE SEITE nach rechts (WCAG 1.4.10:
+     bei 320 CSS-Pixeln darf nur der Inhalt scrollen, nicht das Dokument), und
+     ein Bereich, den nur die Maus scrollen kann, ist per Tastatur unerreichbar
+     (WCAG 2.1.1). Der Rahmen um die Tabelle löst das Erste, `tabindex` das
+     Zweite. Gesetzt wird nur, was tatsächlich überläuft - eine schmale Tabelle
+     bekommt keinen Haltepunkt in der Tabulatorreihenfolge, den niemand braucht. */
+  function initScrollbereiche() {
+    var haupt = document.querySelector(".avd-academy-guide-main, .avd-academy-doc-main, main");
+    if (!haupt) return;
+
+    haupt.querySelectorAll("table").forEach(function (tab) {
+      if (tab.parentNode.classList &&
+          tab.parentNode.classList.contains("avd-academy-tablescroll")) return;
+      var rahmen = document.createElement("div");
+      rahmen.className = "avd-academy-tablescroll";
+      tab.parentNode.insertBefore(rahmen, tab);
+      rahmen.appendChild(tab);
+    });
+
+    /* GESUCHT IST, WAS TATSAECHLICH SCROLLT - nicht, was danach aussieht. Beim
+       Code sind es je nach Auszeichnung mal das `pre`, mal das `code` darin
+       (highlight.css setzt `overflow-x: auto` auf `pre code.hljs`); wer nur
+       eines von beiden nimmt, laesst die Haelfte unerreichbar. */
+    function pruefen(b) {
+      var art = window.getComputedStyle(b).overflowX;
+      var scrollt = (art === "auto" || art === "scroll") && b.scrollWidth > b.clientWidth + 1;
+      if (scrollt) { b.setAttribute("tabindex", "0"); }
+      else if (b.getAttribute("tabindex") === "0") { b.removeAttribute("tabindex"); }
+    }
+    var kandidaten = haupt.querySelectorAll(".avd-academy-tablescroll, pre, pre > code");
+
+    /* EINMAL MESSEN GENUEGT NICHT. Ob ein Block ueberlaeuft, steht erst fest, wenn
+       Schrift UND Inhalt endgueltig sind - und die Syntaxhervorhebung baut den
+       Inhalt danach noch einmal um: Sie ersetzt den Text durch ausgezeichnete
+       Spannen, und die sind breiter. Gemessen davor, fehlte dem Codeblock der
+       Haltepunkt in der Tabulatorreihenfolge - und der Befund tauchte je nach
+       Rechnertempo mal auf und mal nicht.
+       `ResizeObserver` beendet das Raten: Er meldet JEDE Groessenaenderung - die
+       Hervorhebung, den Schriftwechsel, das Fenster. Wo es ihn nicht gibt, bleibt
+       es beim einmaligen Messen und einem Blick nach dem Schriftwechsel. */
+    if (window.ResizeObserver) {
+      var beobachter = new ResizeObserver(function (eintraege) {
+        eintraege.forEach(function (e) { pruefen(e.target); });
+      });
+      Array.prototype.forEach.call(kandidaten, function (b) { beobachter.observe(b); pruefen(b); });
+    } else {
+      var nachmessen = function () { Array.prototype.forEach.call(kandidaten, pruefen); };
+      nachmessen();
+      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(nachmessen); }
+      var t = null;
+      window.addEventListener("resize", function () {
+        window.clearTimeout(t); t = window.setTimeout(nachmessen, 150);
+      });
+    }
+  }
+
   function init() {
     initBackButtons();
     initThemeToggle();
     initCopyButtons();
     initNavToggle();
     initNavDropdown();
+    initNavLayout();
     initCopyMarkdown();
     initPrintButtons();
     initTabs();
     initPageQr();
+    initCheckboxNamen();
     initGuideProgress();
+    initScrollbereiche();
     initGuideToc();
+    /* NACH beiden - vorher steht nicht fest, ob der rechte Bereich etwas zeigt. */
+    initSidebarLeer();
     initReveals();
   }
 

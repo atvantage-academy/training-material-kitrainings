@@ -97,8 +97,13 @@
   function render() {
     track.style.transform = "translateX(-" + index * 100 + "%)";
     slides.forEach(function (s, i) {
-      if (i === index) s.removeAttribute("aria-hidden");
-      else s.setAttribute("aria-hidden", "true");
+      /* NICHT NUR VERSTECKEN, SONDERN STILLLEGEN. Eine Folie, die nur
+         `aria-hidden` traegt, ist fuer eine Vorlesehilfe weg - ihre Links
+         bleiben aber in der Tabulatorreihenfolge: Der Fokus wandert in etwas,
+         das niemand sieht und niemand angesagt bekommt. `inert` nimmt beides
+         zusammen; Browser, die es nicht kennen, verhalten sich wie bisher. */
+      if (i === index) { s.removeAttribute("aria-hidden"); s.removeAttribute("inert"); }
+      else { s.setAttribute("aria-hidden", "true"); s.setAttribute("inert", ""); }
     });
     if (counter) counter.textContent = index + 1 + " / " + slides.length;
     if (progress) progress.style.width = ((index + 1) / slides.length) * 100 + "%";

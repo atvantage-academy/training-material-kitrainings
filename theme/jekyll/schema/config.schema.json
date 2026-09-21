@@ -439,6 +439,12 @@
           "items": {
             "$ref": "#/definitions/navEintrag"
           }
+        },
+        "compact_after": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 5,
+          "description": "Ab wie vielen Top-Level-Einträgen die Leiste als Burger erscheint – auch am Schreibtisch. STANDARD: 5. Eine zweizeilige Navigationsleiste sieht nicht nach Absicht aus. Zusätzlich misst das Theme den tatsächlichen Umbruch; diese Zahl gilt auch ohne JavaScript."
         }
       }
     },
@@ -701,10 +707,19 @@
         "children": {
           "type": "array",
           "minItems": 1,
-          "description": "Die Einträge des Untermenüs – gewöhnliche Verweise, ohne weitere Ebene.",
+          "description": "Die Einträge des Untermenüs. Sie dürfen ihrerseits `children` tragen – bis zu DREI Ebenen insgesamt. Wie die dritte Ebene erscheint, steuert `menu` am Eintrag der zweiten.",
           "items": {
-            "$ref": "frontmatter.schema.json#/definitions/verweis"
+            "$ref": "#/definitions/navEintrag"
           }
+        },
+        "menu": {
+          "type": "string",
+          "enum": [
+            "flyout",
+            "embedded"
+          ],
+          "default": "flyout",
+          "description": "Nur bei einem Eintrag der ZWEITEN Ebene mit `children`: wie sein Untermenü erscheint. `flyout` fährt am Schreibtisch zur Seite aus (Standard), `embedded` stellt die Kinder IM Menü dar, abgetrennt durch einen Querstrich, mit dem Titel als Überschrift. Auf der DRITTEN Ebene wird der Schlüssel nicht gelesen – dort ist es immer `embedded`, weil ein viertes Aufklappmenü nicht mehr zu treffen wäre."
         }
       }
     },

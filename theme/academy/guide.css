@@ -41,7 +41,7 @@
   text-decoration: none;
 }
 .avd-academy-topbar__nav a:hover,
-.avd-academy-topbar__nav a[aria-current] { color: var(--avd-orange); }
+.avd-academy-topbar__nav a[aria-current] { color: var(--avd-academy-color-link); }
 
 /* --- Hero-Band ------------------------------------------------------------ */
 .avd-academy-guide-hero {
@@ -57,7 +57,7 @@
   flex-wrap: wrap;
 }
 .avd-academy-guide-hero__crumbs a { color: inherit; text-decoration: none; }
-.avd-academy-guide-hero__crumbs a:hover { color: var(--avd-orange); }
+.avd-academy-guide-hero__crumbs a:hover { color: var(--avd-academy-color-link-hover); }
 .avd-academy-guide-hero__crumbs [aria-current] { color: var(--avd-academy-color-headline); }
 /* Meta-Zeile im Hero: Tags links, Werkzeuge rechts (auf Topics-Höhe). */
 .avd-academy-guide-hero__meta {
@@ -106,11 +106,28 @@
 
    Kompound-Selektor (beide Klassen, Spezifität 0,2,0), damit die Überschreibung
    unabhängig von der Quellordnung gegen `.avd-academy-guide` (0,1,0) gewinnt. */
-.avd-academy-guide.avd-academy-guide--viz { --avd-academy-guide-max: 1040px; }
-.avd-academy-guide--viz .avd-academy-guide-layout {
+/* EINE VISUALISIERUNG IST EIN AUSGESCHALTETER RECHTER BEREICH - nicht mehr. Eine
+   gewoehnliche Seite, deren rechter Bereich nur ZUFAELLIG leer bleibt (kein
+   Inhaltsverzeichnis, kein Fortschritt, keine weiterfuehrenden Links), soll
+   deshalb genauso stehen: eine Spalte, mittig, mit derselben Lesebreite. Sonst
+   reserviert das Raster 300px fuer nichts und die Seite haengt links.
+
+   Den Unterschied merkt nur die TopNav: Die Visualisierung hat keine, die
+   gewoehnliche Seite behaelt ihre.
+
+   `--sidebar-empty` setzt das Skript, nachdem es das Inhaltsverzeichnis gebaut
+   und die Fortschrittskarte entschieden hat - vorher ist gar nicht bekannt, ob
+   etwas uebrig bleibt. */
+.avd-academy-guide.avd-academy-guide--viz,
+.avd-academy-guide.avd-academy-guide--sidebar-empty { --avd-academy-guide-max: 1040px; }
+.avd-academy-guide--viz .avd-academy-guide-layout,
+.avd-academy-guide--sidebar-empty .avd-academy-guide-layout {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
 }
+/* Der leere Rahmen faellt ganz weg - `display: none` und nicht bloss unsichtbar,
+   damit er im Raster keine Spur hinterlaesst. */
+.avd-academy-guide--sidebar-empty .avd-academy-guide-sidebar { display: none; }
 /* Der Hero-Titel ist regulär auf 900px begrenzt – eine Lesebreite, die zur ~836px
    schmalen Inhaltsspalte des zweispaltigen Layouts passt und dort nie auffällt.
    In dieser Ansicht läuft der Inhalt auf 1040px; die Kappung ließe den Titel 140px
@@ -118,7 +135,8 @@
    also aufheben: Hero-Titel und Inhalt teilen dieselbe Box.
    Spezifität 0,2,1 gegen die Basisregel 0,1,1 – gewinnt unabhängig von der
    Quellordnung. */
-.avd-academy-guide--viz .avd-academy-guide-hero h1 { max-width: none; }
+.avd-academy-guide--viz .avd-academy-guide-hero h1,
+.avd-academy-guide--sidebar-empty .avd-academy-guide-hero h1 { max-width: none; }
 
 /* --- Tag-Pillen ----------------------------------------------------------- */
 .avd-academy-tag {
@@ -132,7 +150,8 @@
   font-weight: 500;
   line-height: 1.5;
 }
-.avd-academy-tag--time { border-color: var(--avd-orange); color: var(--avd-orange); }
+/* Rand bleibt Marke (Flaeche, 3:1 genuegt), Schrift wird dunkler (4,5:1). */
+.avd-academy-tag--time { border-color: var(--avd-orange); color: var(--avd-academy-color-link); }
 
 /* --- Zweispaltiges Layout ------------------------------------------------- */
 .avd-academy-guide-layout {
@@ -189,6 +208,30 @@
 .avd-academy-guide-main table td { overflow-wrap: break-word; }
 .avd-academy-guide-main table code,
 .avd-academy-guide-main table a { overflow-wrap: anywhere; }
+/* Dasselbe ausserhalb von Tabellen: Ein langer Bezeichner in Fließtext - ein
+   Pfad, ein Schemaschluessel - schiebt bei 320 Pixeln sonst die ganze Seite nach
+   rechts (WCAG 1.4.10). `anywhere` bricht ihn nur, wenn er allein nicht passt. */
+.avd-academy-guide-main :not(pre) > code { overflow-wrap: anywhere; }
+/* VERWEISE IM FLIESSTEXT SIND UNTERSTRICHEN. Nicht Geschmack, sondern Kriterium
+   1.4.1: Wer Farben schlecht unterscheidet, erkennt einen Verweis sonst gar
+   nicht – gegen den umgebenden Text hat er weniger als 3:1, und damit ist die
+   Farbe allein kein Träger. Absichtlich NUR im Fließtext: In Karten,
+   Navigation, Materialübersicht und Fußbereich ist der Verweis schon durch
+   Fläche, Liste oder Position erkennbar, und eine Unterstreichung dort machte
+   aus einer Übersicht einen Teppich. */
+.avd-academy-guide-main p > a,
+.avd-academy-guide-main li > a,
+.avd-academy-guide-main td > a,
+.avd-academy-guide-main th > a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: from-font;
+}
+/* Ein Verweis, der ein Bild oder einen ganzen Baustein umschließt, bekommt
+   keinen Strich – da wäre nichts zu unterstreichen ausser Luft. */
+.avd-academy-guide-main a:has(> img),
+.avd-academy-guide-main a:has(> svg) { text-decoration: none; }
+
 /* Schritt-Zähler nur auf nummerierten Seiten (Übungen/Guides, s. u.). */
 .avd-academy-guide-main--numbered { counter-reset: avd-academy-step; }
 
@@ -277,7 +320,7 @@
   width: 18px; height: 18px;
   accent-color: var(--avd-orange); cursor: pointer;
 }
-/* Der Wickel-Absatz traegt sonst die Standard-Abstaende des Themes und reisst den
+/* Der Wickel-Absatz traegt sonst die Standard-Abstaende des Themes und reißt den
    Punkt auf. Zwischen ZWEI Absaetzen desselben Punktes bleibt Luft. */
 .avd-academy-guide-main ul:has(> li > p > input[type="checkbox"]) > li > p { margin: 0; }
 .avd-academy-guide-main ul:has(> li > p > input[type="checkbox"]) > li > p + p { margin-top: 8px; }
@@ -348,8 +391,8 @@
 }
 .avd-academy-toc { display: flex; flex-direction: column; gap: 10px; }
 .avd-academy-toc a { color: var(--avd-academy-color-ink); text-decoration: none; font-size: 16px; }
-.avd-academy-toc a:hover { color: var(--avd-orange); }
-.avd-academy-toc a[aria-current="true"] { color: var(--avd-orange); font-weight: 500; }
+.avd-academy-toc a:hover { color: var(--avd-academy-color-link-hover); }
+.avd-academy-toc a[aria-current="true"] { color: var(--avd-academy-color-link); font-weight: 500; }
 .avd-academy-toc .avd-academy-toc--h3 { padding-left: 14px; font-size: 15px; }
 
 /* Fortschritt */
@@ -359,7 +402,7 @@
 
 /* Weiterführende Informationen */
 .avd-academy-guide-side__links { display: flex; flex-direction: column; gap: 10px; }
-.avd-academy-guide-side__links a { color: var(--avd-orange); text-decoration: none; font-size: 16px; }
+.avd-academy-guide-side__links a { color: var(--avd-academy-color-link); text-decoration: none; font-size: 16px; }
 .avd-academy-guide-side__links a:hover { text-decoration: underline; }
 
 /* --- Fuß (dunkel, atvantage-Slate) ---------------------------------------- */
@@ -376,12 +419,31 @@
 /* --- Responsive ----------------------------------------------------------- */
 @media (max-width: 960px) {
   .avd-academy-guide-layout { grid-template-columns: 1fr; gap: 2.5rem; }
-  /* Schmal: Die Sidebar steht ueber dem Inhalt und scrollt mit der Seite – ein eigener
-     Scrollbereich waere dort eine Scrollfalle im Scrollfluss. */
+  /* SCHMAL GELTEN ANDERE REGELN ALS AM SCHREIBTISCH - und zwar unabhaengig von der
+     `_config.yml`. Die Schalter dort beschreiben eine Seitenspalte; auf einem
+     Telefon gibt es keine Spalte, sondern eine Reihenfolge.
+
+     `display: contents` loest den Rahmen auf: Die drei Karten werden selbst zu
+     Rastereintraegen und lassen sich einzeln einsortieren. Als Block liesse sich
+     nur der ganze Block verschieben - und dann stuenden die weiterfuehrenden
+     Links zwangslaeufig vor dem Text. */
   .avd-academy-guide-sidebar {
-    position: static; order: -1;
-    max-height: none; overflow: visible; padding-right: 0;
+    display: contents;
+    position: static; max-height: none; overflow: visible; padding-right: 0;
   }
+  /* Das Inhaltsverzeichnis steht VOR dem Text - es ist der Wegweiser durch ihn.
+     Zugeklappt startet es immer; das erledigt das Skript, weil ein `<details>`
+     sich per CSS nicht schließen laesst. */
+  .avd-academy-guide-side--toc { order: -1; }
+  /* Alles Uebrige - heute die weiterfuehrenden Links - steht DAHINTER: Es ist der
+     naechste Schritt, nicht die Einleitung. Ueber den Ausschluss und nicht ueber
+     `--bordered`, weil diese Klasse auch die Fortschrittskarte traegt und eine
+     kuenftige vierte Karte von selbst richtig einsortiert wird. */
+  .avd-academy-guide-sidebar > *:not(.avd-academy-guide-side--toc) { order: 1; }
+  /* Der Fortschritt entfaellt ganz. Auf einem Telefon liest man einen Abschnitt,
+     man arbeitet keine Checkliste ab - und als Karte ueber dem Text waere er die
+     erste Information, die niemand gesucht hat. */
+  .avd-academy-guide-sidebar > [data-avd-academy-progress] { display: none; }
 }
 @media (max-width: 700px) {
   .avd-academy-metanav { display: none; }

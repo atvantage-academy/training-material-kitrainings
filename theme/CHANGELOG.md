@@ -15,6 +15,120 @@ Abschnitt „Theme-Version“.
 
 ---
 
+## 2.33.0
+
+### Barrierefreiheit als Maßstab – und als Messung
+
+**WCAG 2.2 AA gilt für alles, was das Theme erzeugt.** Was das heißt, was das Theme
+schon mitbringt und was eine Unterlage beitragen muss, steht neu unter
+[Barrierefreiheit](https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/barrierefreiheit.html).
+
+**Neu: `theme/jekyll/a11y.sh`** misst das gebaute `_site` mit **axe-core** in einem
+echten Browser – bei **1280 und 390 Pixeln** und in **beiden Farbschemata**, nach dem
+Laufen der Skripte, weil Inhaltsverzeichnis, Fortschritt, Reiter, Quiz und Menüs erst
+dort entstehen. Das Farbschema wird ausdrücklich gesetzt und nicht dem Rechner
+überlassen: Sonst findet ein dunkel eingestelltes Notebook nicht, was die Pipeline auf
+einem hellen Runner meldet – genau so ist der Kontrastfehler in der
+Visualisierungs-Vorlage durchgerutscht (hell 2,75:1, dunkel 4,49:1).
+
+axe-core liegt als Kopie daneben (`theme/jekyll/vendor/axe-core/`, MPL-2.0); kein CDN,
+keine Installation, kein Netz. Lokal `make a11y`; in der Pipeline ein eigener Job neben
+den übrigen Prüfungen, mit Bericht in der Zusammenfassung und im Pull Request – **auch
+ohne Befund**.
+
+**Im Theme blockiert eine Verletzung**, in den Schulungs-Repos nicht: Was hier kaputt
+ist, wandert mit dem nächsten Paket in jede Unterlage, und dort kann es niemand
+reparieren. Dort ist der Befund dagegen meist eine inhaltliche Entscheidung – die
+zentrale didaktikon-Action meldet ihn als Warnung.
+
+### Die Verweisfarbe ist nicht mehr das Marken-Orange
+
+`#FF5401` erreicht als Schrift auf Weiß nur **3,22:1**; gefordert sind 4,5:1. Neu
+sind `--avd-academy-color-link` und `--avd-academy-color-link-hover`, aus dem Akzent
+gemischt: hell 5,7:1, dunkel 5,2:1. **Als Fläche, Rand, Balken und Fokusring bleibt
+die Marke unverändert.** Verweise im Fließtext sind zusätzlich unterstrichen – gegen
+den umgebenden Text trägt die Farbe allein nicht.
+
+Wer einen eigenen Akzent setzt, bekommt seine eigene Verweisfarbe automatisch dazu.
+
+### Was sonst noch behoben wurde
+
+| | |
+| --- | --- |
+| **Aufgabenlisten** | Die Kästchen bekommen ihren Namen aus dem Listeneintrag – vorher sagte eine Vorlesehilfe fünfzehnmal „Kontrollkästchen“. |
+| **Fortschritt** | `role="progressbar"` mit Wert und Namen; der Text daneben wird angesagt und ist endlich **übersetzt** (stand fest auf „erledigt“). |
+| **Breite Tabellen** | bekommen automatisch einen Scrollbereich – mit `tabindex`, sonst erreicht die Tastatur die rechten Spalten nicht. Im Druck geht der Rahmen auf. |
+| **Folien** | Nicht sichtbare Folien sind `inert`, nicht nur `aria-hidden` – der Fokus lief vorher hinein. |
+| **Quiz** | Balken mit Rolle und Wert, Begründung als `status`, und der Fokus wandert zur nächsten Frage statt zum `body`. |
+| **Menüs** | `aria-expanded` folgt jetzt auch dem Fokus, nicht nur dem Klick. |
+| **QR-Schalter** | sagt mit `aria-pressed`, ob er gedrückt ist. |
+| **Fußbereich** | Verweise sind 24 px hoch (WCAG 2.5.8). |
+| **HTTP-Status im Code** | Die Farben waren im hellen Schema gegen die Seitenfläche gerechnet, standen aber auf dem dunklen Codeblock – 2,1:1. |
+| **Vorlagen** | Das Foliendeck ist ein `<main>`, die Simulationsvorlage hat eine H1, ihre Knöpfe tragen Schrift mit 5,7:1 und die Schrittliste ist per Tastatur erreichbar. |
+| **Visualisierungs-Vorlage** | Der hervorgehobene Wert stand im reinen Marken-Orange auf heller Fläche (2,75:1) – jetzt `--avd-academy-color-accent-ink`, 6,9:1 in beiden Schemata. |
+
+### Für Schulungs-Repos
+
+Das Werkzeug liegt **im Paket** (`theme/jekyll/a11y.sh`), damit die zentrale
+didaktikon-Action dieselbe Prüfung fahren kann wie dieses Repo.
+
+## 2.32.0
+
+### Eine Seite ohne rechten Bereich steht mittig
+
+Bleibt die rechte Spalte leer – kein Inhaltsverzeichnis, kein Fortschritt, keine
+weiterführenden Links –, ordnet sich die Seite einspaltig und mittig an, wie eine
+Visualisierung; Überschrift und Brotkrume wandern mit. Entschieden wird das im
+Browser, nach dem Aufbau von Verzeichnis und Fortschritt.
+
+### Schmal gilt eine eigene Anordnung
+
+Unabhängig von der `_config.yml`: Inhaltsverzeichnis **vor** dem Text und zugeklappt,
+Fortschritt gar nicht, weiterführende Links **nach** dem Text. Die Schalter in der
+Konfiguration beschreiben eine Seitenspalte; auf einem Telefon gibt es keine.
+
+## 2.31.0
+
+### Drei Ebenen in der oberen Navigation
+
+Untermenüs fahren wahlweise zur Seite aus (`menu: flyout`, Standard) oder stehen
+eingebettet im selben Menü (`menu: embedded`), abgetrennt durch einen Querstrich, mit
+dem bündelnden Eintrag als Überschrift – verlinkt, wenn er ein Ziel hat. Die dritte
+Ebene ist immer eingebettet.
+
+Der Burger erscheint ab `nav.compact_after` Einträgen (Standard 5) **und** sobald das
+Theme einen Zeilenumbruch in der Leiste misst. Im Burger wird jede Ebene zum
+Akkordeon, auf dem Telefon über die volle Breite.
+
+## 2.30.0
+
+### Layout `quiz`: Wissens-Checks zum Anklicken
+
+Die Seite trägt nur noch `layout: quiz` und die Fragen (`quiz.questions`,
+`quiz.verdicts`); Gerüst, Form und Mechanik kommen aus dem Theme. Ohne JavaScript und
+im Druck erscheint die Fragenliste. Vorher standen rund 240 Zeilen CSS und JavaScript
+in der Unterlage.
+
+### `AvdHighlight`: Syntaxhervorhebung für nachgeladenen Code
+
+Wer Code erst im Browser einfügt (Simulation, Quiz), färbt ihn über
+`window.AvdHighlight.apply(el)`; das Ereignis `avd-academy-highlight-ready` sagt, wann
+es bereitsteht.
+
+## 2.29.0
+
+### Reiter wahlweise links (`--side`) und Adressen, die man verschicken kann
+
+`avd-academy-tabs--side` stellt die Reiterleiste an die linke Seite; die Pfeiltasten
+folgen der Anordnung. Jeder Reiter hat eine lesbare Kennung, und die Adresse führt den
+offenen Reiter mit – ein Verweis auf einen Reiter (oder auf etwas darin) öffnet ihn.
+
+### Behoben: `folder_slug` in Unterordnern
+
+Ein Ordner-Slug ging verloren, wenn der Ordner selbst keine Seite trug, sondern nur
+ein Unterordner darin. Der Bauablauf reicht die Zuordnung jetzt als
+`avd_folder_slugs` in die Konfiguration des Laufs.
+
 ## 2.27.1
 
 ### Behoben: Die Reiter sahen nicht aus wie Reiter

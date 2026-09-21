@@ -64,13 +64,13 @@
 
 <meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789836777"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789836777">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789836777">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789836777">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789836777"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789836777">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789836777" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789836777" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789836777">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789992834"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789992834">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789992834">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789992834">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789992834"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789992834">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789992834" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789992834" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789992834">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -78,8 +78,23 @@
     .then(([core, ...grammatiken]) => {
       const hljs = core.default;
       _hlsprachen.forEach((s, i) => hljs.registerLanguage(s, grammatiken[i].default));
-      document.querySelectorAll(_hlsprachen.map((s) => "pre code.language-" + s).join(","))
-        .forEach((el) => hljs.highlightElement(el));
+      const _auswahl = _hlsprachen.map((s) => "pre code.language-" + s).join(",");
+      const _faerben = (wurzel) => (wurzel || document)
+        .querySelectorAll(_auswahl)
+        .forEach((el) => { if (!el.dataset.highlighted) { hljs.highlightElement(el); } });
+      _faerben(document);
+
+      /* NACHTRAEGLICH EINGEFUEGTER CODE. Die Hervorhebung laeuft einmal beim Laden.
+         Eine Seite, die ihre Codebloecke per Skript einsetzt - eine Visualisierung,
+         die rohe Nachrichten durchschaltet -, bekam deshalb gar keine Farben und
+         baute sich einen eigenen Hervorheber. Genau die Kopie, die das Theme
+         verhindern soll.
+
+         `AvdHighlight.apply(knoten)` faerbt, was seither dazugekommen ist; `hljs`
+         liegt daneben fuer Faelle, die mehr brauchen. Das Ereignis sagt Seiten, die
+         frueh zeichnen, wann der Haken da ist - die Module laden asynchron. */
+      window.AvdHighlight = { hljs, apply: _faerben, languages: _hlsprachen.slice() };
+      document.dispatchEvent(new CustomEvent("avd-academy-highlight-ready"));
 
       /* Statuszeile nach Klasse einfaerben. highlight.js gibt jedem dreistelligen
          Code dieselbe Klasse `hljs-number` - in einem Mitschnitt ist aber genau das
@@ -98,16 +113,14 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789836777">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789836777"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789992834">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789992834"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
-  <header class="avd-academy-header"><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite"><img class="avd-academy-header__logo" src="/training-material-kitrainings/assets/logo-schulung.svg" alt="ATVANTAGE Academy"><span class="avd-academy-header__logo-mask" role="img" aria-label="ATVANTAGE Academy"
-          style="--avd-academy-logo-src: url('/training-material-kitrainings/assets/logo-schulung.svg'); --avd-academy-logo-ratio: 260 / 24;"></span></a>
-  <button class="avd-academy-btn avd-academy-btn--ghost avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
-          aria-label="Navigation umschalten" aria-expanded="false">☰</button>
-  <nav class="avd-academy-header__nav" id="avd-academy-main-nav">
+  <header class="avd-academy-header" data-avd-academy-header><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite"><img class="avd-academy-header__logo" src="/training-material-kitrainings/assets/logo-schulung.svg" alt="ATVANTAGE Academy"><span class="avd-academy-header__logo-mask" role="img" aria-label="ATVANTAGE Academy"
+          style="--avd-academy-logo-src: url('/training-material-kitrainings/assets/logo-schulung.svg'); --avd-academy-logo-ratio: 260 / 24;"></span></a><button class="avd-academy-tool avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
+          aria-label="Navigation umschalten" aria-expanded="false">☰</button><nav class="avd-academy-header__nav" id="avd-academy-main-nav">
       <a href="/training-material-kitrainings/">Start</a>
       <a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
   </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
@@ -116,13 +129,13 @@
               title="Farbschema umschalten (hell/dunkel)"
               aria-label="Farbschema umschalten">◐</button></div>
 </header>
-
-  <section class="avd-academy-guide-hero"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/">Home</a><span>/</span><span>Theme</span><span>/</span><span aria-current="page">Änderungen am ATVANTAGE Academy Theme</span></nav><div class="avd-academy-guide-hero__meta">
+<section class="avd-academy-guide-hero"
+           aria-labelledby="avd-academy-page-title"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/">Home</a><span>/</span><span>Theme</span><span>/</span><span aria-current="page">Änderungen am ATVANTAGE Academy Theme</span></nav><div class="avd-academy-guide-hero__meta">
       <div class="avd-academy-guide-hero__tags">
       </div>
       <div class="avd-academy-guide-hero__actions">
       </div>
-    </div><h1>Änderungen am ATVANTAGE Academy Theme</h1>
+    </div><h1 id="avd-academy-page-title">Änderungen am ATVANTAGE Academy Theme</h1>
   </section><div class="avd-academy-guide-layout">
     <main class="avd-academy-guide-main" id="avd-academy-content">
 
@@ -161,6 +174,161 @@ inkompatibel gilt und wie eingestuft wird, steht in
 Abschnitt „Theme-Version“.</p>
 
 <hr />
+
+<h2 id="2330">2.33.0</h2>
+
+<h3 id="barrierefreiheit-als-maßstab--und-als-messung">Barrierefreiheit als Maßstab – und als Messung</h3>
+
+<p><strong>WCAG 2.2 AA gilt für alles, was das Theme erzeugt.</strong> Was das heißt, was das Theme
+schon mitbringt und was eine Unterlage beitragen muss, steht neu unter
+<a href="https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/barrierefreiheit.html">Barrierefreiheit</a>.</p>
+
+<p><strong>Neu: <code>theme/jekyll/a11y.sh</code></strong> misst das gebaute <code>_site</code> mit <strong>axe-core</strong> in einem
+echten Browser – bei <strong>1280 und 390 Pixeln</strong> und in <strong>beiden Farbschemata</strong>, nach dem
+Laufen der Skripte, weil Inhaltsverzeichnis, Fortschritt, Reiter, Quiz und Menüs erst
+dort entstehen. Das Farbschema wird ausdrücklich gesetzt und nicht dem Rechner
+überlassen: Sonst findet ein dunkel eingestelltes Notebook nicht, was die Pipeline auf
+einem hellen Runner meldet – genau so ist der Kontrastfehler in der
+Visualisierungs-Vorlage durchgerutscht (hell 2,75:1, dunkel 4,49:1).</p>
+
+<p>axe-core liegt als Kopie daneben (<code>theme/jekyll/vendor/axe-core/</code>, MPL-2.0); kein CDN,
+keine Installation, kein Netz. Lokal <code>make a11y</code>; in der Pipeline ein eigener Job neben
+den übrigen Prüfungen, mit Bericht in der Zusammenfassung und im Pull Request – <strong>auch
+ohne Befund</strong>.</p>
+
+<p><strong>Im Theme blockiert eine Verletzung</strong>, in den Schulungs-Repos nicht: Was hier kaputt
+ist, wandert mit dem nächsten Paket in jede Unterlage, und dort kann es niemand
+reparieren. Dort ist der Befund dagegen meist eine inhaltliche Entscheidung – die
+zentrale didaktikon-Action meldet ihn als Warnung.</p>
+
+<h3 id="die-verweisfarbe-ist-nicht-mehr-das-marken-orange">Die Verweisfarbe ist nicht mehr das Marken-Orange</h3>
+
+<p><code>#FF5401</code> erreicht als Schrift auf Weiß nur <strong>3,22:1</strong>; gefordert sind 4,5:1. Neu
+sind <code>--avd-academy-color-link</code> und <code>--avd-academy-color-link-hover</code>, aus dem Akzent
+gemischt: hell 5,7:1, dunkel 5,2:1. <strong>Als Fläche, Rand, Balken und Fokusring bleibt
+die Marke unverändert.</strong> Verweise im Fließtext sind zusätzlich unterstrichen – gegen
+den umgebenden Text trägt die Farbe allein nicht.</p>
+
+<p>Wer einen eigenen Akzent setzt, bekommt seine eigene Verweisfarbe automatisch dazu.</p>
+
+<h3 id="was-sonst-noch-behoben-wurde">Was sonst noch behoben wurde</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Aufgabenlisten</strong></td>
+      <td>Die Kästchen bekommen ihren Namen aus dem Listeneintrag – vorher sagte eine Vorlesehilfe fünfzehnmal „Kontrollkästchen“.</td>
+    </tr>
+    <tr>
+      <td><strong>Fortschritt</strong></td>
+      <td><code>role="progressbar"</code> mit Wert und Namen; der Text daneben wird angesagt und ist endlich <strong>übersetzt</strong> (stand fest auf „erledigt“).</td>
+    </tr>
+    <tr>
+      <td><strong>Breite Tabellen</strong></td>
+      <td>bekommen automatisch einen Scrollbereich – mit <code>tabindex</code>, sonst erreicht die Tastatur die rechten Spalten nicht. Im Druck geht der Rahmen auf.</td>
+    </tr>
+    <tr>
+      <td><strong>Folien</strong></td>
+      <td>Nicht sichtbare Folien sind <code>inert</code>, nicht nur <code>aria-hidden</code> – der Fokus lief vorher hinein.</td>
+    </tr>
+    <tr>
+      <td><strong>Quiz</strong></td>
+      <td>Balken mit Rolle und Wert, Begründung als <code>status</code>, und der Fokus wandert zur nächsten Frage statt zum <code>body</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Menüs</strong></td>
+      <td><code>aria-expanded</code> folgt jetzt auch dem Fokus, nicht nur dem Klick.</td>
+    </tr>
+    <tr>
+      <td><strong>QR-Schalter</strong></td>
+      <td>sagt mit <code>aria-pressed</code>, ob er gedrückt ist.</td>
+    </tr>
+    <tr>
+      <td><strong>Fußbereich</strong></td>
+      <td>Verweise sind 24 px hoch (WCAG 2.5.8).</td>
+    </tr>
+    <tr>
+      <td><strong>HTTP-Status im Code</strong></td>
+      <td>Die Farben waren im hellen Schema gegen die Seitenfläche gerechnet, standen aber auf dem dunklen Codeblock – 2,1:1.</td>
+    </tr>
+    <tr>
+      <td><strong>Vorlagen</strong></td>
+      <td>Das Foliendeck ist ein <code>&lt;main&gt;</code>, die Simulationsvorlage hat eine H1, ihre Knöpfe tragen Schrift mit 5,7:1 und die Schrittliste ist per Tastatur erreichbar.</td>
+    </tr>
+    <tr>
+      <td><strong>Visualisierungs-Vorlage</strong></td>
+      <td>Der hervorgehobene Wert stand im reinen Marken-Orange auf heller Fläche (2,75:1) – jetzt <code>--avd-academy-color-accent-ink</code>, 6,9:1 in beiden Schemata.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="für-schulungs-repos">Für Schulungs-Repos</h3>
+
+<p>Das Werkzeug liegt <strong>im Paket</strong> (<code>theme/jekyll/a11y.sh</code>), damit die zentrale
+didaktikon-Action dieselbe Prüfung fahren kann wie dieses Repo.</p>
+
+<h2 id="2320">2.32.0</h2>
+
+<h3 id="eine-seite-ohne-rechten-bereich-steht-mittig">Eine Seite ohne rechten Bereich steht mittig</h3>
+
+<p>Bleibt die rechte Spalte leer – kein Inhaltsverzeichnis, kein Fortschritt, keine
+weiterführenden Links –, ordnet sich die Seite einspaltig und mittig an, wie eine
+Visualisierung; Überschrift und Brotkrume wandern mit. Entschieden wird das im
+Browser, nach dem Aufbau von Verzeichnis und Fortschritt.</p>
+
+<h3 id="schmal-gilt-eine-eigene-anordnung">Schmal gilt eine eigene Anordnung</h3>
+
+<p>Unabhängig von der <code>_config.yml</code>: Inhaltsverzeichnis <strong>vor</strong> dem Text und zugeklappt,
+Fortschritt gar nicht, weiterführende Links <strong>nach</strong> dem Text. Die Schalter in der
+Konfiguration beschreiben eine Seitenspalte; auf einem Telefon gibt es keine.</p>
+
+<h2 id="2310">2.31.0</h2>
+
+<h3 id="drei-ebenen-in-der-oberen-navigation">Drei Ebenen in der oberen Navigation</h3>
+
+<p>Untermenüs fahren wahlweise zur Seite aus (<code>menu: flyout</code>, Standard) oder stehen
+eingebettet im selben Menü (<code>menu: embedded</code>), abgetrennt durch einen Querstrich, mit
+dem bündelnden Eintrag als Überschrift – verlinkt, wenn er ein Ziel hat. Die dritte
+Ebene ist immer eingebettet.</p>
+
+<p>Der Burger erscheint ab <code>nav.compact_after</code> Einträgen (Standard 5) <strong>und</strong> sobald das
+Theme einen Zeilenumbruch in der Leiste misst. Im Burger wird jede Ebene zum
+Akkordeon, auf dem Telefon über die volle Breite.</p>
+
+<h2 id="2300">2.30.0</h2>
+
+<h3 id="layout-quiz-wissens-checks-zum-anklicken">Layout <code>quiz</code>: Wissens-Checks zum Anklicken</h3>
+
+<p>Die Seite trägt nur noch <code>layout: quiz</code> und die Fragen (<code>quiz.questions</code>,
+<code>quiz.verdicts</code>); Gerüst, Form und Mechanik kommen aus dem Theme. Ohne JavaScript und
+im Druck erscheint die Fragenliste. Vorher standen rund 240 Zeilen CSS und JavaScript
+in der Unterlage.</p>
+
+<h3 id="avdhighlight-syntaxhervorhebung-für-nachgeladenen-code"><code>AvdHighlight</code>: Syntaxhervorhebung für nachgeladenen Code</h3>
+
+<p>Wer Code erst im Browser einfügt (Simulation, Quiz), färbt ihn über
+<code>window.AvdHighlight.apply(el)</code>; das Ereignis <code>avd-academy-highlight-ready</code> sagt, wann
+es bereitsteht.</p>
+
+<h2 id="2290">2.29.0</h2>
+
+<h3 id="reiter-wahlweise-links---side-und-adressen-die-man-verschicken-kann">Reiter wahlweise links (<code>--side</code>) und Adressen, die man verschicken kann</h3>
+
+<p><code>avd-academy-tabs--side</code> stellt die Reiterleiste an die linke Seite; die Pfeiltasten
+folgen der Anordnung. Jeder Reiter hat eine lesbare Kennung, und die Adresse führt den
+offenen Reiter mit – ein Verweis auf einen Reiter (oder auf etwas darin) öffnet ihn.</p>
+
+<h3 id="behoben-folder_slug-in-unterordnern">Behoben: <code>folder_slug</code> in Unterordnern</h3>
+
+<p>Ein Ordner-Slug ging verloren, wenn der Ordner selbst keine Seite trug, sondern nur
+ein Unterordner darin. Der Bauablauf reicht die Zuordnung jetzt als
+<code>avd_folder_slugs</code> in die Konfiguration des Laufs.</p>
 
 <h2 id="2271">2.27.1</h2>
 

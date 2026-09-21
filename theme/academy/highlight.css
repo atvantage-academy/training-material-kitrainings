@@ -38,3 +38,23 @@ pre code.language-http .avd-academy-http-status--2xx { color: var(--avd-academy-
 pre code.language-http .avd-academy-http-status--3xx { color: var(--avd-academy-color-warning-ink); }
 pre code.language-http .avd-academy-http-status--4xx,
 pre code.language-http .avd-academy-http-status--5xx { color: var(--avd-academy-color-danger-ink); }
+
+/* IN EINER UNTERLAGE IST DER CODEBLOCK IMMER DUNKEL - guide.css legt `--avd-ink`
+   als Flaeche darunter, auch im hellen Schema. Die `…-ink`-Toene oben sind aber
+   gegen die SEITENfarbe gemischt: Im hellen Schema ergibt das dunkles Gruen auf
+   dunklem Grund (gemessen 2,1:1). Hier deshalb dieselben Toene, zu Weiß hin
+   gemischt - gerechnet gegen #1A2627: 1xx 4,9:1, 2xx 6,2:1, 3xx 7,1:1,
+   4xx/5xx 5,1:1. */
+.avd-academy-guide-main pre code.language-http .avd-academy-http-status--1xx {
+  color: color-mix(in srgb, var(--avd-academy-fill-1) 50%, #fff);
+}
+.avd-academy-guide-main pre code.language-http .avd-academy-http-status--2xx {
+  color: color-mix(in srgb, var(--avd-academy-color-success) 65%, #fff);
+}
+.avd-academy-guide-main pre code.language-http .avd-academy-http-status--3xx {
+  color: color-mix(in srgb, var(--avd-academy-color-warning) 65%, #fff);
+}
+.avd-academy-guide-main pre code.language-http .avd-academy-http-status--4xx,
+.avd-academy-guide-main pre code.language-http .avd-academy-http-status--5xx {
+  color: color-mix(in srgb, var(--avd-academy-color-danger) 65%, #fff);
+}

@@ -569,7 +569,9 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   width: fit-content;
   cursor: pointer;
   font-weight: 600;
-  color: var(--avd-academy-color-accent);
+  /* Die dunklere Verweisfarbe statt des reinen Akzents: Der Text ist anklickbar
+     und muss 4,5:1 tragen - das Marken-Orange kommt auf Weiß nur auf 3,22:1. */
+  color: var(--avd-academy-color-link);
   border-bottom: 1px dashed currentColor;
   list-style: none;             /* Standard-Dreieck weg (Firefox) */
 }
@@ -653,6 +655,10 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   position: absolute; top: var(--avd-academy-space-3); right: var(--avd-academy-space-3);
   border: 0; background: transparent; color: inherit;
   font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0 .2rem;
+  /* Mindestens 24x24 - darunter verlangt WCAG 2.5.8 freien Abstand ringsum, den
+     ein Kreuz in der Ecke eines Panels nicht hat. Das Zeichen bleibt gleich groß;
+     nur die anklickbare Flaeche waechst. */
+  min-width: 24px; min-height: 24px;
 }
 
 /* --- Badge / Chip (Academy) ----------------------------------------------- */
@@ -768,7 +774,10 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    QR-Code daneben ist ebenso groß. */
 
 @media (max-width: 900px) {
-  .avd-academy-header__burger { display: inline-flex; margin-left: auto; }
+  /* NEBEN DER WORTMARKE, nicht am rechten Rand. Im Markup steht der Knopf direkt
+     hinter ihr; ohne `margin-left: auto` bleibt er dort. Den Rechtsschub
+     uebernehmen die Werkzeuge. */
+  .avd-academy-header__burger { display: inline-flex; flex: none; margin-left: var(--avd-academy-space-3); }
   .avd-academy-header__nav {
     display: none;
     position: absolute; top: 100%; left: 0; right: 0;
@@ -787,8 +796,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
      steht die Gruppe nach dem Nav; ohne `order` landete sie rechts vom Burger und
      der Burger mitten in der Zeile. Der Rechtsschub wandert deshalb von ihm zu
      den Werkzeugen – die Regel muss NACH der Burger-Regel oben stehen. */
-  .avd-academy-header__tools { order: 1; margin-left: auto; }
-  .avd-academy-header__burger { order: 2; margin-left: var(--avd-academy-space-3); }
+  .avd-academy-header__tools { margin-left: auto; }
 }
 
 /* --- Header-Untermenü: Dropdown (breit) / aufklappbar (schmal) ------------ */
@@ -800,7 +808,10 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   color: var(--avd-academy-color-headline);
 }
 .avd-academy-header__grouptoggle:hover,
-.avd-academy-header__group:focus-within .avd-academy-header__grouptoggle { color: var(--avd-orange); }
+/* Auch hier der Kind-Selektor: Mit dem Nachfahren faerbte sich beim Fokus in der
+   ersten Ebene der Schalter der dritten gleich mit ein - zwei hervorgehobene
+   Eintraege, obwohl nur einer den Fokus hat. */
+.avd-academy-header__group:focus-within > .avd-academy-header__grouptoggle { color: var(--avd-orange); }
 .avd-academy-header__caret { font-size: 11px; line-height: 1; }
 /* Inline-Icon in Link-Labels (TopNav, Footer, Ressourcen). Quadratische Quellbilder
    werden – wie GitHub-Profilbilder – KREISRUND dargestellt (quadratisch + border-radius
@@ -818,11 +829,21 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    Kompound-Selektor (beide Klassen) + volle `padding`-Kurzform, damit die
    Basisregel `.avd-academy-header__submenu a { padding: 8px 20px }` den linken
    Innenabstand NICHT zurücksetzt (sonst rutscht der Text unter das Icon). */
+/* EINE SPALTE, EINE BREITE. Die Einrueckung stand als `1.65em` da und rechnete
+   damit an der Schrift der jeweiligen Zeile - bei der Gruppenueberschrift (12 px
+   statt 16 px) kamen 39,8 px heraus statt 46,4, und der Titel stand 6 px zu weit
+   links. Die Spalte ist jetzt eine feste Groesse, abgeleitet von der Schriftgroesse
+   der EINTRAEGE; wer sie aendert, aendert sie hier einmal. */
+.avd-academy-header__submenu--hasicons {
+  --avd-academy-menu-icon: calc(1.15 * 16px);
+  --avd-academy-menu-indent: calc(20px + 1.65 * 16px);
+}
 .avd-academy-header__submenu--hasicons.avd-academy-header__submenu a {
-  position: relative; padding: 8px 20px 8px calc(20px + 1.65em);
+  position: relative; padding: 8px 20px 8px var(--avd-academy-menu-indent);
 }
 .avd-academy-header__submenu--hasicons .avd-academy-linkicon {
   position: absolute; left: 20px; top: 50%; transform: translateY(-50%); margin-right: 0;
+  width: var(--avd-academy-menu-icon); height: var(--avd-academy-menu-icon);
 }
 .avd-academy-header__submenu {
   display: none; position: absolute; top: 100%; left: 0;
@@ -842,8 +863,13 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   content: ""; position: absolute; left: 0; right: 0;
   top: -14px; height: 18px; pointer-events: auto;
 }
-.avd-academy-header__group:hover .avd-academy-header__submenu,
-.avd-academy-header__group:focus-within .avd-academy-header__submenu,
+/* NUR DAS EIGENE UNTERMENUE, nicht alles darunter. Der Nachfahren-Selektor
+   traf beim Ueberfahren der ersten Ebene AUCH die Menues der dritten - sie
+   standen damit offen, bevor jemand den Eintrag der zweiten beruehrt hatte.
+   Mit `>` oeffnet jede Gruppe genau ihr eigenes Menue; die dritte Ebene
+   erscheint erst, wenn ihre eigene Gruppe Hover oder Fokus hat. */
+.avd-academy-header__group:hover > .avd-academy-header__submenu,
+.avd-academy-header__group:focus-within > .avd-academy-header__submenu,
 .avd-academy-header__submenu[data-open] { display: flex; }
 .avd-academy-header__submenu a {
   padding: 8px 20px; font-size: 16px; font-weight: 500; white-space: nowrap;
@@ -855,7 +881,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 @media (max-width: 900px) {
   /* Im Burger-Menü: Gruppe als volle Breite, Untermenü statisch eingerückt,
      NUR per Klick (data-open) aufklappbar – kein Hover. */
-  .avd-academy-header__group { display: block; width: 100%; }
+  .avd-academy-header__group { width: 100%; }
   .avd-academy-header__grouptoggle { width: 100%; justify-content: space-between; }
   .avd-academy-header__submenu {
     position: static; min-width: 0; margin: 6px 0 0; padding: 0 0 0 14px;
@@ -867,9 +893,361 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
      `…__submenu[data-open]` (0,2,0): Der Klick auf den Toggle setzt zwar
      `data-open`, gibt dem Button aber gleichzeitig den Fokus — die Gruppe matcht
      `:focus-within`, `display: none` bleibt, und das Menü klappt nie auf. */
-  .avd-academy-header__group:hover .avd-academy-header__submenu:not([data-open]),
-  .avd-academy-header__group:focus-within .avd-academy-header__submenu:not([data-open]) { display: none; }
-  .avd-academy-header__submenu[data-open] { display: flex; }
+
+  /* --- Im Burger: die Hoehe traegt die Bewegung ---------------------------- *
+     Hier klappt nichts auf, hier WAECHST etwas - und man muss sehen, dass das eine
+     Menue zugeht, waehrend das andere aufgeht.
+
+     GEMACHT MIT DER GITTERZEILE, nicht mit `max-height`. Der erste Versuch stand
+     auf `max-height: 150vh` fuer offen und 0 fuer zu: Beim Zuklappen faellt der
+     Wert dann erst durch 150 Bildschirmhoehen, bevor er die echte Hoehe
+     unterschreitet - sichtbar wird nur das letzte Zehntel, und das sieht aus wie
+     ein Sprung (gemessen: nach 80 ms bereits geschlossen). `0fr` -> `1fr` rechnet
+     mit der WIRKLICHEN Hoehe und braucht dafuer kein zusaetzliches Element.
+
+     Das Klappfeld bekommt eine Hoehengrenze und scrollt - sonst raegte ein tiefes
+     Menue auf dem Handy unter den Bildschirmrand.
+
+     `visibility` schaltet verzoegert: erst nach der Bewegung unsichtbar, beim
+     Oeffnen sofort. So ist nichts mit der Tastatur erreichbar, was zu ist.       */
+  .avd-academy-header__nav {
+      max-height: calc(100dvh - 4.5rem); overflow-y: auto; overscroll-behavior: contain;
+}
+  .avd-academy-header__nav .avd-academy-header__group {
+      display: grid; /* `minmax(0, …)` ist noetig: `0fr` allein ist die Kurzform fuer
+     `minmax(auto, 0fr)`, und das `auto` haelt die Zeile auf der Mindesthoehe des
+     Inhalts - gemessen blieben 12px Innenabstand stehen statt null. */
+  grid-template-rows: auto minmax(0, 0fr);
+      transition: grid-template-rows 220ms ease;
+}
+  .avd-academy-header__nav .avd-academy-header__group:has(> .avd-academy-header__submenu[data-open]) {
+      grid-template-rows: auto minmax(0, 1fr);
+}
+  .avd-academy-header__submenu {
+      display: flex; min-height: 0; overflow: hidden;
+      opacity: 0; visibility: hidden; transform: none;
+      margin-top: 0; max-height: none;
+      padding-top: 0; padding-bottom: 0;
+      transition: opacity 140ms ease, padding-top 220ms ease,
+                  padding-bottom 220ms ease, visibility 0s linear 220ms;
+}
+  .avd-academy-header__submenu[data-open] {
+      opacity: 1; visibility: visible;
+      padding-top: 6px; padding-bottom: 6px;
+      transition: opacity 180ms ease, padding-top 220ms ease,
+                  padding-bottom 220ms ease, visibility 0s;
+}
+  /* Der seitliche Pfeil zeigt hier nach unten und dreht wie der große. */
+  .avd-academy-header__grouptoggle--sub[aria-expanded="true"] > .avd-academy-header__caret--side {
+      transform: rotate(180deg);
+}
+
+}
+
+/* --- TopNav: drei Ebenen, eingebettete Gruppen, Burger ------------------- *
+   Die Regeln oben tragen Ebene 1 und 2. Hier kommt dazu:
+     - Ebene 3 als seitlich ausfahrendes Menue (rechts, sonst links)
+     - eingebettete Gruppen mit Querstrich (`__set`)
+     - die Burger-Fassung fuer BEIDE Faelle: schmaler Viewport (Media Query oben)
+       und zu volle Leiste (`--compact`, gesetzt aus der Anzahl oder gemessen)   */
+
+/* --- Eingebettete Gruppe -------------------------------------------------- */
+/* Ein Eintrag mit `menu: embedded` bleibt IM Menue und wird durch einen Strich
+   abgetrennt. Der Strich sitzt oben an der Gruppe, nicht zwischen je zwei
+   Eintraegen: So trennt er die Gruppe vom Vorherigen, ohne die Eintraege
+   untereinander zu zerschneiden. Die erste Gruppe im Menue bekommt keinen -
+   dort ist nichts zu trennen. */
+.avd-academy-header__set { display: flex; flex-direction: column; }
+.avd-academy-header__set + .avd-academy-header__set,
+.avd-academy-header__submenu > a + .avd-academy-header__set,
+.avd-academy-header__submenu > .avd-academy-header__group + .avd-academy-header__set {
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid var(--avd-academy-border-soft);
+}
+/* Und andersherum: Was NACH einer Gruppe kommt, ist wieder etwas anderes. */
+.avd-academy-header__set + a,
+.avd-academy-header__set + .avd-academy-header__group {
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid var(--avd-academy-border-soft);
+}
+.avd-academy-header__setlabel {
+  position: relative;
+  margin: 0; padding: 4px 20px 6px;
+  font-size: 12px; font-weight: var(--avd-academy-fw-bold, 700);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--avd-academy-color-ink-muted);
+}
+/* EINE ZWEITE, LEISERE LINIE - zwischen der Ueberschrift und ihren Kindern.
+   Ohne sie unterschied nur die Schriftart Gruppe von Eintrag, und das traegt
+   nicht. Sie ist ausdruecklich NICHT der Trenner von oben und unten: Der laeuft
+   durch die volle Breite und schneidet die Gruppe aus dem Menue heraus; diese
+   hier haelt links und rechts Abstand und gliedert nur INNERHALB der Gruppe.
+   Deshalb auch duenner getoent statt derselben Farbe. */
+.avd-academy-header__setlabel::after {
+  content: ""; position: absolute; bottom: 0; left: 14px; right: 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--avd-academy-border-soft) 55%, transparent);
+}
+/* Die Ueberschrift IST der buendelnde Eintrag. Hat er ein Ziel, ist sie ein Link -
+   dann muss sie sich auch wie einer anfuehlen. Die Basisregel fuer Menue-Links
+   (`__submenu a`) wuerde sie sonst zur gewoehnlichen Zeile machen; der
+   Kompound-Selektor haelt die Ueberschriftenform. */
+.avd-academy-header__submenu a.avd-academy-header__setlabel--link {
+  padding: 4px 20px 2px; font-size: 12px; text-decoration: none;
+  color: var(--avd-academy-color-ink-muted);
+}
+.avd-academy-header__submenu a.avd-academy-header__setlabel--link:hover,
+.avd-academy-header__submenu a.avd-academy-header__setlabel--link[aria-current="page"] {
+  color: var(--avd-orange); background: none; text-decoration: underline;
+}
+/* DIE GRUPPENUEBERSCHRIFT GEHOERT IN DIESELBE SPALTE. Ohne diese Regel fehlte ihr
+   der linke Gutter: Ihr Text stand 26 px weiter links als der der Eintraege
+   darunter, und ihr Icon - absolut gesetzt, aber ohne positionierten Vorfahren -
+   landete am oberen Rand des ganzen Menues, quer ueber der Schrift. Gemessen:
+   Text der Ueberschrift bei 921 px, Text der Eintraege bei 947 px.
+
+   STEHT HIER UND NICHT OBEN BEI DEN UEBRIGEN ICON-REGELN: Die Regel fuer den
+   verlinkten Titel hat dieselbe Spezifitaet (0-2-1). Weiter oben verlor sie
+   gegen sie, und der Gutter blieb aus - gemessen unveraendert 20 px. */
+.avd-academy-header__submenu--hasicons .avd-academy-header__setlabel,
+.avd-academy-header__submenu--hasicons a.avd-academy-header__setlabel--link {
+  position: relative; padding-left: var(--avd-academy-menu-indent);
+}
+
+/* --- Ebene 3: seitlich ---------------------------------------------------- */
+.avd-academy-header__group--sub { display: flex; width: 100%; }
+.avd-academy-header__grouptoggle--sub {
+  width: 100%; justify-content: space-between;
+  padding: 8px 20px; font-size: 16px; text-align: left;
+}
+.avd-academy-header__grouptoggle--sub:hover { color: var(--avd-orange); background: var(--avd-academy-color-bg-subtle); }
+.avd-academy-header__caret--side { margin-left: 8px; }
+
+.avd-academy-header__submenu--side {
+  top: 0; left: 100%; margin-top: -8px; margin-left: 2px;
+}
+/* Kein Platz nach rechts? Dann nach links. Die Klasse setzt das Skript beim
+   Oeffnen - CSS allein kann den Rand des Fensters nicht messen. */
+.avd-academy-header__submenu--side.avd-academy-header__submenu--flip {
+  left: auto; right: 100%; margin-left: 0; margin-right: 2px;
+}
+/* Die Hover-Bruecke der ersten Ebene liegt OBEN; fuer das seitliche Menue muss sie
+   zur Seite - sonst reißt der Hover auf dem Weg nach rechts ab. */
+.avd-academy-header__submenu--side::before {
+  top: 0; bottom: 0; height: auto; left: -6px; right: auto; width: 8px;
+}
+.avd-academy-header__submenu--side.avd-academy-header__submenu--flip::before {
+  left: auto; right: -6px;
+}
+
+/* --- Burger-Fassung ------------------------------------------------------- *
+   Gilt fuer schmale Viewports UND fuer `--compact`. Beide Zustaende erzeugen
+   dieselbe Oberflaeche: eine Spalte, jede Ebene ein Akkordeon, jede Ebene etwas
+   staerker abgesetzt. Die Media Query oben deckt den ersten Fall bereits ab; hier
+   steht, was zusaetzlich fuer `--compact` gilt und was BEIDE brauchen.          */
+/* `flex: none` - ohne das schrumpft der Knopf im engen Kopf auf 25 px Breite bei
+   34 px Hoehe (gemessen bei 390 px Fensterbreite) und ist kein Quadrat mehr. */
+.avd-academy-header--compact .avd-academy-header__burger { display: inline-flex; flex: none; margin-left: var(--avd-academy-space-3); }
+.avd-academy-header--compact .avd-academy-header__nav {
+  display: none;
+  position: absolute; top: 100%; left: 0; right: 0;
+  flex-direction: column; align-items: stretch;
+  gap: var(--avd-academy-space-3);
+  margin-left: 0;
+  padding: var(--avd-academy-space-4) max(24px, calc((100% - var(--avd-academy-page-width, 1200px)) / 2));
+  background: var(--avd-academy-topbar-bg);
+  border-bottom: 1px solid var(--avd-academy-border-soft);
+  box-shadow: var(--avd-academy-shadow-2);
+  z-index: 50;
+}
+.avd-academy-header--compact .avd-academy-header__nav[data-open] { display: flex; }
+.avd-academy-header--compact .avd-academy-header__tools { margin-left: auto; }
+
+/* Am SCHREIBTISCH muss das aufgeklappte Menue nicht die volle Breite nehmen -
+   eine Spalte, die ueber 1200 px laeuft, liest sich schlecht. Auf dem Handy nimmt
+   es sie, weil es dort nichts Schmaleres gibt. */
+@media (min-width: 901px) {
+  /* UNTER DEM BURGER, nicht am rechten Rand. Solange der Knopf rechts sass, war
+     `right: 0` richtig; seit er neben der Wortmarke steht, klappte das Feld an
+     der falschen Stelle auf. Der linke Rand ist derselbe wie der des
+     Seiteninhalts - dort steht auch der Knopf. */
+  .avd-academy-header--compact .avd-academy-header__nav {
+    left: var(--avd-academy-nav-left, max(24px, calc((100% - var(--avd-academy-page-width, 1200px)) / 2)));
+    right: auto; width: min(420px, calc(100vw - 48px));
+    border: 1px solid var(--avd-academy-border-soft);
+    border-radius: 0 0 var(--avd-academy-radius) var(--avd-academy-radius);
+    padding: var(--avd-academy-space-4);
+  }
+}
+
+/* Die Akkordeon-Regeln fuer BEIDE Faelle. Der Block der Media Query oben bleibt
+   stehen; dies hier ergaenzt ihn um `--compact` und um die dritte Ebene. */
+.avd-academy-header--compact .avd-academy-header__group { width: 100%; }
+.avd-academy-header--compact .avd-academy-header__grouptoggle { width: 100%; justify-content: space-between; }
+.avd-academy-header--compact .avd-academy-header__submenu {
+  position: static; min-width: 0; margin: 6px 0 0;
+  /* NUR WAAGERECHT. Senkrecht faehrt der Abstand mit der Bewegung; eine
+     Kurzform hier setzte ihn wieder auf 6px, und die geschlossene Zeile
+     behielt 12px Hoehe statt null (gemessen). */
+  padding-left: 12px; padding-right: 0;
+  border: 0; border-radius: 0; box-shadow: none;
+  /* JEDE EBENE ETWAS STAERKER ABGESETZT - so ist ohne Einrueckung allein
+     erkennbar, dass man in einem Untermenue steht. */
+  background: color-mix(in srgb, var(--avd-academy-color-ink) 5%, transparent);
+  border-left: 2px solid var(--avd-academy-border-soft);
+}
+
+/* --- Im Burger: die Hoehe traegt die Bewegung ---------------------------- *
+   Hier klappt nichts auf, hier WAECHST etwas - und man muss sehen, dass das eine
+   Menue zugeht, waehrend das andere aufgeht.
+
+   GEMACHT MIT DER GITTERZEILE, nicht mit `max-height`. Der erste Versuch stand
+   auf `max-height: 150vh` fuer offen und 0 fuer zu: Beim Zuklappen faellt der
+   Wert dann erst durch 150 Bildschirmhoehen, bevor er die echte Hoehe
+   unterschreitet - sichtbar wird nur das letzte Zehntel, und das sieht aus wie
+   ein Sprung (gemessen: nach 80 ms bereits geschlossen). `0fr` -> `1fr` rechnet
+   mit der WIRKLICHEN Hoehe und braucht dafuer kein zusaetzliches Element.
+
+   Das Klappfeld bekommt eine Hoehengrenze und scrollt - sonst raegte ein tiefes
+   Menue auf dem Handy unter den Bildschirmrand.
+
+   `visibility` schaltet verzoegert: erst nach der Bewegung unsichtbar, beim
+   Oeffnen sofort. So ist nichts mit der Tastatur erreichbar, was zu ist.       */
+.avd-academy-header--compact .avd-academy-header__nav {
+  max-height: calc(100dvh - 4.5rem); overflow-y: auto; overscroll-behavior: contain;
+}
+.avd-academy-header--compact .avd-academy-header__nav .avd-academy-header__group {
+  display: grid; /* `minmax(0, …)` ist noetig: `0fr` allein ist die Kurzform fuer
+     `minmax(auto, 0fr)`, und das `auto` haelt die Zeile auf der Mindesthoehe des
+     Inhalts - gemessen blieben 12px Innenabstand stehen statt null. */
+  grid-template-rows: auto minmax(0, 0fr);
+  transition: grid-template-rows 220ms ease;
+}
+.avd-academy-header--compact .avd-academy-header__nav .avd-academy-header__group:has(> .avd-academy-header__submenu[data-open]) {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.avd-academy-header--compact .avd-academy-header__submenu {
+  display: flex; min-height: 0; overflow: hidden;
+  opacity: 0; visibility: hidden; transform: none;
+  margin-top: 0; max-height: none;
+  padding-top: 0; padding-bottom: 0;
+  transition: opacity 140ms ease, padding-top 220ms ease,
+              padding-bottom 220ms ease, visibility 0s linear 220ms;
+}
+.avd-academy-header--compact .avd-academy-header__submenu[data-open] {
+  opacity: 1; visibility: visible;
+  padding-top: 6px; padding-bottom: 6px;
+  transition: opacity 180ms ease, padding-top 220ms ease,
+              padding-bottom 220ms ease, visibility 0s;
+}
+/* Der seitliche Pfeil zeigt hier nach unten und dreht wie der große. */
+.avd-academy-header--compact .avd-academy-header__grouptoggle--sub[aria-expanded="true"] > .avd-academy-header__caret--side {
+  transform: rotate(180deg);
+}
+
+
+@media (max-width: 900px) {
+  /* Ebene 3 faehrt hier NICHT zur Seite aus - sie klappt auf wie Ebene 2. */
+  .avd-academy-header__submenu--side {
+    top: auto; left: auto; right: auto; margin: 6px 0 0; margin-left: 0;
+  }
+  .avd-academy-header__submenu--side::before { display: none; }
+  /* KEIN `display: block` - die Gruppe ist hier ein Gitter (siehe Bewegung
+     weiter oben). Mit `block` kollabierte die Zeile nicht, und ein geschlossenes
+     Untermenue belegte weiter seinen Platz: gemessen 180px unsichtbarer Raum. */
+  .avd-academy-header__group--sub { width: 100%; }
+  .avd-academy-header__grouptoggle--sub { padding: 8px 0; }
+  .avd-academy-header__caret--side { transform: rotate(90deg); }
+  .avd-academy-header__submenu {
+    background: color-mix(in srgb, var(--avd-academy-color-ink) 5%, transparent);
+    border-left: 2px solid var(--avd-academy-border-soft);
+    padding-left: 12px; padding-right: 0;
+  }
+  .avd-academy-header__setlabel { padding-left: 0; }
+  .avd-academy-header__setlabel::after { left: 0; right: 8px; }
+  .avd-academy-header__submenu a { white-space: normal; padding-left: 0; padding-right: 0; }
+
+  /* DIE ICON-SPALTE GILT AUCH HIER - nur ohne den Seitenrand des Aufklappmenues.
+     Ohne diese drei Zeilen setzte der Innenabstand auf 0, waehrend das Icon
+     weiter absolut bei 20px stand: Es lag quer ueber dem Text (gemeldet aus
+     „Layouts – Formate & Vorlagen"). */
+  .avd-academy-header__submenu--hasicons { --avd-academy-menu-indent: calc(1.65 * 16px); }
+  .avd-academy-header__submenu--hasicons.avd-academy-header__submenu a,
+  .avd-academy-header__submenu--hasicons .avd-academy-header__setlabel,
+  .avd-academy-header__submenu--hasicons a.avd-academy-header__setlabel--link { padding-left: var(--avd-academy-menu-indent); }
+  .avd-academy-header__submenu--hasicons .avd-academy-linkicon { left: 0; }
+
+}
+.avd-academy-header--compact .avd-academy-header__submenu--side {
+  top: auto; left: auto; right: auto; margin: 6px 0 0; margin-left: 0;
+}
+.avd-academy-header--compact .avd-academy-header__submenu--side::before { display: none; }
+.avd-academy-header--compact .avd-academy-header__group--sub { width: 100%; }
+.avd-academy-header--compact .avd-academy-header__grouptoggle--sub { padding: 8px 0; }
+.avd-academy-header--compact .avd-academy-header__caret--side { transform: rotate(90deg); }
+.avd-academy-header--compact .avd-academy-header__setlabel { padding-left: 0; }
+.avd-academy-header--compact .avd-academy-header__setlabel::after { left: 0; right: 8px; }
+.avd-academy-header--compact .avd-academy-header__submenu a { white-space: normal; padding-left: 0; padding-right: 0; }
+
+/* DIE ICON-SPALTE GILT AUCH HIER - nur ohne den Seitenrand des Aufklappmenues.
+   Ohne diese drei Zeilen setzte der Innenabstand auf 0, waehrend das Icon
+   weiter absolut bei 20px stand: Es lag quer ueber dem Text (gemeldet aus
+   „Layouts – Formate & Vorlagen"). */
+.avd-academy-header--compact .avd-academy-header__submenu--hasicons { --avd-academy-menu-indent: calc(1.65 * 16px); }
+.avd-academy-header--compact .avd-academy-header__submenu--hasicons.avd-academy-header__submenu a,
+.avd-academy-header--compact .avd-academy-header__submenu--hasicons .avd-academy-header__setlabel,
+.avd-academy-header--compact .avd-academy-header__submenu--hasicons a.avd-academy-header__setlabel--link { padding-left: var(--avd-academy-menu-indent); }
+.avd-academy-header--compact .avd-academy-header__submenu--hasicons .avd-academy-linkicon { left: 0; }
+
+
+/* Ohne JavaScript bleibt die Messung aus; die Anzahl-Regel greift trotzdem, weil
+   sie aus Liquid kommt. Der Burger selbst braucht JavaScript - deshalb steht die
+   Leiste ohne Skript in ihrer gewoehnlichen Form, auch wenn sie umbricht. Ein
+   Menue, das sich nicht oeffnen laesst, waere schlechter als ein Umbruch. */
+
+/* --- Bewegung beim Auf- und Zuklappen ------------------------------------ *
+   WARUM UEBERHAUPT: Im Burger sprang ein Menue auf und ein anderes zu, im selben
+   Bild. Gemeldet als „ich erkenne nicht, dass das eine zuklappt und das andere
+   aufgeht" - und genau das leistet eine kurze Bewegung: Sie zeigt, WAS sich
+   veraendert hat, nicht nur DASS etwas anders ist.
+
+   Die globale Regel in base.css setzt bei `prefers-reduced-motion` jede Dauer auf
+   0,01ms. Hier steht deshalb keine eigene Ausnahme - sie gilt schon.            */
+
+/* Der Pfeil dreht sich. Das allein traegt schon viel: Er sagt den Zustand an,
+   auch wenn das Menue selbst gerade ausserhalb des Blickfelds aufgeht. */
+.avd-academy-header__caret,
+.avd-academy-header__caret--side {
+  transition: transform var(--avd-academy-transition, 160ms ease);
+}
+.avd-academy-header__grouptoggle[aria-expanded="true"] > .avd-academy-header__caret { transform: rotate(180deg); }
+
+/* --- Am Schreibtisch: kurz einblenden und heranrutschen ------------------- */
+/* `display` ist nicht animierbar - `allow-discrete` schaltet es am ENDE der
+   Rueckblende und am ANFANG der Einblende. `@starting-style` liefert den Wert,
+   von dem aus eingeblendet wird; ohne ihn beginnt der Uebergang beim Zielwert
+   und man sieht nichts. Kann eine Engine beides nicht, erscheint das Menue
+   schlicht sofort - der alte Zustand. */
+.avd-academy-header__submenu {
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease,
+              display 140ms allow-discrete;
+}
+.avd-academy-header__group:hover > .avd-academy-header__submenu,
+.avd-academy-header__group:focus-within > .avd-academy-header__submenu,
+.avd-academy-header__submenu[data-open] { opacity: 1; transform: none; }
+@starting-style {
+  .avd-academy-header__group:hover > .avd-academy-header__submenu,
+  .avd-academy-header__group:focus-within > .avd-academy-header__submenu,
+  .avd-academy-header__submenu[data-open] { opacity: 0; transform: translateY(-4px); }
+}
+/* Das seitliche Menue kommt von der Seite, nicht von oben - aus der Richtung,
+   in die es auch aufgeht. */
+.avd-academy-header__submenu--side { transform: translateX(-4px); }
+.avd-academy-header__submenu--side.avd-academy-header__submenu--flip { transform: translateX(4px); }
+@starting-style {
+  .avd-academy-header__group:hover > .avd-academy-header__submenu--side,
+  .avd-academy-header__group:focus-within > .avd-academy-header__submenu--side,
+  .avd-academy-header__submenu--side[data-open] { opacity: 0; transform: translateX(-4px); }
 }
 
 /* --- Footer (dunkel, ATVANTAGE-Slate) ------------------------------------- */
@@ -886,6 +1264,18 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 .avd-academy-footer a { color: #fff; }
+/* MINDESTENS 24 PIXEL HOCH (WCAG 2.5.8): Die Verweise im Fußbereich stehen als
+   Liste untereinander, getrennt nur durch `<br>` - bei 16 Pixel Zeilenhoehe ist
+   jeder Treffer ein Streifen, den man auf einem Telefon kaum sicher trifft. Die
+   Schrift bleibt gleich groß; groesser wird nur die anklickbare Flaeche, und
+   die Zeilen ruecken so weit auseinander, dass sich die Flaechen nicht
+   ueberlappen. Die Zeile mit Impressum und Datenschutz ist davon ausgenommen:
+   Dort stehen die Verweise IM Satz, und dafuer kennt das Kriterium eine
+   Ausnahme. */
+.avd-academy-footer__grid p { line-height: 2; }
+.avd-academy-footer__grid p a {
+  display: inline-block; min-height: 24px; padding-block: 4px;
+}
 .avd-academy-footer a:hover { color: var(--avd-orange); }
 .avd-academy-footer__legal { margin-top: var(--avd-academy-space-6); text-align: center; color: rgba(255, 255, 255, 0.7); }
 
@@ -986,12 +1376,18 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    die Seite selbst bekommt niemals einen waagerechten Balken. */
 .avd-academy-tablescroll { overflow-x: auto; }
 .avd-academy-tablescroll > table { margin: 0; }
+/* Seit `initScrollbereiche()` den Rahmen selbst setzt, liegt JEDE Tabelle darin.
+   Auf Papier gibt es kein Scrollen: Dort muss der Rahmen aufgehen, sonst schneidet
+   der Druck die rechten Spalten ab. Der Tastatur-Haltepunkt entfaellt dort ebenso. */
+@media print {
+  .avd-academy-tablescroll { overflow-x: visible; }
+}
 
 /* ===========================================================================
    TABS – ein langer Leitfaden in schaltbaren Abschnitten
    ---------------------------------------------------------------------------
    GRUNDLAGE IST `<details name="…">`, nicht ein Klick-Handler. Der Browser
-   schaltet damit von sich aus exklusiv: Oeffnet man eines, schliessen die
+   schaltet damit von sich aus exklusiv: Oeffnet man eines, schließen die
    anderen. Ohne JavaScript ist es ein Akkordeon, in dem jeder Inhalt erreichbar
    bleibt - dieselbe Zusage wie beim Reveal-Baustein.
 
@@ -1120,7 +1516,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    untereinander darf jede Beschriftung umbrechen und trotzdem lesbar bleiben.
 
    Es ist dieselbe Komponente, nur anders angeordnet: dasselbe Markup, dasselbe
-   Skript, dieselben Anker, dieselben Druckregeln. Nur diese Datei weiss davon.  */
+   Skript, dieselben Anker, dieselben Druckregeln. Nur diese Datei weiß davon.  */
 
 /* Leiste in Spalte 1, ALLE Panels in Spalte 2 - ausdruecklich gesetzt und nicht
    dem Fluss ueberlassen. Ein geschlossenes `<details>` ist im Gitter weiterhin
