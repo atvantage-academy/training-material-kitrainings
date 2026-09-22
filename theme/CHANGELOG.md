@@ -15,6 +15,51 @@ Abschnitt „Theme-Version“.
 
 ---
 
+## 2.35.0
+
+### Eine Messung, die nichts messen konnte, meldet das jetzt
+
+**Der Fall, der es gezeigt hat:** Die Pipeline eines Schulungs-Repos baut das
+Lernenden-Bundle für eine Basisadresse (`/training-material-…`) – alle Verweise darin
+sind absolut. Ausgeliefert wurde es der Messung unter `/`. **Jede CSS- und JS-Datei lief
+ins Leere**, gemessen wurde nacktes HTML, und der Bericht nannte **468 Befunde**: zu
+kleine Trefferflächen, fehlende Namen, schlechte Kontraste. Alles wahr für die Seite, die
+der Browser sah – und alles falsch für die Unterlage.
+
+Zwei Änderungen, und die zweite ist die wichtigere:
+
+**`--baseurl`** reicht die Basisadresse durch: Der eingebaute Server bedient sie, und die
+Seiten werden darunter geöffnet.
+
+**Eine Plausibilitätsprobe vor jeder Messung.** Ist das Theme nicht angekommen – kein
+`--avd-academy-color-bg` im Dokument –, **gibt es kein Ergebnis, sondern eine Fehlmeldung
+mit Grund**. Die Seite zählt als „nicht messbar", und der Bericht sagt ausdrücklich, dass
+das **nicht** als „sauber" zu lesen ist. Ein Werkzeug, das im Zweifel schweigt, ist
+besser als eines, das im Zweifel Zahlen erfindet.
+
+### Kopiervorlagen werden nicht mehr gemessen
+
+Die Probe hat im eigenen Haus gleich zugeschlagen: `presentation-template.html` trägt
+statt Pfaden den Platzhalter `«BASISPFAD»` – sie lädt also weder Stylesheet noch Skript
+und ist erst dann eine Seite, wenn jemand sie kopiert. **Bisher wurde sie ungestylt
+gemessen und als sauber gemeldet**; jetzt bleibt sie draussen, und der Lauf sagt, welche
+Datei er warum übersprungen hat.
+
+Erkannt wird sie am Platzhalter **in einem Verweis** (`href`/`src`) – eine Doku-Seite,
+die ihn nur im Beispielcode zeigt, bleibt eine gewöhnliche Seite.
+
+### Die mitgelieferte Herkunftsnotiz ist keine Seite mehr
+
+`vendor/axe-core/HERKUNFT.md` wurde von Jekyll **als Seite gerendert** – in jeder
+Unterlage, die das Theme lädt. Die `exclude`-Liste des Themes half nicht: Jekyll
+**ersetzt** den Schlüssel, ein Repo mit eigener Liste verliert die des Themes. Die Datei
+heißt jetzt `HERKUNFT.txt`; was nicht wie eine Seite aussieht, kann auch keine werden.
+
+**Einstufung: Minor, nicht Major.** Die Regel „Dateien aus dem Paket entfernt = Major"
+schützt öffentliche Adressen und Asset-Pfade. Diese Datei ist eine Lizenz- und
+Herkunftsnotiz neben einer Bibliothek; sie wird von nichts verlinkt, und ihr bisheriger
+Pfad war ein Versehen, kein Angebot.
+
 ## 2.34.0
 
 ### Die Verweise sind wieder orange – als benannte Abweichung

@@ -11,8 +11,13 @@ Jahre später.
 
 **Im npm-Paket:** Die Datei wird mit ausgeliefert (`theme/package-contents.txt`
 führt sie), weil dieselbe Prüfung in den Schulungs-Repos über die zentrale
-didaktikon-Action läuft – die kennt nur `theme/`. Jekyll rendert sie nicht: Der
-Ordner `vendor` steht in der `exclude`-Liste des Themes.
+didaktikon-Action läuft – die kennt nur `theme/`.
+
+**Warum `.txt` und nicht `.md`:** Als Markdown hat Jekyll sie zu einer SEITE
+gerendert – in jeder Unterlage, die das Theme lädt. Die `exclude`-Liste des
+Themes half dagegen nicht: Jekyll ERSETZT den Schlüssel, und ein Repo mit
+eigener Liste verliert die des Themes. Was nicht wie eine Seite aussieht, kann
+auch keine werden.
 
 **Erneuern:** `npm pack axe-core@«version»`, daraus `axe.min.js` und `LICENSE`
 hierher kopieren, die Version oben nachziehen, `theme/jekyll/a11y.sh` einmal laufen

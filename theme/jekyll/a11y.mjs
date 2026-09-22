@@ -42,6 +42,11 @@ const JSONZIEL = arg("json", "");
 const MDZIEL = arg("markdown", "");
 const NICHT_SCHEITERN = process.argv.includes("--no-fail");
 const AUSSCHLUSS = arg("exclude", "theme/atvantage,theme/academy").split(",").filter(Boolean);
+/* DIE BASISADRESSE GEHOERT DAZU. Ein Bundle, das fuer `/mein-repo/` gebaut wurde,
+   verweist absolut auf `/mein-repo/theme/…`. Wird es unter `/` ausgeliefert, laeuft
+   JEDE Datei ins Leere - und gemessen wird eine Seite ohne Stylesheet und ohne
+   Skripte. Das sieht nicht nach einem Fehler aus, sondern nach hunderten. */
+const BASEURL = arg("baseurl", "").replace(/\/+$/, "");
 const LAUT = process.argv.includes("--verbose");
 
 /* --- Benannte Ausnahmen ---------------------------------------------------
@@ -85,19 +90,31 @@ const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=u
   ".txt": "text/plain; charset=utf-8", ".webp": "image/webp", ".avif": "image/avif" };
 
 /* --- Seitenliste ---------------------------------------------------------- */
+/* KOPIERVORLAGEN BLEIBEN DRAUSSEN. Eine eigenständige Vorlage trägt statt Pfaden
+   den Platzhalter `«BASISPFAD»` – sie lädt also weder Stylesheet noch Skript und
+   ist erst dann eine Seite, wenn jemand sie kopiert und den Platzhalter ersetzt.
+   Gemessen ergäbe sie nacktes HTML und damit Befunde, die niemanden betreffen.
+   Erkannt wird sie am Platzhalter IN einem Verweis (`href`/`src`) – eine Doku-
+   Seite, die ihn nur im Beispielcode zeigt, ist eine gewöhnliche Seite. */
+const VORLAGENMARKE = /(?:href|src)="[^"]*«BASISPFAD»/;
+
 async function seitenSammeln(wurzel) {
-  const treffer = [];
+  const treffer = [], vorlagen = [];
   async function lauf(ordner) {
     for (const eintrag of await readdir(ordner, { withFileTypes: true })) {
       const voll = path.join(ordner, eintrag.name);
       const rel = path.relative(wurzel, voll);
       if (AUSSCHLUSS.some((a) => rel === a || rel.startsWith(a + path.sep))) continue;
-      if (eintrag.isDirectory()) await lauf(voll);
-      else if (eintrag.name.endsWith(".html")) treffer.push(rel.split(path.sep).join("/"));
+      if (eintrag.isDirectory()) { await lauf(voll); continue; }
+      if (!eintrag.name.endsWith(".html")) continue;
+      const kurz = rel.split(path.sep).join("/");
+      const inhalt = await readFile(voll, "utf8").catch(() => "");
+      if (VORLAGENMARKE.test(inhalt)) { vorlagen.push(kurz); continue; }
+      treffer.push(kurz);
     }
   }
   await lauf(wurzel);
-  return treffer.sort();
+  return { seiten: treffer.sort(), vorlagen: vorlagen.sort() };
 }
 
 /* --- Statischer Server ---------------------------------------------------- */
@@ -106,6 +123,7 @@ function serverStarten(wurzel) {
     const s = createServer(async (req, res) => {
       try {
         let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
+        if (BASEURL && (p === BASEURL || p.startsWith(BASEURL + "/"))) p = p.slice(BASEURL.length) || "/";
         let datei = path.join(wurzel, p);
         /* Kein Ausbrechen aus dem Wurzelverzeichnis. */
         if (!datei.startsWith(wurzel)) { res.writeHead(403).end(); return; }
@@ -223,6 +241,25 @@ async function seiteMessen(b, sitzung, url, axeQuelle, breite, schema) {
   /* Kurz atmen lassen: Inhaltsverzeichnis, Fortschritt und Navigation entstehen
      erst im Browser, und genau die sollen mitgemessen werden. */
   await new Promise((f) => setTimeout(f, 400));
+  /* IST DAS UEBERHAUPT EINE GEMESSENE SEITE? Wenn Stylesheet und Skripte nicht
+     geladen haben - falsche Basisadresse, fehlende Dateien -, steht im Browser
+     nacktes HTML. axe misst das klaglos und meldet hunderte Verstoesse: zu kleine
+     Treffer, fehlende Namen, schlechte Kontraste. Alles wahr fuer diese Seite und
+     alles falsch fuer die Unterlage.
+     Genau so ist einmal ein Bericht mit 468 Befunden entstanden, weil ein Bundle
+     mit Basisadresse unter `/` ausgeliefert wurde. Deshalb wird zuerst geprueft,
+     ob das Theme angekommen ist: Ohne seine Tokens gibt es kein Ergebnis, sondern
+     eine Fehlmeldung mit Grund. */
+  const { result: probe } = await b.ruf("Runtime.evaluate", {
+    expression: `(() => {
+      const w = getComputedStyle(document.documentElement)
+        .getPropertyValue("--avd-academy-color-bg").trim();
+      return w ? "" : "Theme-Stylesheet nicht angekommen - stimmt die Basisadresse (--baseurl)?";
+    })()`,
+    returnByValue: true
+  }, sitzung);
+  if (probe && probe.value) throw new Error(probe.value);
+
   await b.ruf("Runtime.evaluate", { expression: axeQuelle, returnByValue: false }, sitzung);
   const { result, exceptionDetails } = await b.ruf("Runtime.evaluate", {
     expression: `(async () => {
@@ -255,7 +292,7 @@ if (!siteDa) { console.error("FEHLER: " + SITE + " gibt es nicht - erst bauen.")
 const axeQuelle = await readFile(new URL("./vendor/axe-core/axe.min.js", import.meta.url), "utf8");
 const AXE_VERSION = (axeQuelle.match(/axe\.version\s*=\s*["']([\d.]+)["']/) ||
                      axeQuelle.match(/version:\s*["']([\d.]+)["']/) || [, "?"])[1];
-const seiten = await seitenSammeln(SITE);
+const { seiten, vorlagen } = await seitenSammeln(SITE);
 const { server, port } = await serverStarten(SITE);
 
 let b;
@@ -279,7 +316,7 @@ try {
       let ziel = null;
       try {
         ziel = await b.seiteOeffnen();
-        const verstoesse = await seiteMessen(b, ziel.sessionId, `http://127.0.0.1:${port}/${seite}`, axeQuelle, breite, schema);
+        const verstoesse = await seiteMessen(b, ziel.sessionId, `http://127.0.0.1:${port}${BASEURL}/${seite}`, axeQuelle, breite, schema);
         gemessen++;
         if (LAUT) console.log(`  ${String(Date.now() - t0).padStart(5)} ms  ${seite} @${breite} ${schema}`);
         for (const v of verstoesse) {
@@ -314,6 +351,10 @@ try {
 /* --- Bericht -------------------------------------------------------------- */
 const sortiert = [...funde.values()].sort((a, c) => c.stellen - a.stellen);
 console.log(`Barrierefreiheit: ${gemessen} Messungen (${seiten.length} Seiten × ${BREITEN.length} Breiten × ${SCHEMATA.length} Farbschemata), Regelsatz ${TAGS.join(", ")}`);
+if (vorlagen.length) {
+  console.log("Nicht gemessen, weil Kopiervorlage (Platzhalter statt Pfaden): " +
+    vorlagen.length + " – " + vorlagen.slice(0, 3).join(", ") + (vorlagen.length > 3 ? " …" : ""));
+}
 if (unterdrueckt.size) {
   console.log("\nDurch benannte Ausnahmen nicht gemeldet:");
   for (const [a, n] of unterdrueckt) {
@@ -322,7 +363,7 @@ if (unterdrueckt.size) {
   }
 }
 if (kaputt.length) {
-  console.log("\nNicht messbar:");
+  console.log("\nNicht messbar (und deshalb NICHT als 'sauber' zu lesen):");
   kaputt.forEach((k) => console.log("  ! " + k));
 }
 for (const v of sortiert) {
@@ -394,7 +435,12 @@ if (MDZIEL) {
   }
   if (kaputt.length) {
     z.push("");
-    z.push("**Nicht messbar:** " + kaputt.length + " Seite(n) – " + kaputt.slice(0, 3).join("; "));
+    z.push("**⚠️ Nicht messbar:** " + kaputt.length + " Seite(n) – " + kaputt.slice(0, 3).join("; "));
+    z.push("");
+    z.push("Eine Seite, die sich nicht messen lässt, ist **nicht** geprüft. " +
+      "Häufigste Ursache: Das Bundle wurde für eine Basisadresse gebaut, aber ohne " +
+      "sie ausgeliefert – dann fehlen Stylesheet und Skripte, und was axe dann findet, " +
+      "gilt für nacktes HTML und nicht für die Unterlage.");
   }
   z.push("");
   z.push("<sub>Maßstab WCAG 2.2 AA · Erklärung: `docs/theme/barrierefreiheit.md` · lokal `make a11y`</sub>");

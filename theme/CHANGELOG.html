@@ -64,13 +64,13 @@
 
 <meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1789995988"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1789995988">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1789995988">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1789995988">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1789995988"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1789995988">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1789995988" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1789995988" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1789995988">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1790056135"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1790056135">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1790056135">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1790056135">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1790056135"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1790056135">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1790056135" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1790056135" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1790056135">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -113,8 +113,8 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1789995988">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1789995988"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1790056135">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1790056135"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
@@ -174,6 +174,51 @@ inkompatibel gilt und wie eingestuft wird, steht in
 Abschnitt „Theme-Version“.</p>
 
 <hr />
+
+<h2 id="2350">2.35.0</h2>
+
+<h3 id="eine-messung-die-nichts-messen-konnte-meldet-das-jetzt">Eine Messung, die nichts messen konnte, meldet das jetzt</h3>
+
+<p><strong>Der Fall, der es gezeigt hat:</strong> Die Pipeline eines Schulungs-Repos baut das
+Lernenden-Bundle für eine Basisadresse (<code>/training-material-…</code>) – alle Verweise darin
+sind absolut. Ausgeliefert wurde es der Messung unter <code>/</code>. <strong>Jede CSS- und JS-Datei lief
+ins Leere</strong>, gemessen wurde nacktes HTML, und der Bericht nannte <strong>468 Befunde</strong>: zu
+kleine Trefferflächen, fehlende Namen, schlechte Kontraste. Alles wahr für die Seite, die
+der Browser sah – und alles falsch für die Unterlage.</p>
+
+<p>Zwei Änderungen, und die zweite ist die wichtigere:</p>
+
+<p><strong><code>--baseurl</code></strong> reicht die Basisadresse durch: Der eingebaute Server bedient sie, und die
+Seiten werden darunter geöffnet.</p>
+
+<p><strong>Eine Plausibilitätsprobe vor jeder Messung.</strong> Ist das Theme nicht angekommen – kein
+<code>--avd-academy-color-bg</code> im Dokument –, <strong>gibt es kein Ergebnis, sondern eine Fehlmeldung
+mit Grund</strong>. Die Seite zählt als „nicht messbar”, und der Bericht sagt ausdrücklich, dass
+das <strong>nicht</strong> als „sauber” zu lesen ist. Ein Werkzeug, das im Zweifel schweigt, ist
+besser als eines, das im Zweifel Zahlen erfindet.</p>
+
+<h3 id="kopiervorlagen-werden-nicht-mehr-gemessen">Kopiervorlagen werden nicht mehr gemessen</h3>
+
+<p>Die Probe hat im eigenen Haus gleich zugeschlagen: <code>presentation-template.html</code> trägt
+statt Pfaden den Platzhalter <code>«BASISPFAD»</code> – sie lädt also weder Stylesheet noch Skript
+und ist erst dann eine Seite, wenn jemand sie kopiert. <strong>Bisher wurde sie ungestylt
+gemessen und als sauber gemeldet</strong>; jetzt bleibt sie draussen, und der Lauf sagt, welche
+Datei er warum übersprungen hat.</p>
+
+<p>Erkannt wird sie am Platzhalter <strong>in einem Verweis</strong> (<code>href</code>/<code>src</code>) – eine Doku-Seite,
+die ihn nur im Beispielcode zeigt, bleibt eine gewöhnliche Seite.</p>
+
+<h3 id="die-mitgelieferte-herkunftsnotiz-ist-keine-seite-mehr">Die mitgelieferte Herkunftsnotiz ist keine Seite mehr</h3>
+
+<p><code>vendor/axe-core/HERKUNFT.md</code> wurde von Jekyll <strong>als Seite gerendert</strong> – in jeder
+Unterlage, die das Theme lädt. Die <code>exclude</code>-Liste des Themes half nicht: Jekyll
+<strong>ersetzt</strong> den Schlüssel, ein Repo mit eigener Liste verliert die des Themes. Die Datei
+heißt jetzt <code>HERKUNFT.txt</code>; was nicht wie eine Seite aussieht, kann auch keine werden.</p>
+
+<p><strong>Einstufung: Minor, nicht Major.</strong> Die Regel „Dateien aus dem Paket entfernt = Major”
+schützt öffentliche Adressen und Asset-Pfade. Diese Datei ist eine Lizenz- und
+Herkunftsnotiz neben einer Bibliothek; sie wird von nichts verlinkt, und ihr bisheriger
+Pfad war ein Versehen, kein Angebot.</p>
 
 <h2 id="2340">2.34.0</h2>
 
