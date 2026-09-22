@@ -9,6 +9,7 @@
 #   theme/jekyll/a11y.sh --require-browser  # fehlender Browser ist ein Fehler (CI)
 #   theme/jekyll/a11y.sh --no-fail          # Befund meldet, bricht aber nicht ab
 #   theme/jekyll/a11y.sh --widths 1280      # nur eine Breite messen (schneller)
+#   theme/jekyll/a11y.sh --label learner    # Bericht beschriften (mehrere Bündel)
 #
 # LIEGT IM PAKET, nicht unter `bin/`: Dieselbe Prüfung läuft in den Schulungs-
 # Repos über die zentrale didaktikon-Action, und die kennt nur `theme/`. Wie

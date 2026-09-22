@@ -47,6 +47,11 @@ const AUSSCHLUSS = arg("exclude", "theme/atvantage,theme/academy").split(",").fi
    JEDE Datei ins Leere - und gemessen wird eine Seite ohne Stylesheet und ohne
    Skripte. Das sieht nicht nach einem Fehler aus, sondern nach hunderten. */
 const BASEURL = arg("baseurl", "").replace(/\/+$/, "");
+/* WOFÜR DIESER LAUF STEHT. Dieselbe Site wird mehrfach gebaut - einmal je
+   Zielgruppe -, und beide Berichte landen am selben Ort. Ohne Beschriftung steht
+   dort zweimal „2 Regeln verletzt" mit verschiedenen Zahlen, und niemand weiss,
+   welche Fassung gemeint ist. Leer lassen, wenn es nur eine gibt. */
+const LABEL = arg("label", "").trim();
 const LAUT = process.argv.includes("--verbose");
 
 /* --- Benannte Ausnahmen ---------------------------------------------------
@@ -350,7 +355,7 @@ try {
 
 /* --- Bericht -------------------------------------------------------------- */
 const sortiert = [...funde.values()].sort((a, c) => c.stellen - a.stellen);
-console.log(`Barrierefreiheit: ${gemessen} Messungen (${seiten.length} Seiten × ${BREITEN.length} Breiten × ${SCHEMATA.length} Farbschemata), Regelsatz ${TAGS.join(", ")}`);
+console.log(`Barrierefreiheit${LABEL ? " · " + LABEL : ""}: ${gemessen} Messungen (${seiten.length} Seiten × ${BREITEN.length} Breiten × ${SCHEMATA.length} Farbschemata), Regelsatz ${TAGS.join(", ")}`);
 if (vorlagen.length) {
   console.log("Nicht gemessen, weil Kopiervorlage (Platzhalter statt Pfaden): " +
     vorlagen.length + " – " + vorlagen.slice(0, 3).join(", ") + (vorlagen.length > 3 ? " …" : ""));
@@ -390,9 +395,10 @@ if (MDZIEL) {
   const zusatz = unterdrueckt.size
     ? " (" + [...unterdrueckt.values()].reduce((a, b) => a + b, 0) + " Stellen durch benannte Ausnahmen)"
     : "";
+  const wofuer = LABEL ? " · " + LABEL : "";
   z.push("## " + (sortiert.length
-    ? "⚠️ Barrierefreiheit: " + sortiert.length + " Regel(n) verletzt" + zusatz
-    : "✅ Barrierefreiheit: keine Verletzung gefunden" + zusatz));
+    ? "⚠️ Barrierefreiheit" + wofuer + ": " + sortiert.length + " Regel(n) verletzt" + zusatz
+    : "✅ Barrierefreiheit" + wofuer + ": keine Verletzung gefunden" + zusatz));
   z.push("");
   z.push("Gemessen mit **axe-core " + AXE_VERSION + "** in Chrome – " + gemessen + " Messungen (" +
     seiten.length + " Seiten × " + BREITEN.join(" und ") + " Pixel Breite × Farbschema " +

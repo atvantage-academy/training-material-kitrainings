@@ -15,6 +15,22 @@ Abschnitt „Theme-Version“.
 
 ---
 
+## 2.36.0
+
+### Der Bericht sagt, wofür er gilt
+
+Neue Option **`--label`**. Dieselbe Site wird in Schulungs-Repos mehrfach gebaut – einmal
+je Zielgruppe –, und beide Berichte landen am selben Ort: als Kommentar an demselben
+Issue. Dort stand zweimal „Barrierefreiheit: 2 Regel(n) verletzt" mit verschiedenen
+Zahlen, ohne dass erkennbar war, welche Fassung gemeint ist.
+
+```
+## ⚠️ Barrierefreiheit · learner: 2 Regel(n) verletzt
+```
+
+Ohne die Option bleibt alles wie bisher – wer nur ein Bündel baut, braucht keine
+Beschriftung.
+
 ## 2.35.0
 
 ### Eine Messung, die nichts messen konnte, meldet das jetzt
