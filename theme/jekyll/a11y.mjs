@@ -19,6 +19,7 @@
    ============================================================================= */
 import { createServer } from "node:http";
 import { readFile, readdir, stat, mkdtemp, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -53,6 +54,10 @@ const BASEURL = arg("baseurl", "").replace(/\/+$/, "");
    welche Fassung gemeint ist. Leer lassen, wenn es nur eine gibt. */
 const LABEL = arg("label", "").trim();
 const LAUT = process.argv.includes("--verbose");
+/* EIGENE AUSNAHMEN DES PROJEKTS. Ohne Angabe wird `a11y-exceptions.json` im
+   Arbeitsverzeichnis gesucht – so braucht ein Repo, das eine hat, keine Zeile
+   Konfiguration in seiner Pipeline, und eines ohne merkt nichts davon. */
+const AUSNAHMEDATEI = path.resolve(arg("exceptions", "a11y-exceptions.json"));
 
 /* --- Benannte Ausnahmen ---------------------------------------------------
    JEDER EINTRAG IST EINE ENTSCHEIDUNG, KEIN AUSSCHALTER. Deshalb wirkt eine
@@ -61,28 +66,112 @@ const LAUT = process.argv.includes("--verbose");
    Kontrastfehler unsichtbar, und genau das darf nicht passieren.
 
    Und sie verschweigt nichts: Der Bericht zählt am Ende, wie viele Stellen
-   welche Ausnahme unterdrückt hat. Eine Zahl, die wächst, fällt auf.
+   welche Ausnahme unterdrückt hat, und ob sie aus dem Theme oder aus dem Projekt
+   stammt. Eine Zahl, die wächst, fällt auf.
 
-   Felder: `regel` (axe-Kennung), `wenn` (Merkmale aus axes `data`, alle müssen
-   passen; Farben ohne Beachtung von Gross/Klein), `grund`, `seit`. */
-const AUSNAHMEN = [
+   ZWEI HERKÜNFTE, EINE FORM.
+
+   **Das Theme bringt seine eigenen mit.** Was das Theme an bekannten Abweichungen
+   hat, ist kein Problem seiner Nutzer: Die Liste liegt hier, im Paket, und reist
+   mit jeder Unterlage mit. Ein Projekt muss das Marken-Orange nicht selbst
+   ausnehmen – es hat die Entscheidung ja nicht getroffen.
+
+   **Ein Projekt kann ergänzen, nicht überschreiben.** Eigene Ausnahmen kommen aus
+   einer Datei (`--exceptions «datei»`, sonst `a11y-exceptions.json` im
+   Arbeitsverzeichnis) und werden ANGEHÄNGT. Es gibt bewusst keinen Weg, eine
+   Ausnahme des Themes abzuschalten: Sie steht dort, weil sie im Theme entschieden
+   wurde, und wer sie für falsch hält, ändert sie im Theme – nicht still in einem
+   Repo, in dem niemand sie sucht.
+
+   FELDER – und sie sind ENGLISCH, weil ein Projekt sie tippt:
+
+     rule    axe-Kennung ("color-contrast") – Pflicht
+     when    Merkmale aus axes `data`; ALLE müssen passen. Fehlt das Feld, greift
+             die Ausnahme für jede Stelle dieser Regel – das ist der Ausschalter,
+             den es nicht geben soll, deshalb warnt der Lauf davor.
+             Farben ohne Beachtung von Groß- und Kleinschreibung.
+     reason  warum – Pflicht. Eine Ausnahme ohne Begründung ist ein Ausschalter
+             mit besserer Presse.
+     since   seit wann (ISO-Datum), optional.
+
+   Beispiel für `a11y-exceptions.json` in einem Projekt:
+
+     [
+       {
+         "rule": "color-contrast",
+         "when": { "fgColor": "#5a7d2a" },
+         "since": "2026-09-23",
+         "reason": "Schulungsfarbe im Logo-Schriftzug, nur dekorativ; der Name
+                    steht daneben als Text."
+       }
+     ]
+   -------------------------------------------------------------------------- */
+const AUSNAHMEN_THEME = [
   {
-    regel: "color-contrast",
-    wenn: { fgColor: "#ff5401" },
-    seit: "2026-09-21",
-    grund: "Marken-Orange als Schrift (3,22:1 auf Weiss). Bewusste Entscheidung: " +
-           "Die Marke traegt die Verweise; dass es Verweise SIND, zeigt die " +
-           "Unterstreichung im Fliesstext (1.4.1). Die Abweichung steht in " +
-           "docs/theme/barrierefreiheit.md."
+    rule: "color-contrast",
+    when: { fgColor: "#ff5401" },
+    since: "2026-09-21",
+    reason: "Marken-Orange als Schrift (3,22:1 auf Weiss). Bewusste Entscheidung: " +
+            "Die Marke traegt die Verweise; dass es Verweise SIND, zeigt die " +
+            "Unterstreichung im Fliesstext (1.4.1). Die Abweichung steht in " +
+            "docs/theme/barrierefreiheit.md."
   }
 ];
 
+/* EIN FEHLER IN DER DATEI HÄLT DEN LAUF AN. Die Alternative wäre, sie still zu
+   ignorieren – und dann misst das Projekt in dem Glauben, seine Ausnahmen
+   griffen, während der Bericht voller Befunde steht, die es längst entschieden
+   hat. Ein lauter Abbruch ist hier die freundlichere Antwort. */
+function ausnahmenLaden(datei, ausdruecklich) {
+  let roh;
+  try {
+    roh = readFileSync(datei, "utf8");
+  } catch (e) {
+    if (!ausdruecklich) return [];          // Vorgabedatei fehlt: völlig in Ordnung
+    console.error(`FEHLER: Ausnahmeliste ${datei} ist nicht lesbar – ${e.message}`);
+    process.exit(2);
+  }
+  let liste;
+  try {
+    liste = JSON.parse(roh);
+  } catch (e) {
+    console.error(`FEHLER: ${datei} ist kein gültiges JSON – ${e.message}`);
+    process.exit(2);
+  }
+  if (!Array.isArray(liste)) {
+    console.error(`FEHLER: ${datei} muss eine Liste von Ausnahmen enthalten.`);
+    process.exit(2);
+  }
+  liste.forEach((a, i) => {
+    if (!a || typeof a.rule !== "string" || !a.rule) {
+      console.error(`FEHLER: ${datei}, Eintrag ${i + 1}: 'rule' fehlt (axe-Kennung, etwa "color-contrast").`);
+      process.exit(2);
+    }
+    if (typeof a.reason !== "string" || !a.reason.trim()) {
+      console.error(`FEHLER: ${datei}, Eintrag ${i + 1} (${a.rule}): 'reason' fehlt. Eine Ausnahme ohne Begründung ist ein Ausschalter.`);
+      process.exit(2);
+    }
+    if (a.when && typeof a.when !== "object") {
+      console.error(`FEHLER: ${datei}, Eintrag ${i + 1} (${a.rule}): 'when' muss ein Objekt sein.`);
+      process.exit(2);
+    }
+    if (!a.when || !Object.keys(a.when).length) {
+      console.log(`Hinweis: ${datei}, Eintrag ${i + 1} (${a.rule}) hat kein 'when' und gilt damit für JEDE Stelle dieser Regel. Damit wird auch unsichtbar, was noch gar nicht passiert ist.`);
+    }
+  });
+  return liste.map((a) => ({ ...a, projekt: true }));
+}
+
+const AUSNAHMEN = AUSNAHMEN_THEME.concat(
+  ausnahmenLaden(AUSNAHMEDATEI, Boolean(arg("exceptions", "")))
+);
+
 function ausnahmeFuer(regel, daten) {
   return AUSNAHMEN.find(function (a) {
-    if (a.regel !== regel) return false;
-    return Object.keys(a.wenn || {}).every(function (k) {
+    if (a.rule !== regel) return false;
+    return Object.keys(a.when || {}).every(function (k) {
       var ist = daten && daten[k];
-      return typeof ist === "string" && ist.toLowerCase() === String(a.wenn[k]).toLowerCase();
+      return typeof ist === "string" && ist.toLowerCase() === String(a.when[k]).toLowerCase();
     });
   });
 }
@@ -363,8 +452,8 @@ if (vorlagen.length) {
 if (unterdrueckt.size) {
   console.log("\nDurch benannte Ausnahmen nicht gemeldet:");
   for (const [a, n] of unterdrueckt) {
-    console.log(`  ${n} Stellen · ${a.regel} · seit ${a.seit}`);
-    console.log(`     ${a.grund}`);
+    console.log(`  ${n} Stellen · ${a.rule} · ${a.projekt ? "Projekt" : "Theme"}${a.since ? " · seit " + a.since : ""}`);
+    console.log(`     ${a.reason}`);
   }
 }
 if (kaputt.length) {
@@ -436,7 +525,8 @@ if (MDZIEL) {
     z.push("**Durch benannte Ausnahmen nicht gemeldet:**");
     z.push("");
     for (const [a, n] of unterdrueckt) {
-      z.push("- **" + n + " Stellen** · `" + a.regel + "` · seit " + a.seit + " – " + a.grund);
+      z.push("- **" + n + " Stellen** · `" + a.rule + "` · " + (a.projekt ? "Projekt" : "Theme") +
+        (a.since ? " · seit " + a.since : "") + " – " + a.reason);
     }
   }
   if (kaputt.length) {

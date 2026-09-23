@@ -64,13 +64,13 @@
 
 <meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1790063692"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1790063692">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1790063692">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1790063692">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1790063692"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1790063692">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1790063692" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1790063692" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1790063692">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1790166390"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1790166390">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1790166390">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1790166390">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1790166390"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1790166390">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1790166390" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1790166390" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1790166390">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -113,8 +113,8 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1790063692">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1790063692"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1790166390">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1790166390"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
@@ -174,6 +174,527 @@ inkompatibel gilt und wie eingestuft wird, steht in
 Abschnitt „Theme-Version“.</p>
 
 <hr />
+
+<h2 id="2440">2.44.0</h2>
+
+<h3 id="der-blockrhythmus-fehlte-in-reitern-im-akkordeon--und-an-listen-und-zitaten-überall">Der Blockrhythmus fehlte in Reitern, im Akkordeon – und an Listen und Zitaten überall</h3>
+
+<p>Gemeldet aus <code>training-concept-container-technologies</code> (A-005), gemessen an Theme 2.42.0:
+In einem Reiter stößt eine <code>&lt;ul&gt;</code> hart an den Absatz darunter, ein <code>&lt;blockquote&gt;</code> hart an
+die Tabelle. <strong>Die Meldung war richtig und traf nur die Hälfte.</strong></p>
+
+<p><strong>Erstens: die Aufzählung.</strong> <code>base.css</code> räumt mit <code>* { margin: 0 }</code> alles ab; zurück holt
+den Rhythmus eine Eulenregel, die nur <strong>direkte</strong> Kinder der Inhaltsspalte zählt, plus
+eine <strong>Aufzählung</strong> der Container, in denen er ebenfalls gelten soll. In dieser
+Aufzählung fehlten <code>avd-academy-tabs__panel</code> (seit Einführung der Reiter) und
+<code>avd-academy-accordion__body</code> (seit 2.40.0, also vom ersten Tag des Bausteins an).</p>
+
+<p>Das wiegt schwerer als ein Einzelfall: Das Didaktikon schreibt Reiter für <strong>jedes</strong>
+Regiebuch vor – der gesamte Trainerleitfaden jedes Konzept-Repos stand damit in genau dem
+Container, in dem der Rhythmus fehlte.</p>
+
+<p><strong>Zweitens, und das stand nicht in der Meldung: drei Element-Regeln machten die Eulenregel
+zunichte.</strong> <code>.avd-academy-guide-main ul, ol</code> und <code>.avd-academy-guide-main blockquote</code>
+setzten <code>margin: 0</code> – redundant, weil <code>base.css</code> das längst tut, aber <strong>nach</strong> der
+Eulenregel und mit höherer Spezifität (0-1-1 gegen 0-1-0). Jede Liste und jedes Zitat
+verlor damit seinen Blockabstand, <strong>auch auf der Seitenebene</strong>. Gemessen an der
+Bausteine-Seite: <code>margin-top: 0px</code> an jeder <code>&lt;ul&gt;</code>, heute 25,6 px.</p>
+
+<p><strong>Gemessen, vorher → nachher:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>vorher</th>
+      <th>jetzt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Akkordeon, <code>&lt;ul&gt;</code> → <code>&lt;blockquote&gt;</code></td>
+      <td>0 px</td>
+      <td><strong>26 px</strong></td>
+    </tr>
+    <tr>
+      <td>Reiter, erster Absatz</td>
+      <td>0 px</td>
+      <td>0 px + 24 px Innenabstand (richtig, siehe unten)</td>
+    </tr>
+    <tr>
+      <td>Seitenebene, <code>&lt;ul&gt;</code></td>
+      <td>0 px</td>
+      <td><strong>25,6 px</strong></td>
+    </tr>
+    <tr>
+      <td>Listenpunkte <code>li + li</code></td>
+      <td>0 px</td>
+      <td>0 px (unverändert, der <code>gap</code> macht sie)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Kein doppelter Abstand im Reiterstreifen.</strong> Das <code>&lt;summary&gt;</code> ist dort <code>display: none</code>,
+zählt für die Eulenregel aber als Geschwister – der erste sichtbare Absatz hätte 24 px
+Innenabstand <strong>plus</strong> 25,6 px Marge bekommen. Eine eigene Regel nimmt ihn im
+<code>--enhanced</code>-Zustand heraus; im Akkordeon-Zustand ist das <code>summary</code> sichtbar und der
+Abstand gehört dorthin.</p>
+
+<h3 id="avd-academy-flow--die-aufzählung-ist-nicht-mehr-der-einzige-weg"><code>avd-academy-flow</code> – die Aufzählung ist nicht mehr der einzige Weg</h3>
+
+<p>Die Meldung fragte, ob die Aufzählung selbst das Problem sei. <strong>Ja</strong> – sie muss bei jedem
+neuen Container von Hand nachgezogen werden, in <strong>zwei</strong> Dateien, und der Fehler ist
+unsichtbar: Wo der Abstand fehlt, sieht die Seite nicht kaputt aus, sondern nur eng.
+Zweimal ist es passiert, das zweite Mal vom Autor des Bausteins selbst.</p>
+
+<p>Wer jetzt einen Fluss-Container baut – im Theme oder in einem Repo –, gibt ihm
+<code>avd-academy-flow</code>:</p>
+
+<pre><code class="language-html">&lt;div class="mein-kasten avd-academy-flow" markdown="1"&gt;
+</code></pre>
+
+<p><strong>Die Umkehrung („alles außer …”) wurde erwogen und verworfen.</strong> Sie hätte die bessere
+Fehlerrichtung – ein vergessener Eintrag fiele als <em>zu viel</em> Abstand auf statt als gar
+keiner –, aber die Ausnahmeliste wäre länger als die heutige (Reiterleiste, Karten-Gitter,
+Materialspalten, Zeilenerklärung, das Akkordeon selbst, die Demo-Bühne), und <code>ul &gt; li + li</code>
+bekäme plötzlich Blockabstand. Das ist ein Eingriff in jede Seite jedes Repos und gehört in
+einen eigenen Schnitt, nicht in die Behebung eines gemeldeten Befunds.</p>
+
+<p><strong>Und ein Wächter.</strong> <code>bin/flow-containers.sh</code> prüft, dass beide Listen identisch sind und
+die Marke enthalten – in <code>make check</code> und in der Pipeline. Was er nicht kann: wissen,
+welcher Container hineingehört. Das bleibt eine Entwurfsentscheidung.</p>
+
+<h3 id="zur-dritten-frage-grundmargen-an-den-elementen">Zur dritten Frage: Grundmargen an den Elementen</h3>
+
+<p><strong>Nein.</strong> Eine Grundmarge an <code>ul</code>, <code>ol</code>, <code>table</code>, <code>blockquote</code> wäre ein zweites System
+neben dem Rhythmus-Token und würde in Flex- und Grid-Komponenten wieder stören, wo genau
+kein Abstand gewollt ist. Der Ort für den Abstand ist die Eulenregel – sie muss nur
+überall greifen und darf nicht hinterher zurückgesetzt werden. Genau das war der Fehler.</p>
+
+<hr />
+
+<h2 id="2430">2.43.0</h2>
+
+<h3 id="mehr-luft-um-überschriften--und-der-wert-darunter-kommt-jetzt-an">Mehr Luft um Überschriften – und der Wert darunter kommt jetzt an</h3>
+
+<p>Gemeldet aus <code>training-concepts-overview</code>: Die Seiten stehen zu eng, über wie unter den
+Überschriften.</p>
+
+<p><strong>Der Befund zuerst, denn er erklärt die Hälfte.</strong> Unter einer Überschrift stand
+<code>margin-bottom: 0.25rem</code>, also 4 px – gemeint als Bindung an den folgenden Text. Angekommen
+sind davon <strong>18 px</strong>: Der Wert <strong>kollabiert</strong> mit dem <code>margin-top</code> der Flussregel
+(<code>.avd-academy-guide-main &gt; * + *</code>, 1,1 rem), und der größere gewinnt. Eine Überschrift
+stand damit exakt so weit von ihrem Text wie zwei Absätze voneinander – die gemeinte
+Hierarchie gab es nur im Kommentar.</p>
+
+<p>Die Flussregel nimmt Überschriften jetzt aus:</p>
+
+<pre><code class="language-css">.avd-academy-guide-main &gt; :is(h1, h2, h3, h4, h5, h6) + * {
+  margin-top: var(--avd-academy-rhythm-heading);
+}
+</code></pre>
+
+<p>Erst dadurch entscheidet das Token überhaupt. Dazu bekommt die <code>h3</code> ein eigenes
+(<code>--avd-academy-rhythm-subsection</code>); dort stand <code>1.75rem</code> hart im Stylesheet, während die
+<code>h2</code> längst ein Token hatte.</p>
+
+<p><strong>Gemessen am gebauten Stand, vorher und nachher:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>vorher</th>
+      <th>jetzt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>über einer <code>h2</code></td>
+      <td>44 px</td>
+      <td><strong>60 px</strong></td>
+    </tr>
+    <tr>
+      <td>unter einer Überschrift</td>
+      <td>18 px</td>
+      <td><strong>24 px</strong></td>
+    </tr>
+    <tr>
+      <td>über einer <code>h3</code></td>
+      <td>28 px</td>
+      <td><strong>40 px</strong></td>
+    </tr>
+    <tr>
+      <td>zwischen zwei Absätzen</td>
+      <td>17,6 px</td>
+      <td><strong>26 px</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Die Hierarchie bleibt erhalten: unter der Überschrift (24 px) weniger als zwischen zwei
+Absätzen (26 px), damit sie an ihrem Text hängt – nur eben spürbar statt bloß behauptet.</p>
+
+<p><strong>Zur Herkunft:</strong> Das ATVANTAGE-Fundament setzt <code>h1..h6 { margin: 0 0 0.5em }</code> – nichts
+darüber, ein halbes Geviert darunter. Die Academy-Ebene dreht das bewusst um (viel darüber,
+weniger darunter), weil ihre Seiten Abschnitte haben und keine Fließtexte. Diese Abweichung
+ist damit älter als die Tokens; 2.15.0 hatte nur den Abstand <strong>darüber</strong> angehoben.</p>
+
+<p><strong>Was Projekte tun müssen: nichts.</strong> Wer den Rhythmus einer Unterlage anders will, setzt die
+vier Tokens um, statt Klassen des Themes zu überschreiben.</p>
+
+<hr />
+
+<h2 id="2420">2.42.0</h2>
+
+<h3 id="der-kontrastprüfer-kann-nicht-mehr-still-über-nichts-laufen">Der Kontrastprüfer kann nicht mehr still über nichts laufen</h3>
+
+<p>Gemeldet aus <code>atlassian-mcp</code>, wo <code>contrast.rb</code> zum ersten Mal in einer fremden Pipeline
+lief: Zwei Läufe über dieselbe Startseite, beide grün, beide mit derselben Zeile „Keine
+Paarung unter der Schwelle.” Der eine hatte <strong>106</strong> Elemente betrachtet, der andere <strong>4</strong>.
+Nichts in der Ausgabe unterschied sie.</p>
+
+<p><strong>Die Ursache ist der Basispfad.</strong> Eine mit <code>jekyll build --baseurl /docs</code> gebaute Site
+verweist absolut auf <code>/docs/theme/academy/…</code>. <code>contrast.rb</code> servierte das mit <code>--site</code>
+übergebene Verzeichnis flach als Wurzel – unter <code>/docs/</code> lag dort nichts, jede Datei lief
+ins Leere, und gemessen wurde nacktes HTML. Darauf trägt fast jede Paarung, weil es nur
+noch Schwarz auf Weiß gibt.</p>
+
+<p><strong>Zwei Änderungen, und die zweite ist die wichtigere:</strong></p>
+
+<p><strong><code>--baseurl «pfad»</code></strong> – gleiche Schreibweise und Bedeutung wie in <code>links.rb</code>, weil beide
+Prüfer nebeneinander aufgerufen werden. Der interne Server bildet den Pfad nach, statt
+dass jeder Aufrufer sein Artefakt vorher in einen Unterordner umpacken muss.</p>
+
+<p><strong>Ein Wächter, unabhängig davon.</strong> Vor jeder Messung wird geprüft, ob die Theme-Tokens
+überhaupt angekommen sind (<code>--avd-academy-color-bg</code>). Ist das nicht so, wird die Seite
+<strong>benannt und nicht gemessen</strong>, und der Lauf endet mit <strong>Rückgabewert 2</strong> – auch ohne
+<code>--strict</code>. Ein Befund ist eine inhaltliche Entscheidung und darf eine Warnung bleiben;
+eine Seite ohne Stylesheet ist gar keine Messung. <code>a11y.mjs</code> hatte diesen Wächter längst,
+<code>contrast.rb</code> nie.</p>
+
+<p>Ein <code>--baseurl</code> hilft nur dem, der weiß, dass er es braucht. Der Wächter hilft auch dem,
+der es nicht weiß – und er fängt mehr ab als den Basispfad: falsch entpacktes Artefakt,
+halb hochgeladenes Bundle, umbenannter Theme-Ordner.</p>
+
+<p><strong>Dazu die Bezugsgröße, die gefehlt hat:</strong> Der Bericht nennt jetzt, wie viele Elemente mit
+eigenem Text überhaupt betrachtet wurden. An dieser Zahl unterscheidet man 4 von 106.</p>
+
+<p><strong>Kopiervorlagen bleiben draußen.</strong> Eine eigenständige Vorlage trägt statt Pfaden den
+Platzhalter <code>«BASISPFAD»</code>, lädt also gar kein Stylesheet – ohne diese Ausnahme wäre sie
+beim neuen Wächter hängengeblieben. Dasselbe Kriterium steht in <code>a11y.mjs</code>.</p>
+
+<p><strong>Belegt am gebauten Stand</strong> (Doku-Site dieses Repos, mit <code>--baseurl /docs</code> gebaut):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>betrachtete Elemente</th>
+      <th>Rückgabewert</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ohne <code>--baseurl</code></td>
+      <td>26</td>
+      <td><strong>2</strong>, 118 Seitenansichten benannt</td>
+    </tr>
+    <tr>
+      <td>mit <code>--baseurl /docs</code></td>
+      <td>29 582</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Der Selbsttest deckt beide Fälle ab – er baut sich dafür eine Site mit einem
+wurzel-absoluten Stylesheet unter einem Basispfad, weil im eigenen Repo ohne Basispfad
+gebaut wird und der Fall sonst nie entstünde.</p>
+
+<hr />
+
+<h2 id="2410">2.41.0</h2>
+
+<h3 id="ausnahmen-der-barrierefreiheitsmessung-sind-erweiterbar">Ausnahmen der Barrierefreiheitsmessung sind erweiterbar</h3>
+
+<p>Die benannten Ausnahmen standen fest im Skript. Für die des <strong>Themes</strong> war das richtig
+und bleibt es: Was das Theme entschieden hat – heute das Marken-Orange als Verweisfarbe –
+liegt im Paket und reist mit jeder Unterlage mit. Ein Repo bekommt dafür keinen Befund,
+ohne eine Zeile dafür zu schreiben.</p>
+
+<p><strong>Ein Projekt hat aber eigene.</strong> Die kommen jetzt aus einer Datei:</p>
+
+<pre><code class="language-json">[
+  {
+    "rule": "color-contrast",
+    "when": { "fgColor": "#5a7d2a" },
+    "since": "2026-09-23",
+    "reason": "Schulungsfarbe im dekorativen Schriftzug; der Name steht daneben als Text."
+  }
+]
+</code></pre>
+
+<p>Ohne Angabe wird <code>a11y-exceptions.json</code> im Arbeitsverzeichnis gesucht; <code>--exceptions
+«datei»</code> setzt einen anderen Ort. <strong>Die Felder sind englisch</strong>, weil ein Projekt sie
+tippt; <code>rule</code> und <code>reason</code> sind Pflicht.</p>
+
+<p><strong>Ergänzen, nicht überschreiben.</strong> Die Liste des Projekts wird an die des Themes
+angehängt; eine Theme-Ausnahme abzuschalten geht bewusst nicht. Sie steht dort, weil sie
+<strong>im Theme</strong> entschieden wurde – wer sie für falsch hält, ändert sie dort und nicht still
+in einem Repo, in dem niemand sie sucht.</p>
+
+<p>Der Bericht nennt jetzt je Ausnahme die <strong>Herkunft</strong> (<code>Theme</code> oder <code>Projekt</code>) neben der
+Zahl der unterdrückten Stellen. Ein Fehler in der Datei hält den Lauf an (Rückgabewert 2):
+Still übergangen würde das Projekt in dem Glauben messen, seine Ausnahmen griffen.</p>
+
+<p>Intern heißen die Felder der eingebauten Liste jetzt ebenso <code>rule</code>/<code>when</code>/<code>reason</code>/<code>since</code>
+– eine Form statt zweier. Nach außen ändert das nichts; die Liste war nie konfigurierbar.</p>
+
+<hr />
+
+<h2 id="2400">2.40.0</h2>
+
+<h3 id="avd-academy-accordion--aus-überschriften-werden-klappbereiche"><code>avd-academy-accordion</code> – aus Überschriften werden Klappbereiche</h3>
+
+<p>Eine Liste von Abschnitten, die nacheinander drankommen – eine Checkliste, ein Ablauf,
+eine Sammlung von Fällen. Es ist immer genau <strong>einer</strong> offen.</p>
+
+<pre><code class="language-markdown">&lt;div class="avd-academy-accordion" markdown="1"&gt;
+
+### 1. Eigene Vorstellung · ca. 3′
+
+«Beliebiges Markdown.»
+
+### 2. Vorstellungsrunde · ca. 8′
+
+«Beliebiges Markdown.»
+
+&lt;/div&gt;
+</code></pre>
+
+<p><strong>Der Autor schreibt Überschriften, keine Bedienelemente</strong> – das ist der Unterschied zu
+Reveal, Fold und den Reitern. Die Überschrift bleibt eine Überschrift (Ebene, Anker,
+Vorlesereihenfolge) und bekommt den Knopf <strong>hinein</strong>; so steht es in den ARIA Authoring
+Practices. Die Ebene bestimmt, wer sie schreibt: Das Skript nimmt die flachste
+Überschrift unter den direkten Kindern, ein Kasten im Kasten ist damit die zweite Ebene.</p>
+
+<p><strong>Tastatur:</strong> Pfeiltasten links/rechts und hoch/runter wechseln den Abschnitt,
+<code>Home</code>/<code>End</code> springen an den Rand, der gewählte Kopf bleibt im Bild.</p>
+
+<p><strong>Warum ein Gitter und nicht <code>&lt;details&gt;</code>:</strong> Ein <code>&lt;details&gt;</code> geht auf, aber nicht zu – der
+Browser nimmt den Inhalt beim Schließen sofort aus dem Fluss. Geklappt wird deshalb wie
+im Burger-Menü (<code>0fr</code> → <code>1fr</code>, rechnet mit der wirklichen Höhe). Der Preis: <strong>Strg+F
+findet nicht, was zugeklappt ist</strong>; im Ausdruck steht alles offen. Bei den Reitern ist
+das anders, und deshalb stehen beide Bausteine nebeneinander.</p>
+
+<p>Ohne JavaScript steht ein gewöhnliches Dokument da – jede Regel zum Zuklappen hängt an
+<code>avd-academy-accordion--enhanced</code>, und die setzt das Skript erst nach dem Umbau.</p>
+
+<h3 id="aufgabenlisten-sind-überall-anklickbar">Aufgabenlisten sind überall anklickbar</h3>
+
+<p>Kramdown gibt ein <code>- [ ]</code> als <code>&lt;input type="checkbox" disabled&gt;</code> aus. Eingeschaltet hat
+das Theme die Kästchen bisher <strong>nur dort, wo eine Fortschrittskarte danebenstand</strong> – also
+ausgerechnet nicht auf der Seite, die nichts als eine Liste ist. Eine Trainer-Checkliste
+war damit ein Bild von einer Checkliste.</p>
+
+<p>Jetzt gilt es auf jeder Seite, mit dem Text der Zeile als Namen des Kästchens. Der
+Zustand wird nicht gespeichert; die Fortschrittskarte zählt wie bisher zusätzlich mit.</p>
+
+<h3 id="avd-academy-demo--ein-baustein-vorgeführt-in-seinem-eigenen-fenster"><code>avd-academy-demo</code> – ein Baustein, vorgeführt in seinem eigenen Fenster</h3>
+
+<p>Der Baustein hinter der neuen Seite <strong>Playground</strong>: eine Vorführung und ihr Markup aus
+<strong>einer</strong> Quelle (<code>_includes/avd-demo.html</code> + <code>academy/demo.css</code> + <code>academy/demo.js</code>).</p>
+
+<p>Die Vorführung steht in einem <code>&lt;iframe&gt;</code>, und das ist kein Aufwand um seiner selbst
+willen: <code>@media (max-width: 46rem)</code> fragt das <strong>Fenster</strong>, nicht den Kasten – ein auf 320
+Pixel verengtes <code>div</code> zeigt weiter das Layout für den Schreibtisch, und 320 Pixel sind
+die Prüfgröße aus WCAG 1.4.10. Ebenso das Farbschema: Die Dark-Tokens hängen an <code>:root</code>
+und lassen sich für einen Ausschnitt nicht setzen. Im Rahmen sind beide Schalter echt.</p>
+
+<p><code>demo.css</code>/<code>demo.js</code> werden <strong>nicht global geladen</strong>; die Seite, die sie braucht, bindet
+sie ein – dieselbe Regel wie bei Quiz und Simulation.</p>
+
+<p><strong><code>atvantage.js</code> lässt alles unter <code>[data-avd-academy-demo]</code> in Ruhe.</strong> Ohne diesen
+Riegel übergäbe die Seite dem Rahmen eine bereits umgebaute Fassung, und er setzte einen
+Knopf in den Knopf – gemessen zehn Akkordeon-Köpfe, wo fünf hingehören.</p>
+
+<h3 id="neue-namen">Neue Namen</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Klassen</td>
+      <td><code>avd-academy-accordion</code>, <code>--enhanced</code>, <code>__toggle</code>, <code>__region</code>, <code>__body</code></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code>avd-academy-demo</code>, <code>--enhanced</code>, <code>__controls</code>, <code>__group</code>, <code>__label</code>, <code>__switch</code>, <code>__stage</code>, <code>__frame</code>, <code>__source</code></td>
+    </tr>
+    <tr>
+      <td>Attribut</td>
+      <td><code>data-avd-academy-demo</code></td>
+    </tr>
+    <tr>
+      <td>Dateien im Paket</td>
+      <td><code>academy/demo.css</code>, <code>academy/demo.js</code>, <code>jekyll/_includes/avd-demo.html</code></td>
+    </tr>
+    <tr>
+      <td>Beschriftung</td>
+      <td><code>tMarkup</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Alles rein ergänzend – nichts entfernt, nichts umbenannt.</p>
+
+<hr />
+
+<h2 id="2390">2.39.0</h2>
+
+<h3 id="avd-academy-walkthrough--eine-zeile-eine-erklärung"><code>avd-academy-walkthrough</code> – eine Zeile, eine Erklärung</h3>
+
+<p>Eine rohe HTTP-Nachricht, ein OpenAPI-Dokument, ein Stück Code: Jede Zeile ist
+anklickbar und klappt ihre Erklärung auf.</p>
+
+<pre><code class="language-html">&lt;div class="avd-academy-walkthrough"&gt;
+  &lt;details class="avd-academy-walkthrough__line" name="anfrage"&gt;
+    &lt;summary&gt;&lt;span class="avd-academy-walkthrough__mark"&gt;GET&lt;/span&gt; /produkte HTTP/1.1&lt;/summary&gt;
+    &lt;div class="avd-academy-walkthrough__note"&gt;Die Startzeile nennt Methode, Ziel und Protokollfassung.&lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p><strong>Grundlage ist <code>&lt;details name="…"&gt;</code></strong>, wie bei Reitern und Reveal: Der Browser schaltet
+exklusiv, bringt Tastaturbedienung und <code>aria-expanded</code> mit, und ohne JavaScript bleibt
+jede Erklärung erreichbar.</p>
+
+<p><strong>Warum es den Baustein gibt:</strong> Die Konstruktion kam in einem einzigen Schulungs-Repo
+<strong>dreimal selbst gebaut</strong> vor (A-013, A-016), jedes Mal mit denselben drei Fehlern:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Zeilen 22–24 px hoch</td>
+      <td>jetzt <code>min-height: 24px</code> – und weil Zeilen aneinanderliegen, greift die Abstands-Ausnahme gerade nicht (32 Stellen gemessen)</td>
+    </tr>
+    <tr>
+      <td>dunkler Codeblock als Fläche</td>
+      <td>jetzt die zurückgenommene Seitenfläche – auf dunklem Grund kippen die Statusfarben (2,1:1 gemessen)</td>
+    </tr>
+    <tr>
+      <td>Zustand nur über Farbe</td>
+      <td>jetzt ein Marker, der sich dreht (1.4.1)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Dazu: lange Zeilen scrollen <strong>im Baustein</strong> statt die Seite zu verbreitern, mit
+Tastaturzugang; im Druck stehen alle Erklärungen offen, ohne Marker, und Zeile und
+Erklärung bleiben zusammen auf einer Seite.</p>
+
+<p>Nachgemessen an der Doku-Seite, die den Baustein <strong>lauffähig</strong> zeigt: 28,2 px je Zeile,
+Enter öffnet, die nächste Zeile schliesst die vorige, Fokusring sichtbar.</p>
+
+<h2 id="2380">2.38.0</h2>
+
+<h3 id="schriftgrößen-wachsen-wieder-mit-der-browsereinstellung">Schriftgrößen wachsen wieder mit der Browsereinstellung</h3>
+
+<p><strong>25 <code>font-size</code>-Angaben standen in Pixeln</strong> und reagierten damit nicht auf die
+Standardschriftgröße des Browsers. Das Ergebnis war nicht „zu klein”, sondern
+<strong>inkonsistent</strong> – gemessen an einer Guide-Seite mit 24px Standardschrift:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>16 px</th>
+      <th>24 px</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fließtext (rem)</td>
+      <td>21,6 px</td>
+      <td><strong>32,4 px</strong></td>
+    </tr>
+    <tr>
+      <td>Inhaltsverzeichnis (px)</td>
+      <td>16 px</td>
+      <td><strong>16 px</strong></td>
+    </tr>
+    <tr>
+      <td>Brotkrume (px)</td>
+      <td>15 px</td>
+      <td><strong>15 px</strong></td>
+    </tr>
+    <tr>
+      <td>Kartenbeschriftung (px)</td>
+      <td>14 px</td>
+      <td><strong>14 px</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Die Seite wuchs zur Hälfte mit. Wer die Schriftgröße hochstellt, tut das aus einem
+Grund – und für viele ist es der einzige Weg, der ohne Zoom auskommt.</p>
+
+<p>Umgerechnet mit 16px Wurzel, also <strong>dieselben Größen wie bisher</strong>: 14px = 0.875rem,
+15px = 0.9375rem, 17px = 1.0625rem. Optisch ändert sich im Auslieferungszustand nichts.</p>
+
+<p><strong>Für Radien, Schatten und Haarlinien bleibt Pixel richtig.</strong> Ein Rahmen, der mit der
+Schrift wächst, wird unscharf und gewinnt nichts. Die Regel lautet nicht „nie px”,
+sondern „px nicht für Schrift”.</p>
+
+<p><strong>Nicht enthalten:</strong> Die H1 im Hero kommt aus dem ATVANTAGE-Fundament
+(<code>--h1-base: 38px</code>) und bleibt unangetastet – sie zu überschreiben wäre eine
+Design-Abweichung und keine Korrektur. Ebenso die Breakpoints, die weiter in Pixeln
+stehen; <code>em</code>-Breakpoints wären eine eigene, zu messende Entscheidung.</p>
+
+<h3 id="--avd-academy-fs-root-entfällt"><code>--avd-academy-fs-root</code> entfällt</h3>
+
+<p>Das Token stand mit <code>16px</code> im Satz und wurde von <strong>keiner Regel gelesen</strong> – ein Wert,
+der aussieht, als liesse sich damit die Grundschrift einstellen, und es nicht tut.</p>
+
+<p><strong>Einstufung: Minor, nicht Major.</strong> Formal fällt „Token entfernt” unter Major. Die Regel
+schützt Projekte, die ein Token <strong>setzen und damit etwas bewirken</strong>; dieses konnte nichts
+bewirken, weil es nirgends gelesen wurde. Wer es gesetzt hat, sah keine Wirkung und
+verliert keine. Die Grundschrift gehört ohnehin dem Browser.</p>
+
+<h2 id="2370">2.37.0</h2>
+
+<h3 id="avd-academy-muted--zurückgenommener-text-ohne-den-kontrast-mitzunehmen"><code>avd-academy-muted</code> – zurückgenommener Text, ohne den Kontrast mitzunehmen</h3>
+
+<p>Für Randbemerkungen und Einleitungen gab es bisher keine Klasse, also nahmen die
+Unterlagen <code>opacity</code>. Das ist der naheliegendste Weg und der falsche: Die Deckkraft legt
+eine Ebene über die <strong>ganze Gruppe</strong> und senkt damit auch den Kontrast von allem, was
+darin hervorgehoben ist – ein Wort im Akzent, ein Verweis.</p>
+
+<p>Gemessen in <code>training-concept-java-se</code>: Die Schulungsfarbe erreicht abgeleitet 5,38:1;
+unter <code>opacity: .85</code> blieben <strong>4,21</strong>, an 46 Stellen. <strong>Ein <code>opacity: 1</code> am Kindelement
+hebt das nicht auf</strong> – Elterndeckkraft erzeugt eine eigene Ebene. Deshalb sieht man der
+CSS-Regel den Fehler nicht an.</p>
+
+<pre><code class="language-html">&lt;p class="avd-academy-muted"&gt;Die Beispiele stammen aus Java 21.&lt;/p&gt;
+</code></pre>
+
+<p><strong><code>opacity</code> bleibt richtig, wo eine ganze Fläche mitsamt Hintergrund zurücktreten soll</strong> –
+eine Pausenzeile in einer getönten Tabelle etwa. Das Theme nutzt es an drei Stellen
+genau dafür; falsch ist es über Text, dessen Farbe schon knapp ist. Beides steht jetzt
+in <a href="https://timetoact.ghe.com/pages/AVD-Academy-Tools/academy-theme/docs/theme/bausteine.html#muted">Bausteine → Zurückgenommener Text</a>
+und im Plugin-Skill <code>barrierefreiheit-pruefen</code> (3.4.0).</p>
 
 <h2 id="2360">2.36.0</h2>
 

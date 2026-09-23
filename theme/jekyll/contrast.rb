@@ -32,20 +32,42 @@
 #     hinter der ersten, Simulationsschritte. Gemessen wird der Auslieferungs-
 #     zustand der Seite.
 #
-# SIE BRICHT NICHTS. Absichtlich: Ein Prüfer, der aus unwichtigem Grund rot wird,
-# wird weggeklickt und schützt dann gar nichts mehr – siehe die Begründung zum
-# Markup Contract in AGENTS.md. `--strict` macht aus dem Bericht ein Tor, aber
-# erst, wenn eine Ausnahmeliste steht und ein Lauf sauber durchgeht.
+# SIE BRICHT NICHTS – MIT EINER AUSNAHME. Absichtlich: Ein Prüfer, der aus
+# unwichtigem Grund rot wird, wird weggeklickt und schützt dann gar nichts mehr –
+# siehe die Begründung zum Markup Contract in AGENTS.md. `--strict` macht aus dem
+# Bericht ein Tor, aber erst, wenn eine Ausnahmeliste steht und ein Lauf sauber
+# durchgeht.
+#
+# DIE AUSNAHME IST EIN LAUF, DER NICHTS GEMESSEN HAT. Kam eine Seite ohne
+# Theme-CSS in den Browser, steht dort nacktes HTML: Fast jede Paarung trägt,
+# weil es nur noch Schwarz auf Weiß gibt. Der Bericht sagte dann „Keine Paarung
+# unter der Schwelle" und endete mit 0 – dieselbe Zeile wie nach einer echten,
+# sauberen Messung. Gemeldet aus `atlassian-mcp`: 106 betrachtete Elemente gegen
+# 4, beide Läufe grün, nichts in der Ausgabe unterschied sie.
+#
+# Solche Seiten werden jetzt BENANNT und der Lauf endet mit RÜCKGABEWERT 2 –
+# unabhängig von `--strict`, weil ein Befund eine inhaltliche Entscheidung ist
+# und dies keine Messung. Dazu nennt der Bericht, wie viele Elemente er überhaupt
+# betrachtet hat: die Bezugsgröße, die vorher fehlte.
+#
+# DER BASISPFAD IST DIE HÄUFIGSTE URSACHE. Eine mit `jekyll build --baseurl /docs`
+# gebaute Site verweist absolut auf `/docs/theme/academy/…`. Wird das gebaute
+# Verzeichnis flach serviert, liegt dort nichts. `--baseurl /docs` bildet den
+# Pfad nach – gleiche Schreibweise und Bedeutung wie in `links.rb`, weil beide
+# Prüfer nebeneinander aufgerufen werden.
 #
 # BRAUCHT EINEN BROWSER. Chrome oder Chromium, gefunden über `--browser`, die
 # Umgebungsvariable `CHROME` oder die üblichen Pfade. Ohne Browser wird die
 # Prüfung SICHTBAR übersprungen (mit `--require-browser` scheitert sie).
 #
 # Aufruf:
-#   ruby theme/jekyll/contrast.rb                 # Bericht
-#   ruby theme/jekyll/contrast.rb --require-site  # ohne _site scheitern
-#   ruby theme/jekyll/contrast.rb --self-test     # die Prüfung selbst prüfen
+#   ruby theme/jekyll/contrast.rb                    # Bericht
+#   ruby theme/jekyll/contrast.rb --baseurl /docs    # Site mit Basispfad gebaut
+#   ruby theme/jekyll/contrast.rb --require-site     # ohne _site scheitern
+#   ruby theme/jekyll/contrast.rb --self-test        # die Prüfung selbst prüfen
 #   ruby theme/jekyll/contrast.rb --allow .avd-contrast-allow.txt
+#
+# Rückgabewerte: 0 in Ordnung · 1 Befunde (nur mit `--strict`) · 2 nicht gemessen
 # ---------------------------------------------------------------------------
 
 require 'json'
@@ -94,7 +116,14 @@ TYPEN = {
   '.woff' => 'font/woff', '.woff2' => 'font/woff2', '.ico' => 'image/x-icon'
 }.freeze
 
-def server_starten(wurzel)
+# DER BASISPFAD GEHOERT DAZU, GENAU WIE BEI `links.rb`. Eine mit
+# `jekyll build --baseurl /docs` gebaute Site traegt ihre Theme-Pfade
+# wurzel-absolut als `/docs/theme/academy/...`. Serviert man das gebaute
+# Verzeichnis flach, liegt unter `/docs/` nichts: Jede Datei laeuft ins Leere,
+# und gemessen wird eine Seite OHNE Theme-CSS. Der Server bildet den Basispfad
+# deshalb nach, statt dass jeder Aufrufer sein Artefakt vorher in einen
+# Unterordner umpacken muss -- genau dieser Behelf war in `atlassian-mcp` noetig.
+def server_starten(wurzel, basis = '')
   server = TCPServer.new('127.0.0.1', 0)
   port = server.addr[1]
   faden = Thread.new do
@@ -104,13 +133,19 @@ def server_starten(wurzel)
       rescue StandardError
         break
       end
-      Thread.new(sitzung) { |s| anfrage_bedienen(s, wurzel) }
+      Thread.new(sitzung) { |s| anfrage_bedienen(s, wurzel, basis) }
     end
   end
   [server, faden, port]
 end
 
-def anfrage_bedienen(sitzung, wurzel)
+def antwort_404(sitzung)
+  sitzung.print("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n")
+  sitzung.close
+  nil
+end
+
+def anfrage_bedienen(sitzung, wurzel, basis = '')
   # Ein einzelner hängender Socket darf den ganzen Lauf nicht anhalten.
   sitzung.timeout = 5 if sitzung.respond_to?(:timeout=)
   zeile = sitzung.gets
@@ -121,6 +156,15 @@ def anfrage_bedienen(sitzung, wurzel)
     break if kopf.strip.empty?
   end
   pfad = zeile.split(' ')[1].to_s.split('?').first.to_s
+  # Der Basispfad wird abgezogen, nicht ignoriert: Eine Anfrage AUSSERHALB von ihm
+  # geht auch in der Auslieferung ins Leere und muss hier ebenso 404 bekommen -
+  # sonst faende die Messung Dateien, die es spaeter nicht gibt.
+  unless basis.empty?
+    return antwort_404(sitzung) unless pfad == basis || pfad.start_with?(basis + '/')
+
+    pfad = pfad[basis.length..].to_s
+    pfad = '/' if pfad.empty?
+  end
   pfad = '/index.html' if pfad == '/'
   pfad += 'index.html' if pfad.end_with?('/')
   datei = File.join(wurzel, URI_entschluesseln(pfad))
@@ -234,7 +278,17 @@ SONDE = <<~'JS'
       return (eltern ? eltern + " > " : "") + teil(el);
     }
 
+    /* IST DAS THEME UEBERHAUPT ANGEKOMMEN? Diese Frage steht VOR jeder Messung.
+       Laedt das Stylesheet nicht - falsche Basisadresse, flach entpacktes
+       Artefakt, umbenannter Ordner -, steht im Browser nacktes HTML. Darauf
+       traegt fast jede Paarung, weil es nur noch Schwarz auf Weiss gibt: Der
+       Lauf meldet „keine Paarung unter der Schwelle" und hat nichts geprueft.
+       Dasselbe Ruestzeug hat `a11y.mjs` schon; hier fehlte es. */
+    var themeGrund = getComputedStyle(document.documentElement)
+      .getPropertyValue("--avd-academy-color-bg").trim();
+
     var befunde = [], uebersprungen = { bild: 0, transparent: 0, unsichtbar: 0 };
+    var betrachtet = 0;
     var alle = document.querySelectorAll("body *");
     for (var i = 0; i < alle.length; i++) {
       var el = alle[i];
@@ -255,6 +309,7 @@ SONDE = <<~'JS'
       if (!fs) { uebersprungen.unsichtbar++; continue; }
       var f = flaeche(el);
       if (f.bild) { uebersprungen.bild++; continue; }
+      betrachtet++;
       var gross = fs >= 24 || (fs >= 18.66 && fw >= 700);
       var noetig = gross ? 3.0 : 4.5;
       var vg = vgm.farbe;
@@ -269,7 +324,10 @@ SONDE = <<~'JS'
     }
     var pre = document.createElement("pre");
     pre.id = "__contrast";
-    pre.textContent = JSON.stringify({ befunde: befunde, uebersprungen: uebersprungen });
+    pre.textContent = JSON.stringify({
+      befunde: befunde, uebersprungen: uebersprungen,
+      betrachtet: betrachtet, theme: themeGrund
+    });
     document.body.appendChild(pre);
   })();
 JS
@@ -288,7 +346,16 @@ def ignoriert?(pfad, ignorieren)
   ignorieren.any? { |p| pfad == p || pfad.start_with?(p) }
 end
 
-def sondenseiten_anlegen(site, arbeit, ignorieren)
+# KOPIERVORLAGEN BLEIBEN DRAUSSEN. Eine eigenständige Vorlage trägt statt Pfaden
+# den Platzhalter `«BASISPFAD»` – sie lädt also weder Stylesheet noch Skript und
+# ist erst dann eine Seite, wenn jemand sie kopiert und den Platzhalter ersetzt.
+# Gemessen ergäbe sie nacktes HTML und liefe damit in den Wächter für „ohne
+# Theme-CSS". Erkannt wird sie am Platzhalter IN einem Verweis – eine Doku-Seite,
+# die ihn nur im Beispielcode zeigt, ist eine gewöhnliche Seite. Dasselbe
+# Kriterium steht in `a11y.mjs`.
+VORLAGENMARKE = /(?:href|src)="[^"]*«BASISPFAD»/.freeze
+
+def sondenseiten_anlegen(site, arbeit, ignorieren, vorlagen = [])
   FileUtils.cp_r(File.join(site, '.'), arbeit)
   gemacht = []
   Dir.glob(File.join(arbeit, '**', '*.html')).sort.each do |datei|
@@ -300,6 +367,11 @@ def sondenseiten_anlegen(site, arbeit, ignorieren)
     next unless roh =~ /<html[\s>]/i
     next if File.basename(datei).start_with?('__probe-')
     next if ignoriert?(datei.sub(arbeit, ''), ignorieren)
+
+    if roh =~ VORLAGENMARKE
+      vorlagen << datei.sub(arbeit, '').sub(%r{\A/}, '')
+      next
+    end
 
     SCHEMATA.each do |schema|
       inhalt = roh.sub(/<html\b([^>]*)>/i) do
@@ -374,12 +446,14 @@ ensure
   end
 end
 
-def messen(browser, port, seiten, jobs, frist)
+def messen(browser, port, seiten, jobs, frist, basis = '')
   warteschlange = seiten.dup
   schloss = Mutex.new
   befunde = []
   uebersprungen = Hash.new(0)
   stumm = []
+  ohne_theme = []
+  betrachtet = 0
 
   faeden = Array.new([jobs, 1].max) do
     Thread.new do
@@ -394,7 +468,7 @@ def messen(browser, port, seiten, jobs, frist)
         # gemeldet hat das die eigene „Sonde ohne Antwort“-Warnung.
         befehl = "#{browser.inspect} --headless --disable-gpu --no-sandbox " \
                  '--window-size=1400,1000 --virtual-time-budget=5000 ' \
-                 "--dump-dom \"http://127.0.0.1:#{port}#{pfad_kodieren(rel)}\" 2>/dev/null"
+                 "--dump-dom \"http://127.0.0.1:#{port}#{basis}#{pfad_kodieren(rel)}\" 2>/dev/null"
         ausgabe = mit_zeitschranke(befehl, frist)
         # `--dump-dom` liefert HTML, nicht Text: `>` steht dort als `&gt;`, und die
         # Signaturen enthalten `>` als Trenner. Ohne das Zurückschreiben landet die
@@ -411,7 +485,14 @@ def messen(browser, port, seiten, jobs, frist)
           schloss.synchronize { stumm << [quelle, schema] }
           next
         end
+        # OHNE THEME KEINE MESSUNG. Die Seite wird nicht halb ausgewertet, sondern
+        # benannt und ausgelassen - ihre Zahlen waeren die einer anderen Seite.
+        if daten['theme'].to_s.empty?
+          schloss.synchronize { ohne_theme << [quelle, schema] }
+          next
+        end
         schloss.synchronize do
+          betrachtet += daten['betrachtet'].to_i
           daten['uebersprungen'].each { |k, v| uebersprungen[k] += v }
           daten['befunde'].each do |b|
             befunde << Befund.new(b['sig'], b['fg'], b['bg'], b['wert'], b['noetig'],
@@ -422,7 +503,7 @@ def messen(browser, port, seiten, jobs, frist)
     end
   end
   faeden.each(&:join)
-  [befunde, uebersprungen, stumm]
+  [befunde, uebersprungen, stumm, ohne_theme, betrachtet]
 end
 
 # ---------------------------------------------------------------------------
@@ -454,13 +535,34 @@ end
 # ---------------------------------------------------------------------------
 # Bericht
 # ---------------------------------------------------------------------------
-def berichten(befunde, uebersprungen, stumm, ausnahmen, seitenzahl)
+def berichten(befunde, uebersprungen, stumm, ausnahmen, seitenzahl, ohne_theme = [], betrachtet = 0, vorlagen = [])
   gruppen = befunde.group_by(&:sig)
   offen = gruppen.reject { |sig, _| ausnahmen.key?(sig) }
   gedeckt = gruppen.select { |sig, _| ausnahmen.key?(sig) }
 
   puts
   puts "Kontrast: #{seitenzahl} Seite(n) × #{SCHEMATA.size} Farbschemata gemessen (WCAG 2.1)."
+  # DIE BEZUGSGROESSE GEHOERT IN DEN BERICHT. Ohne sie liest sich ein Lauf ueber
+  # vier Elemente genauso wie einer ueber hundertsechs - und beide melden
+  # „keine Paarung unter der Schwelle".
+  puts "Betrachtet: #{betrachtet} Element(e) mit eigenem Text."
+  unless vorlagen.empty?
+    puts "Nicht gemessen, weil Kopiervorlage (Platzhalter statt Pfaden): " \
+         "#{vorlagen.size} – #{vorlagen.first(3).join(', ')}#{vorlagen.size > 3 ? ' …' : ''}"
+  end
+
+  # EIN LAUF UEBER NICHTS IST KEIN ERFOLG. Steht hier etwas, hat die Prueferei
+  # eine Seite ohne Theme-CSS vor sich gehabt - nacktes HTML, auf dem fast jede
+  # Paarung traegt, weil es nur noch Schwarz auf Weiss gibt.
+  unless ohne_theme.empty?
+    puts
+    puts "FEHLER: #{ohne_theme.size} Seitenansicht(en) OHNE Theme-CSS gemessen - das Ergebnis"
+    puts '        dieser Seiten ist wertlos, nicht sauber. Ursache ist fast immer ein'
+    puts '        Basispfad: Eine mit `--baseurl /docs` gebaute Site verweist absolut auf'
+    puts '        `/docs/theme/...`. Dann fehlt hier `--baseurl /docs`.'
+    ohne_theme.first(10).each { |quelle, schema| puts "  #{quelle} (#{schema})" }
+    puts "  … und #{ohne_theme.size - 10} weitere." if ohne_theme.size > 10
+  end
 
   if offen.empty?
     puts 'Keine Paarung unter der Schwelle.'
@@ -503,25 +605,28 @@ def berichten(befunde, uebersprungen, stumm, ausnahmen, seitenzahl)
     stumm.first(10).each { |quelle, schema| puts "  #{quelle} (#{schema})" }
   end
 
-  [offen, stumm]
+  [offen, stumm, ohne_theme]
 end
 
 # ---------------------------------------------------------------------------
 # Lauf
 # ---------------------------------------------------------------------------
-def lauf(site, browser, jobs, ausnahmen, frist, ignorieren)
+def lauf(site, browser, jobs, ausnahmen, frist, ignorieren, basis = '')
   Dir.mktmpdir('academy-contrast') do |tmp|
     arbeit = File.join(tmp, 'site')
     FileUtils.mkdir_p(arbeit)
-    seiten = sondenseiten_anlegen(site, arbeit, ignorieren)
-    server, faden, port = server_starten(arbeit)
+    vorlagen = []
+    seiten = sondenseiten_anlegen(site, arbeit, ignorieren, vorlagen)
+    server, faden, port = server_starten(arbeit, basis)
     begin
-      befunde, uebersprungen, stumm = messen(browser, port, seiten, jobs, frist)
+      befunde, uebersprungen, stumm, ohne_theme, betrachtet =
+        messen(browser, port, seiten, jobs, frist, basis)
     ensure
       server.close
       faden.kill
     end
-    berichten(befunde, uebersprungen, stumm, ausnahmen, seiten.size / SCHEMATA.size)
+    berichten(befunde, uebersprungen, stumm, ausnahmen,
+              seiten.size / SCHEMATA.size, ohne_theme, betrachtet, vorlagen)
   end
 end
 
@@ -535,6 +640,9 @@ end
 # ---------------------------------------------------------------------------
 SELBSTTEST_SEITE = <<~'HTML'
   <html lang="de"><head><style>
+    /* Der Nachweis, dass das Theme angekommen ist. Ohne ihn gilt die Seite als
+       ungemessen - und genau dieser Fall wird weiter unten eigens geprueft. */
+    :root { --avd-academy-color-bg: #ffffff; }
     body { background: #ffffff; color: #111111; }
     :root[data-avd-academy-theme="dark"] body { background: #101010; color: #eeeeee; }
     /* MUSS ein Befund sein: feste Flaeche, kippende Schrift. */
@@ -581,6 +689,24 @@ SELBSTTEST_SEITE = <<~'HTML'
   </body></html>
 HTML
 
+# Die zweite Testsite prueft den blinden Fleck selbst: Sie laedt ihr Theme-Token
+# aus einer Datei, die WURZEL-ABSOLUT unter einem Basispfad liegt - genau wie eine
+# mit `jekyll build --baseurl /docs` gebaute Site. Flach serviert findet der
+# Browser sie nicht; mit `--baseurl /docs` schon.
+SELBSTTEST_BASEURL_CSS = <<~'CSS'
+  :root { --avd-academy-color-bg: #ffffff; }
+  body { background: #ffffff; color: #111111; }
+  .schwach { background: #ffffff; color: #b9b9b9; }
+CSS
+
+SELBSTTEST_BASEURL_SEITE = <<~'HTML'
+  <html lang="de"><head>
+    <link rel="stylesheet" href="/docs/assets/tokens.css">
+  </head><body>
+    <p class="schwach">zu schwach, aber nur zu sehen, wenn das Stylesheet ankommt</p>
+  </body></html>
+HTML
+
 def selbsttest(browser, jobs, frist)
   fehler = []
   Dir.mktmpdir('academy-contrast-test') do |tmp|
@@ -593,13 +719,16 @@ def selbsttest(browser, jobs, frist)
     seiten = sondenseiten_anlegen(site, arbeit, [])
     server, faden, port = server_starten(arbeit)
     begin
-      befunde, uebersprungen, stumm = messen(browser, port, seiten, jobs, frist)
+      befunde, uebersprungen, stumm, ohne_theme, betrachtet =
+        messen(browser, port, seiten, jobs, frist)
     ensure
       server.close
       faden.kill
     end
 
     fehler << "#{stumm.size} Sonde(n) ohne Antwort." unless stumm.empty?
+    fehler << "#{ohne_theme.size} Seite(n) faelschlich als ohne Theme-CSS gemeldet." unless ohne_theme.empty?
+    fehler << 'Es wurde kein einziges Element betrachtet.' if betrachtet.to_i.zero?
 
     klassen = befunde.map { |b| b.sig[/\.([a-z]+)\z/, 1] }.compact
     je = klassen.each_with_object(Hash.new(0)) { |k, h| h[k] += 1 }
@@ -628,6 +757,49 @@ def selbsttest(browser, jobs, frist)
     end
     fehler << 'Nicht gerenderter Text wurde nicht gezaehlt.' if uebersprungen['unsichtbar'].to_i.zero?
   end
+
+  # ---- Der blinde Fleck: Seite mit Basispfad, einmal ohne und einmal mit ----
+  # OHNE diesen Teil faende der Selbsttest den Fehler nicht, um dessentwillen es
+  # ihn gibt: Im eigenen Repo wird ohne Basispfad gebaut, also entsteht der Fall
+  # hier nie von selbst - dieselbe Blindheit wie bei `links.rb` vor 2.5.1.
+  Dir.mktmpdir('academy-contrast-baseurl') do |tmp|
+    site = File.join(tmp, '_site')
+    FileUtils.mkdir_p(File.join(site, 'assets'))
+    File.write(File.join(site, 'index.html'), SELBSTTEST_BASEURL_SEITE, encoding: 'UTF-8')
+    File.write(File.join(site, 'assets', 'tokens.css'), SELBSTTEST_BASEURL_CSS, encoding: 'UTF-8')
+
+    ['', '/docs'].each do |basis|
+      arbeit = File.join(tmp, "work#{basis.empty? ? '-flach' : '-basis'}")
+      FileUtils.mkdir_p(arbeit)
+      seiten = sondenseiten_anlegen(site, arbeit, [])
+      server, faden, port = server_starten(arbeit, basis)
+      begin
+        befunde, _u, _s, ohne_theme, = messen(browser, port, seiten, jobs, frist, basis)
+      ensure
+        server.close
+        faden.kill
+      end
+
+      if basis.empty?
+        # Das ist der gemeldete Zustand: Das Stylesheet kommt nicht an, die Seite
+        # ist nacktes HTML - und der Lauf darf sie NICHT als sauber durchwinken.
+        if ohne_theme.empty?
+          fehler << 'Eine Seite ohne Theme-CSS wurde nicht als ungemessen erkannt.'
+        end
+        unless befunde.empty?
+          fehler << 'Aus einer Seite ohne Theme-CSS wurden Befunde gemeldet.'
+        end
+      else
+        unless ohne_theme.empty?
+          fehler << '--baseurl bringt das Stylesheet nicht an die Seite.'
+        end
+        unless befunde.any? { |b| b.sig.end_with?('.schwach') }
+          fehler << 'Mit --baseurl wurde der eingebaute Befund nicht gefunden.'
+        end
+      end
+    end
+  end
+
   fehler
 end
 
@@ -636,6 +808,7 @@ end
 # ---------------------------------------------------------------------------
 def main
   site = '_site'
+  basis = ''
   browser_vorgabe = nil
   jobs = 8
   frist = 30
@@ -651,6 +824,7 @@ def main
     a = args.shift
     case a
     when '--site' then site = args.shift
+    when '--baseurl' then basis = args.shift
     when '--browser' then browser_vorgabe = args.shift
     when '--jobs' then jobs = args.shift.to_i
     when '--timeout' then frist = args.shift.to_i
@@ -692,6 +866,13 @@ def main
     exit 1
   end
 
+  # EINE SCHREIBWEISE, wie in `links.rb`: fuehrender Schraegstrich, keiner am Ende.
+  # `/docs`, `docs`, `/docs/` meinen dasselbe, und wer beide Pruefer nebeneinander
+  # aufruft, soll nicht zweimal nachdenken muessen.
+  basis = basis.to_s.strip
+  basis = '/' + basis unless basis.empty? || basis.start_with?('/')
+  basis = basis.sub(%r{/+\z}, '')
+
   ausnahmen, ausnahmefehler = ausnahmen_lesen(ausnahmedatei)
   unless ausnahmefehler.empty?
     ausnahmefehler.each { |f| warn "FEHLER: #{f}" }
@@ -708,7 +889,12 @@ def main
     exit 0
   end
 
-  offen, stumm = lauf(site, browser, jobs, ausnahmen, frist, ignorieren)
+  offen, stumm, ohne_theme = lauf(site, browser, jobs, ausnahmen, frist, ignorieren, basis)
+  # EIGENER RUECKGABEWERT, UND ZWAR UNABHAENGIG VON `--strict`. Ein Befund ist eine
+  # inhaltliche Entscheidung und darf eine Warnung bleiben; eine Seite ohne
+  # Theme-CSS ist gar keine Messung. Wer beides auf 1 abbildete, koennte es im
+  # Aufrufer nicht auseinanderhalten - und genau dort wird `--strict` abgewogen.
+  exit 2 unless ohne_theme.empty?
   exit 1 if strict && (!offen.empty? || !stumm.empty?)
   exit 0
 end

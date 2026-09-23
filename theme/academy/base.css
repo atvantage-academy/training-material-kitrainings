@@ -77,6 +77,22 @@ th { font-weight: 600; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+/* --- Zurückgenommener Text ------------------------------------------------
+   FÜR DAS, WOFÜR SONST `opacity` GENOMMEN WIRD. Der Unterschied ist nicht
+   kosmetisch: `opacity` legt eine Ebene über die GANZE Gruppe und senkt damit
+   auch den Kontrast von allem, was darin hervorgehoben ist – ein Wort im Akzent,
+   ein Verweis. Gemessen in einem Schulungs-Repo: Die Schulungsfarbe erreicht
+   5,38:1, unter `opacity: .85` blieben 4,21 – und ein `opacity: 1` am Kind hebt
+   das NICHT auf, weil die Elterndeckkraft eine eigene Ebene erzeugt.
+
+   Diese Klasse dämpft die SCHRIFTFARBE. Was darin eine eigene Farbe trägt,
+   behält sie unverändert.
+
+   `opacity` bleibt richtig, wo eine ganze Fläche mitsamt Hintergrund
+   zurücktreten soll – etwa eine Pausenzeile in einer getönten Tabelle. Falsch
+   ist es über Text, dessen Farbe schon knapp ist. */
+.avd-academy-muted { color: var(--avd-academy-color-ink-muted); }
+
 .avd-academy-visually-hidden {
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;

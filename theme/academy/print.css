@@ -211,4 +211,39 @@
     break-after: avoid;
   }
   .avd-academy-tabs--enhanced > .avd-academy-tabs__panel > summary::before { content: none; }
+
+  /* Akkordeon: Auf Papier steht alles offen. Ein zugeklappter Bereich waere
+     hier schlicht verlorener Inhalt - dieselbe Ueberlegung wie beim Fold. Der
+     Knopf wird wieder zu dem, was er im Quelltext ist: eine Ueberschrift. Sie
+     bleibt bei ihrem Text (`break-after: avoid`), sonst steht sie allein unten
+     auf der Seite.
+
+     `visibility` MUSS mit zurueckgesetzt werden: Die Bewegung am Bildschirm
+     haengt daran, und eine unsichtbare Zeile druckt als leerer Platz - ein
+     Fehler, den man erst auf dem Papier sieht. */
+  .avd-academy-accordion__region {
+    display: block !important;
+    grid-template-rows: none !important;
+  }
+  .avd-academy-accordion__body {
+    visibility: visible !important;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+  }
+  .avd-academy-accordion__toggle {
+    display: block !important;
+    padding: 0 !important;
+    cursor: auto;
+    break-after: avoid;
+  }
+  .avd-academy-accordion__toggle::before { content: none !important; }
+  .avd-academy-accordion--enhanced > :is(h2, h3, h4, h5, h6) { border-top: 0 !important; }
+
+  /* Zeilenerklärung: Auf Papier gibt es nichts aufzuklappen. Der Marker entfällt,
+     die Zeile bleibt eine Zeile, und Zeile und Erklärung gehören zusammen auf
+     dieselbe Seite. */
+  .avd-academy-walkthrough { overflow: visible !important; }
+  .avd-academy-walkthrough__line > summary::before { content: none !important; }
+  .avd-academy-walkthrough__line > summary { cursor: auto; break-after: avoid; }
+  .avd-academy-walkthrough__line { break-inside: avoid; }
 }

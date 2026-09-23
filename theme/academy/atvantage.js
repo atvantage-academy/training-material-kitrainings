@@ -245,13 +245,25 @@
      Voraussetzungen). Läuft VOR der Doc-Sidebar-Sichtbarkeitsprüfung in
      initGuideToc(), damit die (per [hidden]) versteckte Fortschrittskarte dort
      korrekt als „leer“ zählt. */
-  /* --- Namen fuer die Kaestchen aus Markdown-Aufgabenlisten --------------- */
+  /* --- Aufgabenlisten: anklickbar und benannt ----------------------------- */
   /* EIGENE FUNKTION, NICHT TEIL DES FORTSCHRITTS: Aufgabenlisten stehen auch auf
-     Seiten ohne Fortschrittskarte (Doku, Uebersichten). Dort blieben die Kaestchen
-     sonst namenlos - eine Vorlesehilfe sagt fuenfzehnmal „Kontrollkaestchen“ und
-     nichts weiter. Der Name kommt aus dem Listeneintrag, in dem es steht. */
-  function initCheckboxNamen() {
+     Seiten ohne Fortschrittskarte (Doku, Uebersichten, Trainer-Checklisten).
+
+     ZWEI DINGE, WEIL SIE DIESELBE URSACHE HABEN. Kramdown gibt ein
+     `- [ ] …` als `<input type="checkbox" disabled>` aus, und es blieb auch
+     genau so stehen: Eine Checkliste, die man nicht abhaken kann, ist ein Bild
+     von einer Checkliste. Eingeschaltet wurde bisher nur, wo eine
+     Fortschrittskarte danebenstand - also ausgerechnet nicht auf der Seite, die
+     nichts als eine Liste ist. Und ohne Namen sagt eine Vorlesehilfe
+     fuenfzehnmal „Kontrollkaestchen“ und sonst nichts; der Name kommt aus dem
+     Listeneintrag, in dem das Kaestchen steht.
+
+     Der Zustand wird NICHT gespeichert. Ein Haken gilt fuer diesen Durchgang -
+     eine Liste, die beim naechsten Kurs noch die Haken des letzten traegt, waere
+     schlimmer als eine leere. */
+  function initAufgabenlisten() {
     document.querySelectorAll('li > input[type="checkbox"]').forEach(function (c, i) {
+      c.disabled = false;
       if (c.getAttribute("aria-label") || (c.labels && c.labels.length)) return;
       var li = c.closest("li");
       var name = li ? li.textContent.replace(/\s+/g, " ").trim() : "";
@@ -292,9 +304,9 @@
       box.classList.toggle("is-complete", done === checks.length);
     }
     checks.forEach(function (c) {
-      /* EINGESCHALTET heißt: ein echtes Bedienelement. Den Namen hat es von
-         `initCheckboxNamen()`, die vorher laeuft - auch auf Seiten ohne Karte. */
-      c.disabled = false;
+      /* Eingeschaltet und benannt sind die Kaestchen schon - das erledigt
+         `initAufgabenlisten()`, die vorher laeuft, auch auf Seiten ohne Karte.
+         Hier kommt nur noch das Mitzaehlen dazu. */
       c.addEventListener("change", update);
     });
     update();
@@ -747,6 +759,7 @@
      also am JavaScript. */
   function initReveals() {
     document.querySelectorAll("details.avd-academy-reveal").forEach(function (details) {
+      if (inVorfuehrung(details)) { return; }
       var summary = details.querySelector(":scope > summary");
       if (!summary) return;
 
@@ -815,7 +828,9 @@
     var namenGemerkt = [];
     function nameAus() {
       namenGemerkt = [];
-      document.querySelectorAll("details.avd-academy-tabs__panel[name]").forEach(function (d) {
+      document.querySelectorAll(
+        "details.avd-academy-tabs__panel[name], details.avd-academy-walkthrough__line[name]"
+      ).forEach(function (d) {
         namenGemerkt.push([d, d.getAttribute("name")]);
         d.removeAttribute("name");
       });
@@ -828,7 +843,8 @@
       nameAus();
       fuerDruckGeoeffnet = [];
       document.querySelectorAll(
-        "details.avd-academy-reveal, details.avd-academy-tabs__panel"
+        "details.avd-academy-reveal, details.avd-academy-tabs__panel, " +
+        "details.avd-academy-walkthrough__line"
       ).forEach(function (d) {
         if (d.classList.contains("avd-academy-reveal--screen-only")) return;
         if (d.open) return;
@@ -856,6 +872,20 @@
     }
   }
 
+  /* --- Vorfuehrungen gehoeren dem Demo-Skript ----------------------------- */
+  /* EINE BUEHNE IST EINE VORSCHAU, KEIN BAUSTEIN. `demo.js` nimmt ihr Markup und
+     baut es in einem eigenen Rahmen noch einmal auf - mit demselben Theme und
+     demselben Skript. Wer hier vorher zugreift, uebergibt eine bereits
+     umgebaute Fassung: Der Rahmen setzte dann einen Knopf in den Knopf und eine
+     Klappzeile in die Klappzeile. Gemessen: zehn Koepfe, wo fuenf hingehoeren.
+
+     Deshalb laesst dieses Skript alles in Ruhe, was unter
+     `[data-avd-academy-demo]` steht. Ohne `demo.js` bleibt die Buehne damit das
+     rohe Markup - und genau das ist sie dann auch. */
+  function inVorfuehrung(el) {
+    return !!(el.closest && el.closest("[data-avd-academy-demo]"));
+  }
+
   /* ==========================================================================
      TABS – aus dem Akkordeon einen Reiterstreifen machen
      --------------------------------------------------------------------------
@@ -869,6 +899,7 @@
      ========================================================================== */
   function initTabs() {
     document.querySelectorAll(".avd-academy-tabs").forEach(function (box, nr) {
+      if (inVorfuehrung(box)) { return; }
       var panels = Array.prototype.slice.call(
         box.querySelectorAll(":scope > details.avd-academy-tabs__panel")
       );
@@ -999,6 +1030,196 @@
     ausHash();
   }
 
+
+  /* ==========================================================================
+     AKKORDEON – aus Ueberschriften werden Klappbereiche
+     --------------------------------------------------------------------------
+     DIE SEITE FUNKTIONIERT OHNE DIESE FUNKTION. Der Autor schreibt gewoehnliche
+     Ueberschriften in einen Kasten; ohne Skript steht da ein gewoehnliches
+     Dokument, und zwar vollstaendig. Alles Zuklappen haengt an der Klasse
+     `--enhanced`, die erst gesetzt wird, wenn der Umbau steht.
+
+     WARUM UEBERSCHRIFTEN UND NICHT `<details>` wie bei Reitern und Fold: Eine
+     Ueberschrift ist die Gliederung des Dokuments - sie traegt die Ebene, den
+     Anker und die Vorlesereihenfolge. Wer dieselbe Liste als `<details>`
+     schreibt, verliert beides und muss jede Zeile in Markup einpacken. Hier
+     bleibt die Quelle Markdown, und die Bedienung kommt dazu.
+
+     WARUM EIN GITTER UND KEIN `<details>` FUER DIE BEWEGUNG: Es klappt hier
+     genauso zu, wie das Burger-Menue zuklappt - `0fr` -> `1fr` rechnet mit der
+     wirklichen Hoehe. Ein `<details>` kann man zwar aufgehen lassen, aber nicht
+     zugehen: Der Browser nimmt den Inhalt beim Schliessen sofort aus dem Fluss.
+     Der Preis steht in der Doku unter „Grenzen": Strg+F findet nicht, was
+     zugeklappt ist. Bei Reitern ist das anders, und deshalb stehen beide
+     Bausteine nebeneinander.
+     ========================================================================== */
+  function initAccordion() {
+    var kaesten = Array.prototype.slice.call(
+      document.querySelectorAll(".avd-academy-accordion")
+    ).filter(function (box) { return !inVorfuehrung(box); });
+
+    kaesten.forEach(function (box, nr) {
+      var kinder = Array.prototype.slice.call(box.children);
+
+      /* DIE FLACHSTE UEBERSCHRIFT UNTER DEN DIREKTEN KINDERN macht die Bereiche.
+         Damit entscheidet der Autor die Ebene, indem er sie schreibt (`###` in
+         einem `##`-Kapitel), und ein verschachteltes Akkordeon in einem Bereich
+         zaehlt nicht mit - es ist kein direktes Kind mehr. */
+      var ebene = 0;
+      kinder.forEach(function (el) {
+        var treffer = /^H([1-6])$/.exec(el.tagName);
+        if (!treffer) return;
+        var n = Number(treffer[1]);
+        if (!ebene || n < ebene) { ebene = n; }
+      });
+      if (!ebene) return;
+      var marke = "H" + ebene;
+
+      /* Was VOR der ersten Ueberschrift steht, bleibt stehen: eine Einleitung
+         gehoert in keinen Bereich - sie sagt ja gerade, wozu die Liste da ist. */
+      var abschnitte = [];
+      var offen = null;
+      kinder.forEach(function (el) {
+        if (el.tagName === marke) {
+          offen = { kopf: el, inhalt: [] };
+          abschnitte.push(offen);
+        } else if (offen) {
+          offen.inhalt.push(el);
+        }
+      });
+      /* Ein einzelner Bereich ist kein Akkordeon - dafuer gibt es
+         `avd-academy-fold`. Ohne diese Bremse baute das Skript eine Bedienung,
+         die nichts zu waehlen hat. */
+      if (abschnitte.length < 2) return;
+
+      abschnitte.forEach(function (a, i) {
+        var kopf = a.kopf;
+
+        /* EINE LESBARE ID JE ABSCHNITT - sie ist der Anker, unter dem sich ein
+           einzelner Bereich verlinken laesst. Eine vorhandene bleibt
+           unangetastet: Sie steht womoeglich schon in einem Verweis. Kramdown
+           vergibt sie ohnehin aus der Ueberschrift; der Zweig darunter greift
+           nur, wenn eine Seite die automatischen IDs abgeschaltet hat. */
+        if (!kopf.id) {
+          var wunsch = (kopf.textContent || "").toLowerCase()
+            .replace(/ä/g, "ae").replace(/ö/g, "oe")
+            .replace(/ü/g, "ue").replace(/ß/g, "ss")
+            .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+          kopf.id = (wunsch && !document.getElementById(wunsch))
+            ? wunsch : ("avd-accordion-" + nr + "-" + i);
+        }
+
+        /* ZWEI ELEMENTE, WEIL EINES NICHT REICHT: Der Bereich traegt die
+           Gitterzeile (und damit die Bewegung), der Koerper darin `overflow`
+           und den Innenabstand. Stuende beides auf einem Element, schnitte der
+           Innenabstand die Zeile nie auf null - genau der Fehler, der im Burger
+           zwoelf Pixel stehen liess. */
+        var bereich = document.createElement("div");
+        bereich.className = "avd-academy-accordion__region";
+        bereich.id = kopf.id + "-region";
+        bereich.setAttribute("role", "region");
+        bereich.setAttribute("aria-labelledby", kopf.id);
+
+        var koerper = document.createElement("div");
+        koerper.className = "avd-academy-accordion__body";
+        a.inhalt.forEach(function (el) { koerper.appendChild(el); });
+        bereich.appendChild(koerper);
+        kopf.insertAdjacentElement("afterend", bereich);
+
+        /* DIE UEBERSCHRIFT BLEIBT EINE UEBERSCHRIFT, der Knopf steht DARIN.
+           So steht es in den ARIA Authoring Practices, und es ist der einzige
+           Weg, der die Gliederung nicht opfert: Wer die Ueberschrift durch einen
+           Knopf ersetzt, nimmt einer Vorlesehilfe die Sprungmarken der Seite. */
+        var knopf = document.createElement("button");
+        knopf.type = "button";
+        knopf.className = "avd-academy-accordion__toggle";
+        knopf.setAttribute("aria-expanded", "false");
+        knopf.setAttribute("aria-controls", bereich.id);
+        while (kopf.firstChild) { knopf.appendChild(kopf.firstChild); }
+        kopf.appendChild(knopf);
+
+        a.bereich = bereich;
+        a.knopf = knopf;
+      });
+
+      /* Sichtbar halten, was gerade gewaehlt wurde. Der zweite Blick nach der
+         Bewegung ist kein Aberglaube: Waehrend der 220 ms schrumpft der
+         Nachbar, der vorher offen war - was jetzt im Bild steht, liegt danach
+         womoeglich darueber. `nearest` ruehrt sich nicht, wenn nichts noetig
+         ist, also kostet der zweite Aufruf im Regelfall gar nichts. */
+      function sichtbarHalten(el) {
+        el.scrollIntoView({ block: "nearest" });
+        window.setTimeout(function () { el.scrollIntoView({ block: "nearest" }); }, 260);
+      }
+
+      /* EXKLUSIV: Ein Akkordeon zeigt einen Bereich. Das ist der Zweck - eine
+         lange Liste soll nicht doch wieder in ganzer Laenge dastehen. */
+      function waehlen(ziel, auf, mitBewegung) {
+        abschnitte.forEach(function (a) {
+          var jetzt = (a === ziel) ? auf : false;
+          a.knopf.setAttribute("aria-expanded", jetzt ? "true" : "false");
+          a.bereich.classList.toggle("is-open", jetzt);
+        });
+        if (auf && mitBewegung) { sichtbarHalten(ziel.knopf); }
+      }
+
+      abschnitte.forEach(function (a) {
+        a.knopf.addEventListener("click", function () {
+          var war = a.knopf.getAttribute("aria-expanded") === "true";
+          waehlen(a, !war, true);
+        });
+      });
+
+      /* PFEILTASTEN AUF DEN KOEPFEN. Ohne sie ist ein Akkordeon zwar bedienbar
+         (jeder Kopf ist ein Knopf in der Tabulatorreihenfolge), aber man muss
+         sich durch den Inhalt des offenen Bereichs tabben, um zum naechsten
+         Kopf zu kommen. Links/rechts UND hoch/runter, weil beides erwartet
+         wird: die Reihe der Koepfe liest sich waagerecht, die Seite laeuft
+         senkrecht. */
+      box.addEventListener("keydown", function (event) {
+        var i = -1;
+        abschnitte.forEach(function (a, j) {
+          if (a.knopf === document.activeElement) { i = j; }
+        });
+        if (i === -1) { return; }
+        var ziel = null;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          ziel = (i + 1) % abschnitte.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          ziel = (i - 1 + abschnitte.length) % abschnitte.length;
+        } else if (event.key === "Home") { ziel = 0; }
+        else if (event.key === "End") { ziel = abschnitte.length - 1; }
+        if (ziel === null) { return; }
+        event.preventDefault();
+        abschnitte[ziel].knopf.focus();
+        waehlen(abschnitte[ziel], true, true);
+      });
+
+      /* TIEFE VERWEISE: `#…` auf einen Kopf oder auf etwas DARIN muss den
+         Bereich aufklappen - sonst springt der Browser an eine Stelle, die
+         gerade zu ist, und die Seite ruehrt sich nicht. Dieselbe Ueberlegung
+         wie bei den Reitern, nur dass hier jeder Kasten seinen eigenen Zustand
+         fuehrt und die Pruefung deshalb hier drin steht. */
+      function ausHash() {
+        var id = location.hash.slice(1);
+        if (!id) { return; }
+        var ziel = document.getElementById(id);
+        if (!ziel) { return; }
+        var treffer = null;
+        abschnitte.forEach(function (a) {
+          if (a.kopf === ziel || a.bereich.contains(ziel)) { treffer = a; }
+        });
+        if (!treffer) { return; }
+        waehlen(treffer, true, false);
+        ziel.scrollIntoView();
+      }
+      window.addEventListener("hashchange", ausHash);
+
+      box.classList.add("avd-academy-accordion--enhanced");
+      ausHash();
+    });
+  }
+
   /* --- Waagerecht scrollende Bereiche (Tabellen, Code) -------------------- */
   /* ZWEI DINGE AUF EINMAL, weil es dieselbe Ursache hat: Eine breite Tabelle
      schiebt auf einem schmalen Gerät die GANZE SEITE nach rechts (WCAG 1.4.10:
@@ -1030,7 +1251,8 @@
       if (scrollt) { b.setAttribute("tabindex", "0"); }
       else if (b.getAttribute("tabindex") === "0") { b.removeAttribute("tabindex"); }
     }
-    var kandidaten = haupt.querySelectorAll(".avd-academy-tablescroll, pre, pre > code");
+    var kandidaten = haupt.querySelectorAll(
+      ".avd-academy-tablescroll, .avd-academy-walkthrough, pre, pre > code");
 
     /* EINMAL MESSEN GENUEGT NICHT. Ob ein Block ueberlaeuft, steht erst fest, wenn
        Schrift UND Inhalt endgueltig sind - und die Syntaxhervorhebung baut den
@@ -1067,8 +1289,9 @@
     initCopyMarkdown();
     initPrintButtons();
     initTabs();
+    initAccordion();
     initPageQr();
-    initCheckboxNamen();
+    initAufgabenlisten();
     initGuideProgress();
     initScrollbereiche();
     initGuideToc();

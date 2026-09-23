@@ -690,7 +690,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-metanav {
   background: var(--avd-academy-metanav-bg);
   color: var(--avd-academy-metanav-text);
-  font-size: 14px;
+  font-size: 0.875rem;
   display: flex;
   gap: 24px;
   padding: 6px max(24px, calc((100% - var(--avd-academy-page-width, 1200px)) / 2));
@@ -745,7 +745,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 }
 .avd-academy-header__nav { margin-left: auto; display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 .avd-academy-header__nav a {
-  text-decoration: none; font-weight: 500; font-size: 17px;
+  text-decoration: none; font-weight: 500; font-size: 1.0625rem;
   color: var(--avd-academy-color-headline);
 }
 .avd-academy-header__nav a:hover,
@@ -802,7 +802,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-header__grouptoggle {
   display: inline-flex; align-items: center; gap: 6px;
   background: none; border: 0; padding: 0; cursor: pointer;
-  font: inherit; font-weight: 500; font-size: 17px;
+  font: inherit; font-weight: 500; font-size: 1.0625rem;
   color: var(--avd-academy-color-headline);
 }
 .avd-academy-header__grouptoggle:hover,
@@ -810,7 +810,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    ersten Ebene der Schalter der dritten gleich mit ein - zwei hervorgehobene
    Eintraege, obwohl nur einer den Fokus hat. */
 .avd-academy-header__group:focus-within > .avd-academy-header__grouptoggle { color: var(--avd-orange); }
-.avd-academy-header__caret { font-size: 11px; line-height: 1; }
+.avd-academy-header__caret { font-size: 0.6875rem; line-height: 1; }
 /* Inline-Icon in Link-Labels (TopNav, Footer, Ressourcen). Quadratische Quellbilder
    werden – wie GitHub-Profilbilder – KREISRUND dargestellt (quadratisch + border-radius
    50% + object-fit: cover). */
@@ -870,7 +870,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-header__group:focus-within > .avd-academy-header__submenu,
 .avd-academy-header__submenu[data-open] { display: flex; }
 .avd-academy-header__submenu a {
-  padding: 8px 20px; font-size: 16px; font-weight: 500; white-space: nowrap;
+  padding: 8px 20px; font-size: 1rem; font-weight: 500; white-space: nowrap;
   text-decoration: none; color: var(--avd-academy-color-headline);
 }
 .avd-academy-header__submenu a:hover,
@@ -971,7 +971,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-header__setlabel {
   position: relative;
   margin: 0; padding: 4px 20px 6px;
-  font-size: 12px; font-weight: var(--avd-academy-fw-bold, 700);
+  font-size: 0.75rem; font-weight: var(--avd-academy-fw-bold, 700);
   letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--avd-academy-color-ink-muted);
 }
@@ -990,7 +990,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
    (`__submenu a`) wuerde sie sonst zur gewoehnlichen Zeile machen; der
    Kompound-Selektor haelt die Ueberschriftenform. */
 .avd-academy-header__submenu a.avd-academy-header__setlabel--link {
-  padding: 4px 20px 2px; font-size: 12px; text-decoration: none;
+  padding: 4px 20px 2px; font-size: 0.75rem; text-decoration: none;
   color: var(--avd-academy-color-ink-muted);
 }
 .avd-academy-header__submenu a.avd-academy-header__setlabel--link:hover,
@@ -1015,7 +1015,7 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-header__group--sub { display: flex; width: 100%; }
 .avd-academy-header__grouptoggle--sub {
   width: 100%; justify-content: space-between;
-  padding: 8px 20px; font-size: 16px; text-align: left;
+  padding: 8px 20px; font-size: 1rem; text-align: left;
 }
 .avd-academy-header__grouptoggle--sub:hover { color: var(--avd-orange); background: var(--avd-academy-color-bg-subtle); }
 .avd-academy-header__caret--side { margin-left: 8px; }
@@ -1382,6 +1382,96 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 }
 
 /* ===========================================================================
+   ZEILE FÜR ZEILE ERKLÄREN (`avd-academy-walkthrough`)
+   ---------------------------------------------------------------------------
+   Eine rohe HTTP-Nachricht, ein OpenAPI-Dokument, ein Stück Code: Jede Zeile ist
+   anklickbar und klappt ihre Erklärung auf. Die Konstruktion kam in einem
+   einzigen Schulungs-Repo DREIMAL selbst gebaut vor (A-013, A-016) – jedes Mal
+   mit denselben drei Fehlern.
+
+   GRUNDLAGE IST `<details name="…">`, wie bei Reitern und Reveal. Der Browser
+   schaltet exklusiv (eine Erklärung zur Zeit), bringt Tastaturbedienung und
+   `aria-expanded` von sich aus mit, und ohne JavaScript bleibt alles erreichbar.
+   Ein nachgebauter Klick-Handler hatte in den Eigenbauten weder das eine noch
+   das andere.
+
+   WAS DIE EIGENBAUTEN FALSCH HATTEN, und was hier deshalb festgelegt ist:
+
+   1. `min-height: 24px` an der Zeile. Eine Zeile Monospace mit knappem
+      Innenabstand kommt auf 22-24 Pixel; WCAG 2.5.8 verlangt 24. Und weil die
+      Zeilen unmittelbar aneinanderliegen, greift die Ausnahme „genug Platz
+      ringsum" gerade nicht - gemessen 32 Stellen in einem Repo.
+   2. Die Fläche ist die ZURÜCKGENOMMENE Seitenfläche, nicht der dunkle
+      Codeblock. Auf dunklem Grund kippen die Akzent- und Statusfarben, die in so
+      einer Nachricht vorkommen (gemessen 2,1:1).
+   3. Der Marker links zeigt den Zustand mit FORM, nicht nur mit Farbe: Er dreht
+      sich beim Öffnen. Farbe allein trägt nicht (1.4.1).
+   =========================================================================== */
+
+/* Der Klassenname steht zweimal - siehe die Begründung beim Reiter-Baustein:
+   Der Flussrhythmus in guide.css hat dieselbe Spezifität und lädt später. */
+.avd-academy-walkthrough.avd-academy-walkthrough {
+  margin: var(--avd-academy-space-6) 0;
+  border: 1px solid var(--avd-academy-color-border);
+  border-radius: var(--avd-academy-radius);
+  background: var(--avd-academy-color-bg-subtle);
+  overflow-x: auto;                 /* lange Zeilen scrollen IM Baustein */
+  overscroll-behavior-x: contain;
+}
+
+.avd-academy-walkthrough__line { border-bottom: 1px solid var(--avd-academy-color-border); }
+.avd-academy-walkthrough__line:last-child { border-bottom: 0; }
+
+.avd-academy-walkthrough__line > summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--avd-academy-space-2);
+  min-height: 24px;                 /* WCAG 2.5.8 - siehe oben */
+  padding: 0.2rem var(--avd-academy-space-3);
+  font-family: var(--avd-academy-font-mono);
+  font-size: var(--avd-academy-fs-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  list-style: none;                 /* Standard-Dreieck weg (Firefox) */
+}
+.avd-academy-walkthrough__line > summary::-webkit-details-marker { display: none; }
+
+/* Der Marker: eine Form, die sich dreht - nicht nur eine Farbe. */
+.avd-academy-walkthrough__line > summary::before {
+  content: "›";
+  flex: none;
+  width: 1ch;
+  color: var(--avd-academy-color-ink-muted);
+  transition: var(--avd-academy-transition, transform 0.15s ease);
+}
+.avd-academy-walkthrough__line[open] > summary::before { transform: rotate(90deg); }
+
+.avd-academy-walkthrough__line > summary:hover { background: var(--avd-academy-color-accent-soft); }
+.avd-academy-walkthrough__line[open] > summary {
+  background: var(--avd-academy-color-accent-soft);
+  border-left-color: var(--avd-academy-color-accent);
+}
+
+/* Ein hervorgehobenes Stück der Zeile - Methode, Statuscode, Schlüssel. */
+.avd-academy-walkthrough__mark {
+  font-weight: var(--avd-academy-fw-bold, 700);
+  color: var(--avd-academy-color-accent-ink);
+}
+
+.avd-academy-walkthrough__note {
+  margin: 0;
+  padding: var(--avd-academy-space-3) var(--avd-academy-space-4);
+  border-left: 3px solid var(--avd-academy-color-accent);
+  background: var(--avd-academy-color-bg);
+  font-size: var(--avd-academy-fs-sm);
+}
+.avd-academy-walkthrough__note > :first-child { margin-top: 0; }
+.avd-academy-walkthrough__note > :last-child { margin-bottom: 0; }
+
+/* ===========================================================================
    TABS – ein langer Leitfaden in schaltbaren Abschnitten
    ---------------------------------------------------------------------------
    GRUNDLAGE IST `<details name="…">`, nicht ein Klick-Handler. Der Browser
@@ -1507,6 +1597,13 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
 .avd-academy-tabs--enhanced > .avd-academy-tabs__panel[open] {
   padding: var(--avd-academy-space-6, 1.5rem);
 }
+/* DAS UNSICHTBARE `summary` ZAEHLT TROTZDEM ALS GESCHWISTER. Im Reiterstreifen
+   ist es `display: none`; die Eulenregel des Rhythmus sieht es dennoch und gibt
+   dem ersten sichtbaren Element einen Blockabstand - der zum Innenabstand des
+   Panels hinzukaeme. Gemessen: 24 px Padding plus 25,6 px Marge ueber dem ersten
+   Absatz. Im Akkordeon-Zustand (ohne `--enhanced`) ist das `summary` sichtbar,
+   und dort gehoert der Abstand hin; deshalb greift diese Regel nur hier. */
+.avd-academy-tabs--enhanced > .avd-academy-tabs__panel > summary + * { margin-top: 0; }
 
 /* --- Reiter links statt oben (`--side`) ----------------------------------- *
    WOFUER: Beschriftungen, die ganze Saetze sind. Der waagerechte Streifen
@@ -1562,4 +1659,117 @@ pre > .avd-academy-copy.is-copied { opacity: 1; }
     border-right: 0;
     border-bottom: 1px solid var(--avd-academy-color-border);
   }
+}
+
+
+/* ===========================================================================
+   AKKORDEON (`avd-academy-accordion`)
+   ---------------------------------------------------------------------------
+   Ueberschriften werden zu Klappbereichen. Der Autor schreibt gewoehnliches
+   Markdown in einen Kasten; das Skript baut daraus Knoepfe und Bereiche und
+   setzt erst danach `--enhanced`.
+
+   OHNE DIESE KLASSE PASSIERT HIER NICHTS. Das ist die ganze Absicherung: Ohne
+   JavaScript steht ein gewoehnliches Dokument da, vollstaendig und lesbar. Kein
+   `display: none` ausserhalb von `--enhanced`.
+
+   ABGRENZUNG ZU DEN REITERN: Dort schreibt der Autor `<details>` und bekommt
+   einen Streifen; hier bleibt die Gliederung des Dokuments stehen und bekommt
+   eine Bedienung. Beides exklusiv, beides aus demselben Grund - eine lange
+   Seite soll nicht in ganzer Laenge dastehen.
+   =========================================================================== */
+
+/* Der eigene Abstand im Textfluss - der Klassenname steht ZWEIMAL, wie bei den
+   Reitern. Begruendung dort: Der Flussrhythmus `.avd-academy-guide-main > * + *`
+   hat dieselbe Spezifitaet (0-1-0) und laedt spaeter; die Dopplung hebt auf
+   0-2-0 und entscheidet es unabhaengig von der Ladereihenfolge. */
+.avd-academy-accordion.avd-academy-accordion {
+  margin: var(--avd-academy-space-8, 2rem) 0 var(--avd-academy-space-6, 1.5rem);
+}
+
+/* Eine Linie je Bereich - dieselbe Sprache wie das Akkordeon der Reiter ohne
+   JavaScript. Kein Rahmen um das Ganze: Die Bereiche stehen IM Text und sollen
+   nicht wie ein eingesetztes Bedienfeld wirken. */
+.avd-academy-accordion--enhanced > :is(h2, h3, h4, h5, h6) {
+  margin: 0;
+  border-top: 1px solid var(--avd-academy-color-border);
+}
+.avd-academy-accordion--enhanced > :is(h2, h3, h4, h5, h6):last-child,
+.avd-academy-accordion--enhanced > .avd-academy-accordion__region:last-child {
+  border-bottom: 1px solid var(--avd-academy-color-border);
+}
+
+/* DER KNOPF FUELLT DIE UEBERSCHRIFT. Er erbt Schriftgroesse und -gewicht der
+   Ebene, in der er steht - eine `###`-Liste sieht damit aus wie `###` und nicht
+   wie eine Reihe gleicher Knoepfe. `width: 100%` macht die ganze Zeile
+   anklickbar; die Zielgroesse (WCAG 2.5.8) ist ueber den Innenabstand ohnehin
+   weit ueberschritten. */
+.avd-academy-accordion__toggle {
+  appearance: none; cursor: pointer;
+  display: flex; align-items: baseline; gap: 0.6rem;
+  width: 100%; text-align: left;
+  background: transparent; border: 0; border-radius: 0;
+  padding: var(--avd-academy-space-3, 0.75rem) 0;
+  color: inherit; font: inherit;
+  /* MITSCROLLEN BRAUCHT LUFT. Der Header klebt oben; ohne diesen Rand landet
+     der gewaehlte Kopf beim Springen darunter und ist nicht zu sehen. */
+  scroll-margin-top: calc(var(--topnav-height, 80px) + 1rem);
+}
+.avd-academy-accordion__toggle:hover { color: var(--avd-academy-color-accent-ink); }
+.avd-academy-accordion__toggle:focus-visible {
+  outline: 2px solid var(--avd-academy-color-accent); outline-offset: -2px;
+}
+
+/* Das Dreieck zeigt den Zustand an - dasselbe Zeichen und dieselbe Drehung wie
+   bei Reitern und Fold, damit „aufklappbar“ auf jeder Seite gleich aussieht.
+   `flex: none` haelt es bei langen Ueberschriften in der ersten Zeile. */
+.avd-academy-accordion__toggle::before {
+  content: "▸"; flex: none;
+  color: var(--avd-academy-color-accent);
+  transition: transform var(--avd-academy-transition, 160ms ease);
+}
+.avd-academy-accordion__toggle[aria-expanded="true"]::before { transform: rotate(90deg); }
+
+/* DIE BEWEGUNG - dieselbe Bauart wie im Burger-Menue, aus demselben Grund:
+   `0fr` -> `1fr` rechnet mit der WIRKLICHEN Hoehe. Ein `max-height`-Ansatz
+   faellt beim Zuklappen erst durch den zu grossen Wert, bevor etwas passiert;
+   sichtbar wird nur das letzte Zehntel, und das sieht aus wie ein Sprung.
+
+   `minmax(0, 0fr)` und nicht `0fr`: Letzteres ist die Kurzform fuer
+   `minmax(auto, 0fr)`, und das `auto` haelt die Zeile auf der Mindesthoehe des
+   Inhalts - gemessen blieb der Innenabstand stehen statt null.
+
+   `visibility` schaltet verzoegert: erst nach der Bewegung unsichtbar, beim
+   Oeffnen sofort. So laeuft der Fokus nicht in einen Bereich, der zu ist.
+
+   Die globale Regel in base.css setzt bei `prefers-reduced-motion` jede Dauer
+   auf 0,01 ms - hier steht deshalb keine eigene Ausnahme. */
+.avd-academy-accordion__region {
+  display: grid;
+  grid-template-rows: minmax(0, 0fr);
+  transition: grid-template-rows 220ms ease;
+}
+.avd-academy-accordion__region.is-open { grid-template-rows: minmax(0, 1fr); }
+
+.avd-academy-accordion__body {
+  min-height: 0; overflow: hidden;
+  visibility: hidden;
+  padding-bottom: 0;
+  transition: padding-bottom 220ms ease, visibility 0s linear 220ms;
+}
+.avd-academy-accordion__region.is-open > .avd-academy-accordion__body {
+  visibility: visible;
+  padding-bottom: var(--avd-academy-space-4, 1rem);
+  transition: padding-bottom 220ms ease, visibility 0s;
+}
+.avd-academy-accordion__body > :first-child { margin-top: 0; }
+.avd-academy-accordion__body > :last-child { margin-bottom: 0; }
+
+/* Ein Akkordeon IM Akkordeon ruecken wir ein - sonst steht die zweite Ebene auf
+   derselben Kante wie die erste, und die Schachtelung ist nicht zu sehen. Die
+   Linie links sagt dasselbe noch einmal fuer den, der nur den Rand wahrnimmt. */
+.avd-academy-accordion .avd-academy-accordion.avd-academy-accordion {
+  margin: var(--avd-academy-space-2, 0.5rem) 0;
+  padding-left: var(--avd-academy-space-4, 1rem);
+  border-left: 2px solid var(--avd-academy-border-soft);
 }
