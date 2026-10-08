@@ -64,13 +64,13 @@
 
 <meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1790166390"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1790166390">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1790166390">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1790166390">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1790166390"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1790166390">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1790166390" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1790166390" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1790166390">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1791462494"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1791462494">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1791462494">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1791462494">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1791462494"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1791462494">
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1791462494" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1791462494" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1791462494">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -113,8 +113,8 @@
 <link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1790166390">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1790166390"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1791462494">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1791462494"></head><body class="avd-academy-guide">
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
@@ -172,6 +172,338 @@
 inkompatibel gilt und wie eingestuft wird, steht in
 <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/AGENTS.md"><code>AGENTS.md</code></a>,
 Abschnitt „Theme-Version“.</p>
+
+<hr />
+
+<h2 id="2500">2.50.0</h2>
+
+<h3 id="jekyllversiontxt--das-theme-nennt-seine-fassung-dort-wo-sie-gelesen-wird"><code>jekyll/version.txt</code> – das Theme nennt seine Fassung dort, wo sie gelesen wird</h3>
+
+<p>Die Prüf-Bausteine (<code>academy-theme-actions</code>) werden <strong>unabhängig</strong> vom Theme gepinnt. Ob
+beides zusammenpasst, konnten sie bisher nicht feststellen: <code>package.json</code> liegt zwar im
+npm-Paket, die Site schließt <code>theme/package.json</code> aber vom Jekyll-Output aus – im <strong>gebauten
+Bundle</strong>, dem ersten Fundort der Bausteine, war die Version nicht lesbar. Dieselbe Falle wie
+bei axe-core.</p>
+
+<p><strong>Neu:</strong> <code>jekyll/version.txt</code> trägt die Paketversion und liegt neben den Werkzeugen, reist
+also in jedes Bundle mit. <code>npm-validate</code> erzwingt den Gleichstand mit <code>package.json</code> – zwei
+Stellen für dieselbe Zahl driften sonst.</p>
+
+<p>Ab Actions 1.6.0 bricht ein Lauf gegen eine unverträgliche Theme-Reihe damit ab, statt
+unbemerkt gegen Werkzeuge zu laufen, die den Stand nicht kennen.</p>
+
+<h2 id="2490">2.49.0</h2>
+
+<h3 id="liquidrb--steht-in-den-quellen-etwas-das-nie-ausgewertet-wird"><code>liquid.rb</code> — steht in den Quellen etwas, das nie ausgewertet wird?</h3>
+
+<p>Ein neues Werkzeug im Paket, neben <code>links.rb</code>, <code>contrast.rb</code> und <code>a11y.mjs</code>. Es beantwortet
+eine Frage, die erst entsteht, wenn eine Unterlage an einen Verbraucher geht, der <strong>ohne
+Liquid</strong> rendert: Wo verlässt sie sich noch darauf?</p>
+
+<p>Ohne Liquid wird jede Anweisung gedruckt statt ausgewertet. Aus einer Verzweigung wird
+sichtbarer Text; und ein <code>{% comment %}</code>-Block, der sonst <strong>nichts</strong> anzeigt, stellt seine
+internen Notizen in die Öffentlichkeit.</p>
+
+<p><strong>Die Prüfung läuft nur, wenn Liquid aus ist</strong> — und das sagt nicht sie, sondern die Site,
+über Jekylls eigenen Schalter:</p>
+
+<pre><code class="language-yaml">defaults:
+  - scope: { path: "" }
+    values:
+      render_with_liquid: false
+</code></pre>
+
+<p>Solange Liquid läuft, ist eine Liquid-Anweisung Absicht. Eine Prüfung, die sie dann meldet,
+wäre reiner Lärm und würde abgeschaltet statt gelesen.</p>
+
+<p><strong>Als einziges der vier Werkzeuge misst es an den Quellen</strong>, nicht am gebauten <code>_site</code>. Zu
+beheben ist die Quelle, und nur sie kennt Datei und Zeile.</p>
+
+<p>Gelesen wird Markdown ohne Front Matter, ohne umzäunte Codeblöcke und ohne Code-Spans,
+dazu HTML mit Front Matter. Ein `` in einem Vue-Beispiel ist kein Befund.</p>
+
+<p>Die Mustererkennung ist die von ATLAS (Regel 35), Zeichen für Zeichen — nur mit <code>/m</code>: Ein
+Tag darf sich über beliebig viele Zeilen ziehen. Liquid erlaubt das, ein mehrzeiliges
+<code>include</code> mit Parametern ist der häufigste Fall, und ein übersehener Befund wiegt schwerer
+als einer zu viel — er geht ungesehen auf die Seite. Was syntaktisch ein Tag ist, wird
+gefunden.</p>
+
+<p><strong>Liquid ist kein Plugin</strong>, sondern Jekylls Kern; die Frage ist nur, welche Dateien
+hindurchlaufen. <code>jekyll-optional-front-matter</code> befördert Markdown <strong>ohne</strong> Front Matter zu
+einer Seite – dann läuft auch die durch Liquid. Ob es wirkt, wird aus der Konfiguration
+gelesen statt angenommen: Setzt ein Projekt <code>plugins</code> selbst, ersetzt das die Theme-Vorgabe
+vollständig. Fehlt das Plugin, bleibt Markdown ohne Front Matter ungelesen – es ist dann
+keine Seite, sondern eine kopierte Datei.</p>
+
+<p>Aufrufbar aus jeder Pipeline über <code>academy-theme-actions@v1</code> mit <code>checks: liquid</code>.</p>
+
+<h2 id="2480">2.48.0</h2>
+
+<h3 id="der-token-satz-sagt-kontrast-zu--und-rechnet-es-vor-jedem-release-nach">Der Token-Satz sagt Kontrast zu – und rechnet es vor jedem Release nach</h3>
+
+<p>Das Theme hat seinen Farbsatz mehrfach umgebaut: Dark-Theme, Füllflächen, abgeleiteter
+Akzent, Vordergrundfassungen. Jedes Mal fiel erst im Nachhinein auf, dass eine Paarung
+darunter gelitten hatte – die Messwerte stehen bis heute in den Kommentaren von
+<code>tokens.css</code>, aber <strong>nichts rechnete sie nach</strong>. Und nach außen war gar nichts davon
+lesbar: Ein Schulungspaket, das seine Farben aus den Tokens nimmt, konnte nicht erfahren,
+welche Paarung trägt.</p>
+
+<p><strong>Neu im Paket: zwei weitere Zusagen unter <code>contract/</code>.</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Datei</th>
+      <th>Inhalt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>contract/contrast-pairs.txt</code></td>
+      <td>63 zugesagte Paare mit ihrer WCAG-Stufe</td>
+    </tr>
+    <tr>
+      <td><code>contract/contrast-pairs.version.txt</code></td>
+      <td>die Fassung der Zusage, hier <code>1</code></td>
+    </tr>
+    <tr>
+      <td><code>contract/color-tokens.txt</code></td>
+      <td>die 63 Variablen, die eine Farbe tragen</td>
+    </tr>
+    <tr>
+      <td><code>contract/color-tokens.version.txt</code></td>
+      <td>die Fassung der Liste, hier <code>1</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Dieselbe Form wie Markup Contract und Schemas: Datei plus Fassungsnummer daneben.</p>
+
+<p><strong>Drei Stufen, keine erfundene vierte:</strong> <code>text</code> (4,5:1, WCAG 1.4.3), <code>gross</code> (3:1, große
+Schrift) und <code>ui</code> (3:1, WCAG 1.4.11).</p>
+
+<p><strong>Gemessen in fünf Modi, nicht in zweien.</strong> Hell und Dunkel jeweils über
+<code>prefers-color-scheme</code> <strong>und</strong> über <code>data-avd-academy-theme</code>, dazu der Druck. Die
+doppelte Messung von Hell und Dunkel ist Absicht: Die Dark-Werte stehen zweimal in
+<code>tokens.css</code>, und eine Prüfung über nur einen Weg sähe es nicht, wenn die Blöcke
+auseinanderliefen. Der Druck hat eigene, fest geschriebene Werte – eine gedruckte
+Unterlage ist kein Nebenschauplatz dieser Akademie.</p>
+
+<p><strong>Im Browser gemessen, nicht aus dem CSS gelesen.</strong> Die Werte entstehen erst beim Rechnen:
+<code>color-mix(in srgb …)</code>, <code>color-mix(in oklab …)</code>, <code>oklch(from … calc(c * 3) h)</code> und
+<code>var()</code>-Ketten über drei Ebenen. Sie nachzubilden hieße, eine zweite Farb-Engine zu
+pflegen, die gerade dort abweicht, wo am meisten gerechnet wird. 315 Messungen, alle über
+der Zusage; der Engpass liegt bei <strong>4,56:1</strong> (Ton 3 als Schrift auf abgesetzter Fläche im
+Light-Theme) – exakt die Zahl, die seit 2.7.0 im Kommentar von <code>tokens.css</code> steht.</p>
+
+<p><strong>Was NICHT zugesagt ist, steht mit Messwert dabei.</strong> Am Ende der Datei: Haarlinien
+(1,05–1,82:1, Schmuck statt Bedeutungsträger), Gold auf heller Fläche (2,42:1), Slate auf
+dunkler (1,53:1), Orange auf der abgesetzten Fläche (2,75:1) – jeweils mit dem Token, das
+stattdessen trägt. Ohne diesen Teil läse man das Fehlen einer Paarung als „geht schon“.</p>
+
+<p><strong>Die Farb-Token-Liste ist erzeugt, nicht geführt.</strong> Welche Variable eine Farbe trägt,
+entscheidet die Messung: 63 von 104 geführten Variablen. Eine Ermessensfrage bleibt,
+kuratiert und begründet – <code>--avd-academy-accent-base</code> ist die EINGABE der Schulungsfarbe,
+das Theme setzt sie bewusst nicht, und ohne den Eintrag hielte ein Konsument genau den
+sanktionierten Weg für eine fest geschriebene Farbe.</p>
+
+<p><strong>Kein Release mehr ohne Selbstprüfung.</strong> <code>npm-publish</code> veröffentlicht erst, wenn auf
+<strong>demselben Checkout</strong> beides durch ist: die Kontrast-Zusage und die Barrierefreiheit der
+Komponenten und des Chromes (<code>a11y.sh</code>, WCAG 2.2 A/AA). Beide Berichte liegen dem
+GitHub-Release bei. Bisher veröffentlichte die Pipeline bei jedem Push auf <code>theme/**</code>,
+unabhängig davon, was gemessen worden war – ein Release sagte nichts darüber, ob es die
+Selbstprüfung bestanden hatte.</p>
+
+<p><strong>Ein Paar zu entfernen oder abzuschwächen ist ab jetzt ein Bruch</strong>, wie ein weggefallener
+Name im Markup Contract.</p>
+
+<p><strong>Für Konsumenten ändert sich nichts</strong> außer vier zusätzlichen Dateien. Kein Token wurde
+hinzugefügt, umbenannt oder in seinem Wert geändert.</p>
+
+<p>Nebenbei: Die Ansteuerung des Browsers liegt jetzt einmal statt zweimal im Repo
+(<code>jekyll/browser.mjs</code>); <code>a11y.sh</code> und die neue Prüfung teilen sie.</p>
+
+<p>Behebt #226.</p>
+
+<hr />
+
+<h2 id="2470">2.47.0</h2>
+
+<h3 id="die-zusage-lag-nur-im-theme-repo--jetzt-wandert-sie-mit">Die Zusage lag nur im Theme-Repo – jetzt wandert sie mit</h3>
+
+<p><code>markup-contract.txt</code> führt seit 1.14.1 die Namen, die dieses Theme stabil hält: 170
+Klassen, 104 Variablen-Definitionen, vier <code>data</code>-Attribute der Autorenfläche. Ein PR-Check
+lässt die CI scheitern, sobald einer davon verschwindet. <strong>Lesbar war die Liste aber nur
+hier.</strong> Die beiden JSON-Schemas wandern längst mit dem Paket, die Namensliste fehlte im
+<code>files</code>-Feld – und damit war die Zusage von außen nicht nachschlagbar.</p>
+
+<p>Das fällt jetzt auf, weil Trainingspakete künftig <strong>Quellen</strong> einreichen und ATLAS sie mit
+<strong>seiner</strong> Theme-Fassung baut. Damit ist das Content-Design dieses Themes die Fläche, an
+der beide Seiten sich treffen. Nach ATLAS-ADR 0018 ist die Liste dabei eine <strong>Zusage,
+keine Grenze</strong>: Ein Stand darf auch eigenes Markup schreiben, es trägt nur kein
+Stabilitätsversprechen. Genau deshalb muss er die Liste lesen können – sonst weiß er
+nicht, was davon welches ist.</p>
+
+<p><strong>Neu im Paket: <code>contract/</code>.</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Datei</th>
+      <th>Inhalt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>contract/markup-contract.txt</code></td>
+      <td>die 278 geführten Namen, eine Zeile je Name</td>
+    </tr>
+    <tr>
+      <td><code>contract/markup-contract.version.txt</code></td>
+      <td>die Fassung der Liste, hier <code>1</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Dieselbe Form wie bei den Schemas unter <code>jekyll/schema/</code>: Datei plus Fassungsnummer
+daneben. Ein eigener Ordner und nicht die Paketwurzel, weil die Kontrast-Zusagen aus #226
+dort dazukommen – Zusagen gehören an einen Ort.</p>
+
+<p><strong>Die Fassungsnummer steigt bei jeder Änderung der Liste</strong>, auch wenn nur ein Name
+dazukommt: Ein Konsument soll daran erkennen, ob sein Stand noch der aktuelle ist. Die
+Pflicht dazu steht in <code>AGENTS.md</code> neben der Pflicht, das Artefakt selbst nachzuziehen, und
+der Hinweis erscheint bei jedem Lauf von <code>bin/markup-contract.sh --check</code>.</p>
+
+<p><strong>Ein entfernter Name ist ab jetzt immer ein Bruch.</strong> Bisher galt das „wenn Projekte etwas
+tun müssen“ – wer die ausgelieferte Zusage nur liest, ist von hier aus aber nicht sichtbar.</p>
+
+<p><strong>Für Konsumenten ändert sich nichts</strong>, außer dass eine Datei dazukommt. Keine Namen
+wurden ergänzt, geändert oder entfernt; nachgemessen mit <code>npm pack</code> gegen ein frisch
+ausgepacktes Paket. Wie man die Liste liest, steht jetzt in der <code>README.md</code>.</p>
+
+<p>Behebt #213.</p>
+
+<hr />
+
+<h2 id="2461">2.46.1</h2>
+
+<h3 id="ein-baustein-der-sich-spät-anmeldet-bekam-seinen-zustand-nie">Ein Baustein, der sich spät anmeldet, bekam seinen Zustand nie</h3>
+
+<p>Gefunden beim Umstellen von <code>training-concept-api-engineering</code>: Sechs eigene
+Visualisierungen schrieben ihren Zustand brav in die Adresse – und stellten ihn nach dem
+Neuladen <strong>nicht</strong> her. Die Adresse war richtig, niemand las sie.</p>
+
+<p><strong>Die Ursache ist die Reihenfolge, und sie trifft jeden Aufrufer.</strong> <code>atvantage.js</code> trägt
+<code>defer</code>: Wenn es läuft, steht <code>document.readyState</code> bereits auf <code>interactive</code>, das Theme
+richtet sich also <strong>sofort</strong> ein und stellt den Zustand her. Ein Inline-Skript der Seite
+kann sich zu diesem Zeitpunkt noch gar nicht angemeldet haben – es wartet, wie üblich, auf
+<code>DOMContentLoaded</code>, und das kommt danach. Wer sich später meldet, fand ein <code>restore()</code> vor,
+das längst gelaufen war.</p>
+
+<p><strong>Jetzt reicht die Bibliothek den Wert nach</strong>, sobald sich jemand anmeldet. Anmelden darf
+damit <strong>jederzeit</strong> passieren – das ist die Zusage an eigene Bausteine; ohne sie müsste
+jeder Aufrufer die innere Reihenfolge des Themes kennen.</p>
+
+<p>Dazu ein zweiter, feinerer Punkt: Der <strong>Ausgangszustand</strong> wird jetzt aus dem Markup
+bestimmt (<code>standardOffen</code> je Baustein) statt aus dem gerade sichtbaren Stand. Beides fällt
+auseinander, sobald eine späte Anmeldung nachträgt – sonst vergliche „weicht ab?” künftig
+gegen die Adresse statt gegen das Dokument, und die Adresse räumte sich nicht mehr auf.</p>
+
+<p><strong>Nachgemessen</strong> an einer Seite, deren eigener Baustein sich bewusst erst bei
+<code>DOMContentLoaded</code> meldet: schreiben, neu laden, Zustand da – und zusammen mit den
+Theme-Bausteinen in <strong>einer</strong> Adresse (<code>#/?open=…&amp;ansicht=netz</code>).</p>
+
+<h2 id="2460">2.46.0</h2>
+
+<h3 id="bausteine-merken-sich-ihren-zustand--gemeinsam-in-der-adresse">Bausteine merken sich ihren Zustand – gemeinsam, in der Adresse</h3>
+
+<p>Eine Bedienung, die man nicht wiederfindet, ist ein Verlust. Wer einen Reiter wählt, einen
+Abschnitt aufklappt oder eine Musterlösung aufdeckt und neu lädt, stand bisher wieder am
+Anfang – und der QR-Code an der Wand zeigte auf ein anderes Bild als das, über das gerade
+gesprochen wird.</p>
+
+<p><strong>Die Ursache war nicht fehlender Wille, sondern fehlende Zuständigkeit.</strong> Es gibt genau
+<strong>ein</strong> Fragment je Seite. Der Reiterstreifen schrieb bisher <code>#«panel-id»</code> selbst hinein –
+und löschte damit alles, was ein anderer Baustein dort hätte stehen haben wollen. Solange
+jeder für sich schreibt, gewinnt der letzte Klick.</p>
+
+<p><strong>Neu ist deshalb eine gemeinsame Stelle:</strong> <code>window.AvdAcademyState</code> in
+<code>theme/academy/atvantage.js</code>. Sie sammelt den Zustand aller Bausteine und schreibt die
+Adresse <strong>einmal</strong>:</p>
+
+<pre><code>#kapitel-2                 eine gewöhnliche Sprungmarke – unverändert
+#/?open=tag-1,hinweis      nur Zustand
+#/kapitel-2?open=tag-1     Sprungmarke UND Zustand
+</code></pre>
+
+<p><strong>Vier Bausteine hängen ab sofort daran</strong> – ohne eine Zeile in den Unterlagen:
+<strong>Reiter</strong> (<code>avd-academy-tabs</code>), <strong>Akkordeon</strong> (<code>avd-academy-accordion</code>), <strong>Klappabschnitt</strong>
+(<code>avd-academy-fold</code>) und <strong>aufdeckbarer Inhalt</strong> (<code>avd-academy-reveal</code>). Der Fold hatte bis
+hierher gar kein JavaScript; er bekommt es nur dafür und bleibt ohne es vollständig
+bedienbar.</p>
+
+<p><strong>Geschrieben wird nur, was vom Dokument abweicht.</strong> Der Ausgangszustand ist das Markup des
+Autors: Solange niemand etwas anfasst, bleibt die Adresse sauber. Steht <code>open</code> dagegen
+darin, ist es die Wahrheit – auch leer (<code>open=</code>) heißt dann „alles zu“, sonst ließe sich ein
+zugeklappter Standard-Aufklapper nicht ausdrücken. Reiter und Akkordeon-Abschnitte, die
+nicht genannt sind, bleiben wie sie sind: Dort ist immer höchstens eines offen.</p>
+
+<p><strong>Für eigene Bausteine</strong> (Consumer des Themes, klickbare Visualisierungen) gibt es zwei
+Aufrufe: <code>openable({id, istOffen, setzen, exklusiv})</code> reiht etwas in <code>open</code> ein,
+<code>register({key, read, apply})</code> nimmt jeden anderen Zustand auf; <code>update()</code> nach der
+Bedienung schreibt die Adresse. Die Bibliothek erledigt dabei, was von Hand regelmäßig
+schiefgeht: <code>replaceState</code> statt <code>location.hash</code> (kein Sprung, kein Verlaufseintrag je
+Klick), das Ereignis <code>avd-academy-urlchange</code> für den QR-Code, das Zuhören auf <code>hashchange</code>,
+und ein unbekannter Wert führt still in den Ausgangszustand.</p>
+
+<p><strong>Auf Präsentation und Simulation hält die Bibliothek still.</strong> Dort gehört das Fragment dem
+Layout (<code>#/3</code>, <code>#/abgrenzung/3</code>); ein zweiter Schreiber zerschösse die Folien- oder
+Schrittnummer.</p>
+
+<p><strong>Abmelden geht:</strong> <code>data-avd-academy-state="off"</code> an einem Baustein oder an einem Container
+darüber. Neu im Markup Contract.</p>
+
+<p><strong>Was sich für bestehende Unterlagen ändert:</strong> Die Adresse sieht beim Reiterwechsel anders
+aus als bisher (<code>#/?open=tag-1</code> statt <code>#tag-1</code>). <strong>Bestehende Verweise bleiben gültig</strong> –
+ein <code>#tag-1</code> im Text öffnet weiterhin den zugehörigen Reiter, und die Sprungmarken der
+Seite sind unberührt.</p>
+
+<p><strong>Nachgemessen</strong> im Browser, an einer Seite mit Reitern, Akkordeon, zwei Folds und einem
+Reveal: fünfundzwanzig Prüfungen – Zustand nach dem Neuladen, mehrere Bausteine in einer
+Adresse, Vor/Zurück, tiefer Verweis in einen geschlossenen Reiter, <code>open=</code> als „alles zu“,
+abgemeldeter Baustein, unbekannter Wert, und das Fragment einer Präsentationsseite bleibt
+unangetastet.</p>
+
+<p><strong>Doku:</strong> <a href="https://timetoact.ghe.com/AVD-Academy-Tools/academy-theme/blob/main/docs/verwendung/zustand-in-der-url.md">Zustand in der Adresse</a>
+und je Baustein ein Abschnitt in <code>docs/theme/bausteine.md</code>.</p>
+
+<h2 id="2450">2.45.0</h2>
+
+<h3 id="die-wortmarke-war-in-simulation-und-präsentation-orange-statt-in-der-schulungsfarbe">Die Wortmarke war in Simulation und Präsentation orange statt in der Schulungsfarbe</h3>
+
+<p>Gemeldet aus dem Docker-Grundlagenkurs: „Nur die Simulation hat ein orangenes Logo.”</p>
+
+<p><strong>Und genau so war es.</strong> <code>brand.logo_ratio</code> schaltet die Wortmarke von Bild auf Maske, damit
+sie die Schulungsfarbe trägt – gebaut war das aber nur in <code>_includes/header.html</code>, also für
+alles, was durch <code>default.html</code> läuft. <code>presentation</code> und <code>simulation</code> sind <strong>eigenständige
+Dokumente</strong> mit eigenem <code>&lt;!DOCTYPE html&gt;</code>; sie banden die Marke als schlichtes <code>&lt;img&gt;</code> ein.
+Ein <code>&lt;img&gt;</code> lädt das SVG als eigenes Dokument, und dort ist weder ein Token der Seite noch
+<code>currentColor</code> sichtbar – die Datei behielt ihre eigene Farbe.</p>
+
+<p>Aufgefallen ist es erst jetzt, weil die Vorlage bis vor Kurzem eine <strong>grüne</strong> Platzhalter-
+Wortmarke lieferte: Grün neben Grün fällt nicht auf, Orange neben Blau schon.</p>
+
+<p>Beide Layouts tragen jetzt dieselbe Konstruktion wie der Kopfbereich – <code>&lt;img&gt;</code> plus
+eingefärbter <code>&lt;span&gt;</code>, und das Bild bleibt stehen, wenn eine Engine keine Masken kann.</p>
+
+<p><strong>Nachgemessen</strong> an der mitgelieferten Beispiel-Simulation: <code>&lt;img&gt;</code> ausgeblendet, Maske
+sichtbar, Farbe der Akzent der Site.</p>
+
+<p><strong>Neue Namen:</strong> <code>avd-academy-sim__logo-mask</code>, <code>avd-academy-present__logo-mask</code>.</p>
+
+<p><strong>Die eigentliche Lehre steht in der Doku:</strong> Eigenständig heißt, dass jede Gemeinsamkeit
+zweimal gebaut werden muss – und genau dort entstehen Abweichungen, die niemand sucht. Wer
+an Kopfbereich oder Marke etwas ändert, sieht in beiden Layouts nach.</p>
 
 <hr />
 
