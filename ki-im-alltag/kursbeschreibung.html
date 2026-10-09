@@ -1,76 +1,37 @@
-<!DOCTYPE html>
-<!--
-  ATVANTAGE-Academy – EINZIGES Seitenlayout (Jekyll)
-  --------------------------------------------------
-  Ein Layout für alles: allgemeine Doku-Seiten UND Guides (Übungen/Anleitungen).
-  Optik nach der ATVANTAGE-Website: Meta-Nav, weiße sticky Kopfzeile, Hero-Band,
-  zweispaltig mit rechter Sidebar (automatisches Inhaltsverzeichnis, Fortschritt
-  aus Task-Listen, weiterführende Ressourcen). Überschriften ohne Emoji-Icons.
-
-  Verwendung im Front Matter:  layout: default   (oder `layout: guide` – Alias,
-  siehe guide.html; beides rendert dieselbe Guide-Ansicht)
-
-  `layout: visualization` (siehe visualization.html) rendert dieselbe Seite OHNE
-  obere Navigation (Meta-Leiste + Kopfzeile/TopNav), OHNE Brotkrumen und OHNE den
-  rechten Bereich (Inhaltsverzeichnis, Fortschritt, Ressourcen – auch bei gesetztem
-  `resources`), mit schmalerem Hero-Balken und breiterem, zentriertem Inhalt – für
-  eigenständige Visualisierungen/Simulationen.
-
-  Alle Front-Matter-Felder sind OPTIONAL (Convention over Configuration). Nur der
-  Titel ist faktisch erforderlich – als `title:` ODER als erste `#`-Überschrift:
-
-    title:       "…"                → sonst erste #-Überschrift (eins von beiden nötig)
-    description: "…"                → Meta-Description
-    duration:    8                  → Zahl in Minuten → Hero-Tag „ca. 8 Minuten“
-                                       (ungefähre LESEDAUER; bei Guides/Übungen die
-                                       Dauer der Übung, bei Visualisierungen die
-                                       Bearbeitungszeit – dort unüblich, aber erlaubt).
-    topics:      ["Cloud & DevOps"] → weitere Hero-Tags
-    resources:   [{title, url, icon}, …] → Sidebar-Karte „Weiterführende Informationen“.
-                                       title und/oder icon (Bildpfad); icon erscheint
-                                       rechts und wird kreisrund dargestellt.
-    breadcrumb:                     → Brotkrumen anpassen (beides optional):
-      label: "…"                    → überschreibt den Ordnernamen dieser Ebene;
-                                       in der Ordner-`index.md` gesetzt gilt es für
-                                       ALLE Seiten im Ordner und in Unterordnern.
-      ancestors: [{title, url}, …]  → explizite Vorfahren-Kette OHNE die aktuelle
-                                       Seite (diese wird automatisch angehängt); in
-                                       der `index.md` gesetzt wird sie vererbt.
-
-  „Markdown kopieren“ (Button im Hero) erscheint NUR auf Guides – dort ist das
-  Übernehmen des Quelltexts der Zweck. Bedingungen: Markdown-Seite (`.md`, nicht
-  reines HTML) UND der Schalter `toolbar.copy` (Vorgabe: nur `layout: guide`, siehe
-  `_includes/avd-switch.html`). Doku-Seiten und Visualisierungen haben ihn nicht –
-  bei letzteren, weil ihr Inhalt nicht sinnvoll als Markdown kopierbar ist.
-
-  DIE SEITENWERKZEUGE – QR-Code, Farbschema-Umschalter, Drucken – sind EINE
-  Komponente (`_includes/tools.html`) an zwei Standorten in diesem Rahmen:
-
-    Kopfzeile   `chrome: true`  (page, guide)      QR + Farbschema
-    Hero rechts `hero_tools`    (visualization)    QR + Farbschema + Drucken
-
-  Die Regel dahinter ist die Kopfzeile: Wo es sie gibt, tragen die Werkzeuge sie;
-  wo nicht, tritt der Hero an ihre Stelle. Drucken gibt es nur dort, weil auf einer
-  gewöhnlichen Seite der Browser-Befehl (Strg/Cmd+P) genügt, die rahmenlose
-  Ansicht aber keinen anderen Weg aufs Papier hat.
-
-  Der QR-Code wird erst im Browser erzeugt (theme/academy/atvantage.js), weil die
-  Adresse zur Build-Zeit nicht feststeht; ohne JavaScript erscheint er nicht.
---><html lang="de">
+<!DOCTYPE html><html lang="de" data-avd-academy-effects="page-transitions translucent-header reading-progress">
 <head>
   <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Kursbeschreibung · ATVANTAGE Academy</title><meta property="og:site_name" content="ATVANTAGE Academy">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("avd-academy-theme");
+    if (t === "dark" || t === "light") document.documentElement.setAttribute("data-avd-academy-theme", t);
+  } catch (e) {}
+  addEventListener("unhandledrejection", function (e) {
+    var r = e.reason;
+    if (r && r.name === "InvalidStateError" && /ViewTransition opt-in disabled/.test(r.message || "")) e.preventDefault();
+  });
+})();
+</script><title>Kursbeschreibung · ATVANTAGE Academy</title><meta property="og:site_name" content="ATVANTAGE Academy">
 <meta property="og:title" content="Kursbeschreibung">
 
-<meta property="og:type" content="website"><link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/styles.css?v=1791462494"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=1791462494">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=1791462494">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=1791462494">
-<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=1791462494"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/print.css?v=1791462494">
-<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=1791462494" defer></script>
-<script src="/training-material-kitrainings/theme/jekyll/site.js?v=1791462494" defer></script>
-<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=1791462494">
+<meta property="og:type" content="website"><link rel="preload" href="/training-material-kitrainings/theme/academy/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/fonts.css?v=d37c8ecb"><link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/tokens/colors.css?v=b0afc83e">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/tokens/typography.css?v=1b512d1a">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/tokens/spacing.css?v=ffc57a80">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/tokens/components.css?v=fb3020a8">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/atvantage/tokens/base.css?v=01ad66fa"><link rel="stylesheet" href="/training-material-kitrainings/theme/academy/tokens.css?v=e7c08f24">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/base.css?v=32c1897e">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/components.css?v=60856a0a">
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/site.css?v=63868197"><link rel="stylesheet" media="print" href="/training-material-kitrainings/theme/academy/print.css?v=fa38b084">
+<meta name="generator" content="ATVANTAGE Academy Theme 4.5.3">
+<script type="application/json" id="avd-academy-build-info">{"theme":"4.5.3","schemas":{"config":"1.3.0","frontmatter":"1.1.0","layout":"1.0.0"},"audience":"learner","languages":["de"],"internal":false}</script><script type="application/json" id="avd-academy-page-info">{"pageId":null,"language":"de","url":"/training-material-kitrainings/ki-im-alltag/kursbeschreibung.html","title":"Kursbeschreibung","layout":"page","description":null,"duration":null,"topics":null,"languages":["de"],"clientApi":"full","defaultLanguage":"de","siteIndex":"/training-material-kitrainings/theme/site.json"}</script>
+<script src="/training-material-kitrainings/theme/academy/atvantage.js?v=b1738f9e" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/site.js?v=514cf6b3" defer></script>
+<script src="/training-material-kitrainings/theme/jekyll/search-trail.js?v=c7eb3d26" data-avd-academy-search-trail
+        data-base="/training-material-kitrainings/" data-index="/training-material-kitrainings/theme/search/de.json?v=1791547375" defer></script>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/academy/highlight.css?v=2b412283">
 <script type="module">
   const _hlbase = "/training-material-kitrainings/theme/academy/hljs/";
   const _hlsprachen = ["java", "http", "json", "xml"];
@@ -83,24 +44,8 @@
         .querySelectorAll(_auswahl)
         .forEach((el) => { if (!el.dataset.highlighted) { hljs.highlightElement(el); } });
       _faerben(document);
-
-      /* NACHTRAEGLICH EINGEFUEGTER CODE. Die Hervorhebung laeuft einmal beim Laden.
-         Eine Seite, die ihre Codebloecke per Skript einsetzt - eine Visualisierung,
-         die rohe Nachrichten durchschaltet -, bekam deshalb gar keine Farben und
-         baute sich einen eigenen Hervorheber. Genau die Kopie, die das Theme
-         verhindern soll.
-
-         `AvdHighlight.apply(knoten)` faerbt, was seither dazugekommen ist; `hljs`
-         liegt daneben fuer Faelle, die mehr brauchen. Das Ereignis sagt Seiten, die
-         frueh zeichnen, wann der Haken da ist - die Module laden asynchron. */
       window.AvdHighlight = { hljs, apply: _faerben, languages: _hlsprachen.slice() };
       document.dispatchEvent(new CustomEvent("avd-academy-highlight-ready"));
-
-      /* Statuszeile nach Klasse einfaerben. highlight.js gibt jedem dreistelligen
-         Code dieselbe Klasse `hljs-number` - in einem Mitschnitt ist aber genau das
-         die Stelle, auf die man zuerst sieht: 2xx ist etwas anderes als 4xx.
-         Deshalb hier die einzige eigene Zutat, und bewusst nur diese: Die
-         Statusklassen von HTTP aendern sich nicht, das bleibt stabil. */
       document.querySelectorAll("pre code.language-http .hljs-number").forEach((el) => {
         const code = parseInt(el.textContent, 10);
         if (code >= 100 && code <= 599) {
@@ -110,24 +55,58 @@
     });
 </script>
 <link rel="apple-touch-icon" sizes="180x180" href="/training-material-kitrainings/theme/atvantage/assets/icon-180.png">
-<link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/logo-orange.svg">
+<link rel="icon" href="/training-material-kitrainings/theme/atvantage/assets/icon-32.png">
 <link rel="icon" sizes="16x16" href="/training-material-kitrainings/theme/atvantage/assets/icon-16.png">
 
-  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=1791462494">
-  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=1791462494"></head><body class="avd-academy-guide">
+  <link rel="stylesheet" href="/training-material-kitrainings/theme/academy/guide.css?v=590fafce">
+<style>@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }</style>
+<link rel="stylesheet" href="/training-material-kitrainings/theme/jekyll/page-transitions.css?v=83436606">
+  <link rel="stylesheet" href="/training-material-kitrainings/assets/custom.css?v=4a155a65"></head><body class="avd-academy-guide">
+<div class="avd-academy-reading-progress" aria-hidden="true"></div>
   <a class="avd-academy-skip-link" href="#avd-academy-content">Zum Inhalt springen</a><div class="avd-academy-metanav"><span>ATVANTAGE Academy</span>
   </div>
 
-  <header class="avd-academy-header" data-avd-academy-header><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite"><img class="avd-academy-header__logo" src="/training-material-kitrainings/assets/logo-schulung.svg" alt="ATVANTAGE Academy"><span class="avd-academy-header__logo-mask" role="img" aria-label="ATVANTAGE Academy"
-          style="--avd-academy-logo-src: url('/training-material-kitrainings/assets/logo-schulung.svg'); --avd-academy-logo-ratio: 260 / 24;"></span></a><button class="avd-academy-tool avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
+  <header class="avd-academy-header"
+        data-avd-academy-menu-visible="7" data-avd-academy-menu-speed="1.0" data-avd-academy-header><a class="avd-academy-header__brand" href="/training-material-kitrainings/" aria-label="Startseite"><img class="avd-academy-header__logo" src="/training-material-kitrainings/assets/logo-schulung.svg" alt="ATVANTAGE Academy"><span class="avd-academy-header__logo-mask" role="img" aria-label="ATVANTAGE Academy"
+          style="--avd-academy-logo-src: url('/training-material-kitrainings/assets/logo-schulung.svg'); --avd-academy-logo-ratio: 260 / 24;"></span><img class="avd-academy-header__mark" src="/training-material-kitrainings/theme/atvantage/assets/icon-180.png" alt="">
+  </a><button class="avd-academy-tool avd-academy-header__burger" data-avd-academy-nav-toggle="#avd-academy-main-nav"
           aria-label="Navigation umschalten" aria-expanded="false">☰</button><nav class="avd-academy-header__nav" id="avd-academy-main-nav">
       <a href="/training-material-kitrainings/">Start</a>
       <a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a>
-  </nav><div class="avd-academy-header__tools"><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
+  </nav><div class="avd-academy-header__tools"><div class="avd-academy-search" data-avd-academy-search hidden
+             data-mode="expand" data-shortcut="double_shift"
+             data-index="/training-material-kitrainings/theme/search/de.json?v=1791547375"
+             data-base="/training-material-kitrainings/">
+          <button type="button" class="avd-academy-tool avd-academy-tool--search" data-avd-academy-search-toggle
+                  aria-expanded="false" aria-controls="avd-academy-search-dialog"
+                  title="Suchen (zweimal Shift)" aria-label="Suchen"><svg viewBox="0 0 24 24" width="1em" height="1em"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"
+                  ><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+          <dialog class="avd-academy-search__dialog" id="avd-academy-search-dialog" aria-label="Suchen">
+            <div class="avd-academy-search__bar" role="search"><label class="avd-academy-search__field avd-academy-search__field--scope" hidden>
+                <span class="avd-academy-search__label">Bereich</span>
+                <select class="avd-academy-search__scope">
+                  <option value="">Alle</option>
+                </select>
+              </label>
+              <label class="avd-academy-search__field avd-academy-search__field--query">
+                <span class="avd-academy-search__label">Suchbegriff</span>
+                <input type="search" class="avd-academy-search__input"
+                       placeholder="Diese Site durchsuchen" autocomplete="off" spellcheck="false"
+                       aria-describedby="avd-academy-search-status">
+              </label>
+              <button type="button" class="avd-academy-tool avd-academy-search__close" data-avd-academy-search-close
+                      title="Suche schließen" aria-label="Suche schließen">✕</button>
+            </div>
+            <p class="avd-academy-search__status" id="avd-academy-search-status" data-avd-academy-search-status role="status"></p>
+            <ul class="avd-academy-search__results" data-avd-academy-search-results aria-label="Suchergebnisse"></ul>
+          </dialog>
+        </div>
+        <script src="/training-material-kitrainings/theme/jekyll/search.js?v=4b72be9e" defer></script><button type="button" class="avd-academy-qr" data-avd-academy-qr hidden
                 title="Diese Seite auf Deinem Smartphone öffnen"
-                aria-label="Diese Seite auf Deinem Smartphone öffnen"></button><button type="button" class="avd-academy-tool avd-academy-tool--theme avd-academy-theme-toggle" data-avd-academy-theme-toggle
+                aria-label="Diese Seite auf Deinem Smartphone öffnen"></button><button type="button" class="avd-academy-tool avd-academy-tool--theme" data-avd-academy-theme-toggle
               title="Farbschema umschalten (hell/dunkel)"
-              aria-label="Farbschema umschalten">◐</button></div>
+              aria-label="Dunkles Farbschema">◐</button></div>
 </header>
 <section class="avd-academy-guide-hero"
            aria-labelledby="avd-academy-page-title"><nav class="avd-academy-guide-hero__crumbs" aria-label="Brotkrumen"><a href="/training-material-kitrainings/">Home</a><span>/</span><a href="/training-material-kitrainings/ki-im-alltag/">KI im Alltag</a><span>/</span><span aria-current="page">Kursbeschreibung</span></nav><div class="avd-academy-guide-hero__meta">
